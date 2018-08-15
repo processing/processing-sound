@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<project name="Processing Sound Library" default="build">
+
+	<property file="./build.properties" />
+
+	<path id="classpath">
+		<fileset dir="..">
+			<!-- look for Processing's core.jar in ../processing -->
+			<!-- alternatively, this file can also be placed in -->
+			<!-- the local library folder -->
+			<include name="processing/core/library/core.jar" />
+		</fileset>
+		<fileset dir="library">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<target name="clean" description="Clean the build directories">
+		<delete dir="bin" />
+		<delete file="library/sound.jar" />
+	</target>
+
+	<target name="checkandroid">
+		<available file="library/android.jar" property="hasandroid" />
+	</target>
+
+	<target name="android-deps" unless="hasandroid" description="Download an android.jar">
+		<!-- this part of the Android SDK is required to build JSynAndroidAudioDeviceManager -->
+		<!-- preferrably you should soft-link or copy the android.jar of your locally
+			installed SDK into this project's library/ directory -->
+		<get src="https://github.com/marianadangelo/android-platforms/raw/master/android-26/android.jar" dest="library/" usetimestamp="true" />
+	</target>
+
+	<target name="deps" depends="checkandroid,android-deps" description="Get library dependencies">
+		<mkdir dir="library" />
+		<get src="http://www.softsynth.com/jsyn/developers/archives/jsyn-20171016.jar" dest="library/" usetimestamp="true" />
+		<get src="https://github.com/kevinstadler/JavaMP3/releases/download/v1.0.2/javamp3-1.0.2.jar" dest="library/" usetimestamp="true" />
+	</target>
+
+	<target name="compile" depends="deps" description="Compile sources">
+		<mkdir dir="bin" />
+		<javac source="1.8" target="1.8" srcdir="src" destdir="bin" encoding="UTF-8" includeAntRuntime="false" nowarn="true">
+			<classpath refid="classpath" />
+		</javac>
+	</target>
+
+	<target name="javadoc">
+		<javadoc bottom="Processing Sound" destdir="docs" verbose="false" doctitle="Javadocs: Processing Sound" public="true" windowtitle="Javadocs: Processing Sound" additionalparam="-notimestamp">
+			<fileset dir="src" defaultexcludes="yes">
+				<include name="**/*" />
+			</fileset>
+			<classpath refid="classpath" />
+		</javadoc>
+	</target>
+
+	<target name="build" depends="clean,compile" description="Build Sound library jar">
+		<jar destfile="library/sound.jar">
+			<fileset dir="bin" />
+		</jar>
+	</target>
+
+	<target name="dist" depends="build,javadoc">
+		<zip destfile="../processing-sound.zip">
+			<zipfileset dir="." prefix="sound">
+				<exclude name=".*" />
+				<exclude name="build.xml" />
+				<exclude name="bin/**" />
+				<exclude name="docs/**" />
+				<exclude name="examples/**/application.*/**" />
+				<exclude name="library/android.jar" />
+				<exclude name="library/core.jar" />
+				<exclude name="src/**" />
+			</zipfileset>
+		</zip>
+		<!--copy file="library.properties"
+          toFile="../processing-sound.txt" /-->
+	</target>
+</project>
