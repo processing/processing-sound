@@ -28,7 +28,7 @@ public class Env {
 	**/
 	public void play(SoundObject input, float attackTime, float sustainTime, float sustainLevel, float releaseTime) {
 		SegmentedEnvelope env = new SegmentedEnvelope(new double[] {
-				attackTime, 1.0, // attack
+				attackTime, input.amp, // attack
 				// gradual decay towards sustain level across entire sustain period
 				sustainTime, sustainLevel, // sustain
 				releaseTime, 0.0 });
