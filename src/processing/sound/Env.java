@@ -30,7 +30,7 @@ public class Env {
 		SegmentedEnvelope env = new SegmentedEnvelope(new double[] {
 				attackTime, input.amp, // attack
 				// gradual decay towards sustain level across entire sustain period
-				sustainTime, sustainLevel, // sustain
+				sustainTime, sustainLevel * input.amp, // sustain
 				releaseTime, 0.0 });
 
 		// TODO re-use player from fixed or dynamic pool
