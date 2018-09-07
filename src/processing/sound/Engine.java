@@ -48,8 +48,27 @@ class Engine {
 
 		// create and start the synthesizer, and set this object as the singleton.
 		this.synth = JSyn.createSynthesizer(Engine.getAudioManager());
-		this.inputDevice = Engine.getAudioManager().getDefaultInputDeviceID();
-		this.outputDevice = Engine.getAudioManager().getDefaultOutputDeviceID();
+
+		// select default devices
+		for (int i = 0; i < Engine.getAudioManager().getDeviceCount(); i++) {
+			if (Engine.checkDeviceHasOutputs(i)) {
+				this.outputDevice = i;
+				break;
+			}
+			if (i == Engine.getAudioManager().getDeviceCount()) {
+				Engine.printError("library initalization failed: could not find any audio devices with a stereo output");
+				return;
+			}
+		}
+		for (int i = 0; i < Engine.getAudioManager().getDeviceCount(); i++) {
+			if (Engine.checkDeviceHasInputs(i)) {
+				this.inputDevice = i;
+				break;
+			}
+			if (i == Engine.getAudioManager().getDeviceCount()) {
+				Engine.printWarning("could not find any sound devices with input channels, you won't be able to use the AudioIn class");
+			}
+		}
 
 		this.lineOut = new LineOut(); // stereo lineout by default
 		this.synth.add(lineOut);
@@ -79,7 +98,6 @@ class Engine {
 			this.synth.stop();
 		}
 
-		// TODO do some more user-friendly checks based on getMaxInput/OutputChannels
 		this.synth.start(this.sampleRate,
 				this.inputDevice, Engine.getAudioManager().getMaxInputChannels(this.inputDevice),
 				// TODO limit number of output channels to 2?
@@ -103,14 +121,31 @@ class Engine {
 		Engine.singleton.startSynth();
 	}
 
+	private static boolean checkDeviceHasInputs(int deviceId) {
+		return Engine.getAudioManager().getMaxInputChannels(deviceId) > 0;
+	}
+
+	private static boolean checkDeviceHasOutputs(int deviceId) {
+		// require stereo output
+		return Engine.getAudioManager().getMaxOutputChannels(deviceId) > 1;
+	}
+
 	protected void selectInputDevice(int deviceId) {
-		Engine.singleton.inputDevice = deviceId;
-		Engine.singleton.startSynth();
+		if (Engine.checkDeviceHasInputs(deviceId)) {
+			Engine.singleton.inputDevice = deviceId;
+			Engine.singleton.startSynth();
+		} else {
+			Engine.printError("audio device #" + deviceId + " has no input channels");
+		}
 	}
 
 	protected void selectOutputDevice(int deviceId) {
-		Engine.singleton.outputDevice = deviceId;
-		Engine.singleton.startSynth();
+		if (Engine.checkDeviceHasOutputs(deviceId)) {
+			Engine.singleton.outputDevice = deviceId;
+			Engine.singleton.startSynth();
+		} else {
+			Engine.printError("audio device #" + deviceId + " has no stereo output channel");
+		}
 	}
 
 	protected void setVolume(double volume) {

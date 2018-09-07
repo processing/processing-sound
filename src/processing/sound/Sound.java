@@ -68,7 +68,7 @@ public class Sound {
 			int maxOutputs = audioManager.getMaxOutputChannels(i);
 			boolean isDefaultInput = (i == audioManager.getDefaultInputDeviceID());
 			boolean isDefaultOutput = (i == audioManager.getDefaultOutputDeviceID());
-			System.out.println("deviceId" + i + ": " + deviceName);
+			System.out.println("device id " + i + ": " + deviceName);
 			System.out.println("  max inputs : " + maxInputs + (isDefaultInput ? "   (default)" : ""));
 			System.out.println("  max outputs: " + maxOutputs + (isDefaultOutput ? "   (default)" : ""));
 		}

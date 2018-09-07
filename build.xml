@@ -60,7 +60,7 @@
 	</target>
 
 	<target name="dist" depends="build,javadoc">
-		<zip destfile="../processing-sound.zip">
+		<zip destfile="../sound.zip">
 			<zipfileset dir="." prefix="sound">
 				<exclude name=".*" />
 				<exclude name="build.xml" />
@@ -72,7 +72,6 @@
 				<exclude name="src/**" />
 			</zipfileset>
 		</zip>
-		<!--copy file="library.properties"
-          toFile="../processing-sound.txt" /-->
+		<copy file="library.properties" toFile="../sound.txt" />
 	</target>
 </project>
