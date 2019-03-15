@@ -56,6 +56,8 @@ public class SoundFile extends AudioSample {
 			} catch (IOException e) {
 				// try parsing as mp3
 				try {
+					// stream as to be re-created, since it was modified in SampleLoader.loadFloatSample()
+					fin = parent.createInput(path);
 					Sound mp3 = new Sound(fin);
 					try {
 						ByteArrayOutputStream os = new ByteArrayOutputStream();
