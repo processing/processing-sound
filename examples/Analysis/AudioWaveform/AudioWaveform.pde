@@ -1,6 +1,7 @@
 /**
  * This sketch shows how to use the Waveform class to analyze a stream
- * of sound. Change the number of samples to get a longer/shorter part of the waveform.
+ * of sound. Change the number of samples to extract and draw a longer/shorter
+ * part of the waveform.
  */
 
 import processing.sound.*;
@@ -9,8 +10,8 @@ import processing.sound.*;
 SoundFile sample;
 Waveform waveform;
 
-// Define how many samples of the Waveform you want to use (must be a power of two)
-int samples = 128;
+// Define how many samples of the Waveform you want to be able to read at once
+int samples = 100;
 
 public void setup() {
   size(640, 360);

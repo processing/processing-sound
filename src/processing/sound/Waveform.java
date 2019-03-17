@@ -19,31 +19,21 @@ public class Waveform extends Analyzer {
 
 	private JSynWaveform waveform;
 	
-	public PApplet app;
-	
-	public Waveform(PApplet parent) {
-		this(parent, 512);
-	}
-
 	/**
 	 * @param parent
 	 *            typically use "this"
-	 * @param samples
-	 *            number of waveform samples as an integer (default 512).
-	 *            This parameter needs to be a power of 2 (e.g. 16, 32, 64, 128,
-	 *            ...).
+	 * @param nsamples
+	 *            number of waveform samples that you want to be able to read at once (a positive integer).
 	 * @webref sound
 	 */
-	public Waveform(PApplet parent, int samples) {
+	public Waveform(PApplet parent, int nsamples) {
 		super(parent);
-		app = parent;
-		if (samples < 0 || Integer.bitCount(samples) != 1) {
+		if (nsamples <= 0) {
 			// TODO throw RuntimeException?
-			Engine.printError("number of waveform frames needs to be a power of 2");
+			Engine.printError("number of waveform frames needs to be greater than 0");
 		} else {
-			// FFT buffer size is twice the number of frequency bands
-			this.waveform = new JSynWaveform(samples);
-			this.data = new float[samples];
+			this.waveform = new JSynWaveform(nsamples);
+			this.data = new float[nsamples];
 		}
 	}
 
