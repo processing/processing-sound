@@ -1,5 +1,8 @@
 package processing.sound;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import com.jsyn.JSyn;
 import com.jsyn.Synthesizer;
 import com.jsyn.devices.AudioDeviceFactory;
@@ -45,6 +48,11 @@ class Engine {
 		if (Engine.singleton != null) {
 			return;
 		}
+
+		// suppress JSyn's INFO log messages to stop them from showing
+		// up as redtext in the Processing console
+		Logger logger = Logger.getLogger(com.jsyn.engine.SynthesisEngine.class.getName());
+		logger.setLevel(Level.WARNING);
 
 		// create and start the synthesizer, and set this object as the singleton.
 		this.synth = JSyn.createSynthesizer(Engine.getAudioManager());
