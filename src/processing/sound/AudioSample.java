@@ -22,7 +22,11 @@ public class AudioSample extends SoundObject {
 	protected FloatSample sample;
 	protected VariableRateDataReader player;
 
+	// cued frame index of this sample
 	protected int startFrame = 0;
+	// DataReader's queue status, required for accurate computation of playback
+	// position within the sample
+	protected long startFrameCountOffset = 0;
 
 	public AudioSample(PApplet parent, int frames) {
 		this(parent, frames, false);
@@ -115,6 +119,10 @@ public class AudioSample extends SoundObject {
 		// always stay connected to the JSyn synths, since they make no noise
 		// as long as their dataQueue is empty
 		super.play(); // doesn't actually start playback, just adds the (silent) units
+
+		// this is kinda hack-ish, should maybe replace with its own boolean (and
+		// overwrite public boolean isPlaying() to return that boolean instead)
+		this.isPlaying = false;
 	}
 
 	/**
@@ -161,7 +169,9 @@ public class AudioSample extends SoundObject {
 	 *            frame number to start playback from.
 	 **/
 	public void cueFrame(int frameNumber) {
-		this.setStartFrame(frameNumber);
+		if (this.checkStartFrame(frameNumber)) {
+			this.setStartFrame(frameNumber);
+		}
 	}
 
 	/**
@@ -202,7 +212,8 @@ public class AudioSample extends SoundObject {
 		}
 		int startFrame = Math.round(this.sampleRate() * time);
 		if (startFrame >= this.frames()) {
-			Engine.printError("can't cue past of end of sample (total duration is " + this.duration() + "s)");
+			// TODO implement wrapping over to beginning of file and printing warning instead of error
+			Engine.printError("can't cue past end of sample (total duration is " + this.duration() + "s)");
 			return false;
 		}
 		this.startFrame = startFrame;
@@ -219,6 +230,8 @@ public class AudioSample extends SoundObject {
 	 * @webref sound
 	 **/
 	public void jump(float time) {
+		// FIXME this currently only works for simply *playing* files, if the
+		// current playback was a loop, all of the looping information is lost
 		if (this.setStartTime(time)) {
 			this.stop();
 			this.play(); // if the file wasn't playing when jump() was called, just start playing it
@@ -242,12 +255,33 @@ public class AudioSample extends SoundObject {
 		}
 	}
 
+	private void setStartFrameCountOffset() {
+		this.startFrameCountOffset = this.player.dataQueue.getFrameCount();
+	}
+
+	// FIXME cueing subsections of a file for looping is not supported at the
+	// moment because looping information would need to be stored to correctly
+	// compute the current position
+	private void loopInternal(int startFrame, int numFrames, int numLoops) {
+		// always use current sample player
+		this.stop();
+		this.setStartFrameCountOffset();
+		this.startFrame = startFrame;
+		if (numLoops > 1) {
+			this.player.dataQueue.queueLoop(this.sample, startFrame, numFrames, numLoops);
+		} else {
+			this.player.dataQueue.queueLoop(this.sample, startFrame, numFrames);
+		}
+		this.isPlaying = true;
+	}
+
+	private void loopInternal(int startFrame, int numFrames) {
+		this.loopInternal(startFrame, numFrames, 0);
+	}
+
+
 	public void loop() {
-		AudioSample source = this.getUnusedPlayer();
-		source.player.dataQueue.queueLoop(source.sample, 0, source.frames() - source.startFrame);
-		// for improved handling by the user, could return a reference to whichever
-		// sound file is the source of the newly triggered playback
-		// return source;
+		this.loopInternal(0, this.frames());
 	}
 
 	public void loop(float rate) {
@@ -267,7 +301,7 @@ public class AudioSample extends SoundObject {
 	}
 
 	/**
-	 * Starts playback which will loop at the end of the sample.
+	 * Starts playback which loops from the beginning to the end of the sample.
 	 * 
 	 * @param rate
 	 *            relative playback rate to use. 1 is the original speed. 0.5 is
@@ -288,6 +322,23 @@ public class AudioSample extends SoundObject {
 		this.loop(rate, pos, amp);
 	}
 
+//	public void loopFrames(int startFrame, int numFrames) {
+		// TODO check startFrame, numFrames
+//		this.loopInternal(startFrame, numFrames, 0);
+//	}
+
+//	public void loopFrames(int startFrame, int numFrames, int loops) {
+		// TODO check startFrame, numFrames, loop > 1
+//		this.loopInternal(startFrame, numFrames, loops);
+//	}
+
+	// TODO add same functions but specifying loop section in seconds
+//	public void loopSection(float start, float duration) {
+//	}
+//	public void loopSection(float start, float duration, int loops) {
+//	}
+
+
 	/*
 	 * FIXME cueing a position for loops has to be handled differently than for
 	 * simple playback, because passing a startFrame to dataQueue.queueLoop() causes
@@ -299,9 +350,19 @@ public class AudioSample extends SoundObject {
 	 * cue) { this.cue(cue); this.loop(rate, pos, amp, add); }
 	 */
 
+	private void playInternal() {
+		this.playInternal(this.startFrame, this.frames() - this.startFrame);
+	}
+
+	private void playInternal(int startFrame, int numFrames) {
+		this.setStartFrameCountOffset();
+		this.player.dataQueue.queue(this.sample, startFrame, numFrames);
+		this.isPlaying = true;
+	}
+
 	public void play() {
 		AudioSample source = this.getUnusedPlayer();
-		source.player.dataQueue.queue(source.sample, source.startFrame, source.frames() - source.startFrame);
+		source.playInternal();
 		// for improved handling by the user, could return a reference to
 		// whichever audiosample object is the actual source (i.e. JSyn
 		// container) of the newly triggered playback
@@ -442,6 +503,7 @@ public class AudioSample extends SoundObject {
 	 **/
 	public void stop() {
 		this.player.dataQueue.clear();
+		this.isPlaying = false;
 	}
 
 	// new methods go here
@@ -453,11 +515,18 @@ public class AudioSample extends SoundObject {
 	 * @webref sound
 	 */
 	public float position() {
-		// TODO progress in sample seconds or current-rate-playback seconds??
-		// TODO might have to offset getFrameCount by this.startFrame?
-		return (this.player.dataQueue.getFrameCount() % this.frames()) / (float) this.sampleRate();
+		return this.positionFrame() / (float) this.sampleRate();
 	}
 
+	/**
+	 * Get frame index of current sound file playback position.
+	 * 
+	 * @return The current frame index position of the sound file playback
+	 * @webref sound
+	 */
+	public int positionFrame() {
+		return (int) (this.startFrame + this.player.dataQueue.getFrameCount() - this.startFrameCountOffset) % this.frames();
+	}
 	/**
 	 * Get current sound file playback position in percent.
 	 * 
@@ -466,19 +535,7 @@ public class AudioSample extends SoundObject {
 	 * @webref sound
 	 */
 	public float percent() {
-		// TODO might have to offset getFrameCount by this.startFrame?
-		return 100f * (this.player.dataQueue.getFrameCount() % this.frames()) / (float) this.frames();
-	}
-
-	/**
-	 * Check whether this audiosample is currently playing.
-	 * 
-	 * @return `true` if the audiosample is currently playing, `false` if it is not.
-	 * @webref sound
-	 */
-	public boolean isPlaying() {
-		// overrides the SoundObject's default implementation
-		return this.player.dataQueue.hasMore();
+		return 100f * this.positionFrame() / (float) this.frames();
 	}
 
 	/**
@@ -489,10 +546,11 @@ public class AudioSample extends SoundObject {
 	 */
 	public void pause() {
 		if (this.isPlaying()) {
-			this.startFrame = (int) this.player.dataQueue.getFrameCount() % this.frames();
 			this.stop();
+			this.startFrame = this.positionFrame();
+			this.setStartFrameCountOffset();
 		} else {
-			Engine.printWarning("audio sample is not currently playing");
+			Engine.printWarning("audio sample is already paused");
 		}
 	}
 
@@ -522,16 +580,19 @@ public class AudioSample extends SoundObject {
 	 *            the target array that the read data is written to
 	 */
 	public void read(float[] data) {
-		if (data.length != this.frames()) {
+		if (this.channels() == 2 && data.length != 2 * this.frames()) {
 			Engine.printWarning(
-					"the length of the given array does not match the number of frames of this audio sample");
+					"the length of the array passed to read(float[]) does not match the size of the data of this stereo audio sample (note that stereo samples contain two values per frame!)");
+		} else if (this.channels() == 1 && data.length != this.frames()) {
+			Engine.printWarning(
+					"the length of the array passed to read(float[]) does not match the number of frames of this audio sample");
 		}
 		// TODO catch exception and print understandable error message
 		this.sample.read(data);
 	}
 
 	/**
-	 * Read some frames of this audio sample into an array.
+	 * Read some frames of this audio sample into an array. Stereo samples contain two data points per frame.
 	 *
 	 * @param startFrame
 	 *            the index of the first frame of the audiosample that should be
@@ -541,11 +602,12 @@ public class AudioSample extends SoundObject {
 	 *            written to (typically 0)
 	 * @param numFrames
 	 *            the number of frames that should be read (can't be greater than
-	 *            data.length - startIndex)
+	 *            audiosample.channels() * data.length - startIndex)
 	 * @webref sound
 	 */
 	public void read(int startFrame, float[] data, int startIndex, int numFrames) {
 		if (this.checkStartFrame(startFrame)) {
+			// TODO check and print informative warning about stereo case
 			if (startFrame + numFrames < this.frames()) {
 				this.sample.read(startFrame, data, startIndex, numFrames);
 			} else {
@@ -564,6 +626,10 @@ public class AudioSample extends SoundObject {
 	 * @return the value of the audio sample at the given frame
 	 */
 	public float read(int index) {
+		if (this.channels() == 2) {
+			Engine.printWarning(
+					"read(int) only returns data for the left channel of a stereo file, please use one of the other read() methods to access data for all channels");
+		}
 		// TODO catch exception and print understandable error message
 		return (float) this.sample.readDouble(index);
 	}
@@ -576,15 +642,18 @@ public class AudioSample extends SoundObject {
 	 *            the array from which the sample data should be taken
 	 */
 	public void write(float[] data) {
-		if (data.length != this.frames()) {
+		if (this.channels() == 2 && data.length != 2 * this.frames()) {
 			Engine.printWarning(
-					"the length of the given array does not match the number of frames of this audio sample");
+					"the length of the array passed to write(float[]) does not match the size of the data of this stereo audio sample (note that stereo samples contain two values per frame!)");
+		} else if (this.channels() == 1 && data.length != this.frames()) {
+			Engine.printWarning(
+					"the length of the array passed to write(float[]) does not match the number of frames of this audio sample");
 		}
 		this.sample.write(data);
 	}
 
 	/**
-	 * Write some frames of this audio sample.
+	 * Write some frames of this audio sample. Stereo samples require two data points per frame.
 	 *
 	 * @param startFrame
 	 *            the index of the first frame of the audiosample that should be
@@ -594,10 +663,11 @@ public class AudioSample extends SoundObject {
 	 *            taken from (typically 0)
 	 * @param numFrames
 	 *            the number of frames that should be written (can't be greater than
-	 *            data.length - startIndex)
+	 *            audiosample.channels() * data.length - startIndex)
 	 * @webref sound
 	 */
 	public void write(int startFrame, float[] data, int startIndex, int numFrames) {
+		// FIXME check stereo case
 		if (this.checkStartFrame(startFrame)) {
 			if (startFrame + numFrames < this.frames()) {
 				this.sample.write(startFrame, data, startIndex, numFrames);
@@ -619,6 +689,10 @@ public class AudioSample extends SoundObject {
 	 *            the float value that the given audio frame should be set to
 	 */
 	public void write(int index, float value) {
+		if (this.channels() == 2) {
+			Engine.printWarning(
+					"write(int, float) only writes data to the left channel of a stereo file, please use one of the other write() methods to write data to all channels");
+		}
 		if (this.checkStartFrame(startFrame)) {
 			this.sample.writeDouble(index, value);
 		}

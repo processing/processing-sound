@@ -22,7 +22,7 @@ public abstract class SoundObject {
 	protected UnitInputPort amplitude;
 
 	protected float amp = 1.0f;
-	private boolean isPlaying = false;
+	protected boolean isPlaying = false;
 
 	protected SoundObject(PApplet parent) {
 		Engine.getEngine(parent);
