@@ -169,9 +169,7 @@ public class AudioSample extends SoundObject {
 	 *            frame number to start playback from.
 	 **/
 	public void cueFrame(int frameNumber) {
-		if (this.checkStartFrame(frameNumber)) {
-			this.setStartFrame(frameNumber);
-		}
+		this.setStartFrame(frameNumber);
 	}
 
 	/**
@@ -199,9 +197,12 @@ public class AudioSample extends SoundObject {
 		this.resize(frames, false);
 	}
 
-	private void setStartFrame(int frameNumber) {
+	private boolean setStartFrame(int frameNumber) {
 		if (this.checkStartFrame(frameNumber)) {
 			this.startFrame = frameNumber;
+			return true;
+		} else {
+			return false;
 		}
 	}
 
@@ -221,7 +222,7 @@ public class AudioSample extends SoundObject {
 	}
 
 	/**
-	 * Jump to a specific position in the audiosample while continuing to play.
+	 * Jump to a specific position in the audiosample without interrupting playback.
 	 * 
 	 * @param time
 	 *            position to jump to, in seconds.
@@ -235,6 +236,23 @@ public class AudioSample extends SoundObject {
 		if (this.setStartTime(time)) {
 			this.stop();
 			this.play(); // if the file wasn't playing when jump() was called, just start playing it
+		}
+	}
+
+	/**
+	 * Jump to a specific position in the audiosample without interrupting playback.
+	 * 
+	 * @param time
+	 *            frame number to jump to.
+	 * @see cue
+	 * @see play
+	 * @webref sound
+	 **/
+	public void jumpFrame(int frameNumber) {
+		if (this.setStartFrame(frameNumber)) {
+			this.stop();
+			// if the file wasn't already playing when jumpFrame() was called, just start playing it
+			this.play();
 		}
 	}
 
