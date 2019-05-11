@@ -158,7 +158,10 @@ public class AudioSample extends SoundObject {
 	 * @webref sound
 	 **/
 	public void cue(float time) {
-		this.setStartTime(time);
+		if (this.setStartTime(time)) {
+			this.stop();
+			this.setStartFrameCountOffset();
+		}
 	}
 
 	/**
@@ -169,7 +172,10 @@ public class AudioSample extends SoundObject {
 	 *            frame number to start playback from.
 	 **/
 	public void cueFrame(int frameNumber) {
-		this.setStartFrame(frameNumber);
+		if (this.setStartFrame(frameNumber)) {
+			this.stop();
+			this.setStartFrameCountOffset();
+		}
 	}
 
 	/**
