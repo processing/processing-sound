@@ -591,8 +591,9 @@ public class AudioSample extends SoundObject {
 	/**
 	 * Get the current sample data and write it into the given array.
 	 *
-	 * Get the current sample data and write it into the given array. The array has
-	 * to be able to store as many floats as there are frames in this sample.
+	 * Get the current sample data and write it into the given array. The array
+	 * has to be able to store as many floats as there are frames in this sample,
+	 * or twice the number of frames for a stereo sample.
 	 *
 	 * @param data
 	 *            the target array that the read data is written to
@@ -610,7 +611,8 @@ public class AudioSample extends SoundObject {
 	}
 
 	/**
-	 * Read some frames of this audio sample into an array. Stereo samples contain two data points per frame.
+	 * Read some frames of this audio sample into an array. Stereo samples
+	 * contain two data points per frame.
 	 *
 	 * @param startFrame
 	 *            the index of the first frame of the audiosample that should be
@@ -653,11 +655,13 @@ public class AudioSample extends SoundObject {
 	}
 
 	/**
-	 * Overwrite the sample with the data from the given array. The array can
-	 * contain up to as many floats as there are frames in this sample.
+	 * Overwrite the sample with the data from the given array. The array should
+	 * contain as many floats as there are frames in this sample, or twice as
+	 * many as the number of frames for a stereo sample.
 	 * 
 	 * @param data
-	 *            the array from which the sample data should be taken
+	 *            the array from which the sample data, up to
+	 *            sample.frames() * sample.channels() floats, should be copied
 	 */
 	public void write(float[] data) {
 		if (this.channels() == 2 && data.length != 2 * this.frames()) {
@@ -671,7 +675,8 @@ public class AudioSample extends SoundObject {
 	}
 
 	/**
-	 * Write some frames of this audio sample. Stereo samples require two data points per frame.
+	 * Write some frames of this audio sample. Stereo samples require two data
+	 *.points per frame.
 	 *
 	 * @param startFrame
 	 *            the index of the first frame of the audiosample that should be
