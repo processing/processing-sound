@@ -535,7 +535,12 @@ public class AudioSample extends SoundObject {
 	/**
 	 * Get current sound file playback position in seconds.
 	 * 
-	 * @return The current position of the sound file playback in seconds
+	 * Note that, if this audio sample was at some point played back in parallel
+	 * (triggered by another call to play() before the original playback had finished),
+	 * the position returned by this function can be of any of the concurrent playbacks,
+	 * not necessarily the last one that was triggered.
+	 * 
+	 * @return The current position of the audio sample playback in seconds
 	 * @webref sound
 	 */
 	public float position() {
@@ -545,7 +550,12 @@ public class AudioSample extends SoundObject {
 	/**
 	 * Get frame index of current sound file playback position.
 	 * 
-	 * @return The current frame index position of the sound file playback
+	 * Note that, if this audio sample was at some point played back in parallel
+	 * (triggered by another call to play() before the original playback had finished),
+	 * the position returned by this function can be of any of the concurrent playbacks,
+	 * not necessarily the last one that was triggered.
+	 * 
+	 * @return The current frame index position of the audio sample playback
 	 * @webref sound
 	 */
 	public int positionFrame() {
@@ -554,7 +564,12 @@ public class AudioSample extends SoundObject {
 	/**
 	 * Get current sound file playback position in percent.
 	 * 
-	 * @return The current position of the sound file playback in percent (a value
+	 * Note that, if this audio sample was at some point played back in parallel
+	 * (triggered by another call to play() before the original playback had finished),
+	 * the position returned by this function can be of any of the concurrent playbacks,
+	 * not necessarily the last one that was triggered.
+	 * 
+	 * @return The current position of the audio sample playback in percent (a value
 	 *         between 0 and 100).
 	 * @webref sound
 	 */

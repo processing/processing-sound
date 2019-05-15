@@ -1007,10 +1007,15 @@ extends <a href="../../processing/sound/SoundObject.html" title="class in proces
 <li class="blockList">
 <h4>position</h4>
 <pre>public&nbsp;float&nbsp;position&#8203;()</pre>
-<div class="block">Get current sound file playback position in seconds.</div>
+<div class="block">Get current sound file playback position in seconds.
+ 
+ Note that, if this audio sample was at some point played back in parallel
+ (triggered by another call to play() before the original playback had finished),
+ the position returned by this function can be of any of the concurrent playbacks,
+ not necessarily the last one that was triggered.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The current position of the sound file playback in seconds</dd>
+<dd>The current position of the audio sample playback in seconds</dd>
 </dl>
 </li>
 </ul>
@@ -1021,10 +1026,15 @@ extends <a href="../../processing/sound/SoundObject.html" title="class in proces
 <li class="blockList">
 <h4>positionFrame</h4>
 <pre>public&nbsp;int&nbsp;positionFrame&#8203;()</pre>
-<div class="block">Get frame index of current sound file playback position.</div>
+<div class="block">Get frame index of current sound file playback position.
+ 
+ Note that, if this audio sample was at some point played back in parallel
+ (triggered by another call to play() before the original playback had finished),
+ the position returned by this function can be of any of the concurrent playbacks,
+ not necessarily the last one that was triggered.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The current frame index position of the sound file playback</dd>
+<dd>The current frame index position of the audio sample playback</dd>
 </dl>
 </li>
 </ul>
@@ -1035,10 +1045,15 @@ extends <a href="../../processing/sound/SoundObject.html" title="class in proces
 <li class="blockList">
 <h4>percent</h4>
 <pre>public&nbsp;float&nbsp;percent&#8203;()</pre>
-<div class="block">Get current sound file playback position in percent.</div>
+<div class="block">Get current sound file playback position in percent.
+ 
+ Note that, if this audio sample was at some point played back in parallel
+ (triggered by another call to play() before the original playback had finished),
+ the position returned by this function can be of any of the concurrent playbacks,
+ not necessarily the last one that was triggered.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The current position of the sound file playback in percent (a value
+<dd>The current position of the audio sample playback in percent (a value
          between 0 and 100).</dd>
 </dl>
 </li>
