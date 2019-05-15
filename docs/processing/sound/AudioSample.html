@@ -26,7 +26,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":10,"i22":10,"i23":10,"i24":10,"i25":10,"i26":10,"i27":10,"i28":10,"i29":10,"i30":10,"i31":10,"i32":10,"i33":10,"i34":10,"i35":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":10,"i22":10,"i23":10,"i24":10,"i25":10,"i26":10,"i27":10,"i28":10,"i29":10,"i30":10,"i31":10,"i32":10,"i33":10,"i34":10,"i35":10,"i36":10,"i37":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -384,39 +384,53 @@ extends <a href="../../processing/sound/SoundObject.html" title="class in proces
 </td>
 </tr>
 <tr id="i22" class="altColor">
+<td class="colFirst"><code>void</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../processing/sound/AudioSample.html#playFor-float-">playFor</a></span>&#8203;(float&nbsp;duration)</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr id="i23" class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../processing/sound/AudioSample.html#playFor-float-float-">playFor</a></span>&#8203;(float&nbsp;duration,
+       float&nbsp;cue)</code></th>
+<td class="colLast">
+<div class="block">Starts the playback of the audiosample for the specified duration or to the
+ end of the audiosample, whichever comes first.</div>
+</td>
+</tr>
+<tr id="i24" class="altColor">
 <td class="colFirst"><code>float</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../processing/sound/AudioSample.html#position--">position</a></span>&#8203;()</code></th>
 <td class="colLast">
 <div class="block">Get current sound file playback position in seconds.</div>
 </td>
 </tr>
-<tr id="i23" class="rowColor">
+<tr id="i25" class="rowColor">
 <td class="colFirst"><code>int</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../processing/sound/AudioSample.html#positionFrame--">positionFrame</a></span>&#8203;()</code></th>
 <td class="colLast">
 <div class="block">Get frame index of current sound file playback position.</div>
 </td>
 </tr>
-<tr id="i24" class="altColor">
+<tr id="i26" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../processing/sound/AudioSample.html#rate-float-">rate</a></span>&#8203;(float&nbsp;rate)</code></th>
 <td class="colLast">
 <div class="block">Set the playback rate of the audiosample.</div>
 </td>
 </tr>
-<tr id="i25" class="rowColor">
+<tr id="i27" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../processing/sound/AudioSample.html#read-float:A-">read</a></span>&#8203;(float[]&nbsp;data)</code></th>
 <td class="colLast">
 <div class="block">Get the current sample data and write it into the given array.</div>
 </td>
 </tr>
-<tr id="i26" class="altColor">
+<tr id="i28" class="altColor">
 <td class="colFirst"><code>float</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../processing/sound/AudioSample.html#read-int-">read</a></span>&#8203;(int&nbsp;index)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i27" class="rowColor">
+<tr id="i29" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../processing/sound/AudioSample.html#read-int-float:A-int-int-">read</a></span>&#8203;(int&nbsp;startFrame,
     float[]&nbsp;data,
@@ -426,12 +440,12 @@ extends <a href="../../processing/sound/SoundObject.html" title="class in proces
 <div class="block">Read some frames of this audio sample into an array.</div>
 </td>
 </tr>
-<tr id="i28" class="altColor">
+<tr id="i30" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../processing/sound/AudioSample.html#resize-int-">resize</a></span>&#8203;(int&nbsp;frames)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i29" class="rowColor">
+<tr id="i31" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../processing/sound/AudioSample.html#resize-int-boolean-">resize</a></span>&#8203;(int&nbsp;frames,
       boolean&nbsp;stereo)</code></th>
@@ -440,14 +454,14 @@ extends <a href="../../processing/sound/SoundObject.html" title="class in proces
  frames.</div>
 </td>
 </tr>
-<tr id="i30" class="altColor">
+<tr id="i32" class="altColor">
 <td class="colFirst"><code>int</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../processing/sound/AudioSample.html#sampleRate--">sampleRate</a></span>&#8203;()</code></th>
 <td class="colLast">
 <div class="block">Returns the underlying sample rate of the audiosample.</div>
 </td>
 </tr>
-<tr id="i31" class="rowColor">
+<tr id="i33" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../processing/sound/AudioSample.html#set-float-float-float-float-">set</a></span>&#8203;(float&nbsp;rate,
    float&nbsp;pos,
@@ -457,27 +471,27 @@ extends <a href="../../processing/sound/SoundObject.html" title="class in proces
 <div class="block">Set multiple parameters at once</div>
 </td>
 </tr>
-<tr id="i32" class="altColor">
+<tr id="i34" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../processing/sound/AudioSample.html#stop--">stop</a></span>&#8203;()</code></th>
 <td class="colLast">
 <div class="block">Stops the playback.</div>
 </td>
 </tr>
-<tr id="i33" class="rowColor">
+<tr id="i35" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../processing/sound/AudioSample.html#write-float:A-">write</a></span>&#8203;(float[]&nbsp;data)</code></th>
 <td class="colLast">
 <div class="block">Overwrite the sample with the data from the given array.</div>
 </td>
 </tr>
-<tr id="i34" class="altColor">
+<tr id="i36" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../processing/sound/AudioSample.html#write-int-float-">write</a></span>&#8203;(int&nbsp;index,
      float&nbsp;value)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i35" class="rowColor">
+<tr id="i37" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../processing/sound/AudioSample.html#write-int-float:A-int-int-">write</a></span>&#8203;(int&nbsp;startFrame,
      float[]&nbsp;data,
@@ -894,6 +908,35 @@ extends <a href="../../processing/sound/SoundObject.html" title="class in proces
 <dd><code>cue</code> - position in the audiosample that playback should start from, in
             seconds.</dd>
 <dd><code>add</code> - offset the output of the generator by the given value</dd>
+</dl>
+</li>
+</ul>
+<a name="playFor-float-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>playFor</h4>
+<pre>public&nbsp;void&nbsp;playFor&#8203;(float&nbsp;duration)</pre>
+</li>
+</ul>
+<a name="playFor-float-float-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>playFor</h4>
+<pre>public&nbsp;void&nbsp;playFor&#8203;(float&nbsp;duration,
+                    float&nbsp;cue)</pre>
+<div class="block">Starts the playback of the audiosample for the specified duration or to the
+ end of the audiosample, whichever comes first.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>duration</code> - duration that this audiosample should be played back for, in seconds.
+            If the start position plus duration exceeds the total duration of the
+            sample, playback will stop at the end of the sample.</dd>
+<dd><code>cue</code> - position in the audiosample that playback should start from, in
+            seconds.</dd>
 </dl>
 </li>
 </ul>

@@ -439,6 +439,34 @@ public class AudioSample extends SoundObject {
 		this.play(rate, pos, amp, add);
 	}
 
+	public void playFor(float duration) {
+		AudioSample source = this.getUnusedPlayer();
+		source.playInternal(this.startFrame, Math.min((int) Math.round(duration * this.sampleRate()), this.frames() - this.startFrame));
+		// FIXME at the end of playback the startFrame is still the initially cued one,
+		// even though position() reports that the file is at the end of the playback bit.
+		// should we add an event listener that cues the file to the end of the playback
+		// when it finished (for what that might look like see pause()), or otherwise
+		// reset the position()?
+	}
+
+	/**
+	 * Starts the playback of the audiosample for the specified duration or to the
+	 * end of the audiosample, whichever comes first.
+	 * 
+	 * @param duration
+	 *            duration that this audiosample should be played back for, in seconds.
+	 *            If the start position plus duration exceeds the total duration of the
+	 *            sample, playback will stop at the end of the sample.
+	 * @param cue
+	 *            position in the audiosample that playback should start from, in
+	 *            seconds.
+	 * @webref sound
+	 **/
+	public void playFor(float duration, float cue) {
+		this.cue(cue);
+		this.playFor(duration);
+	}
+
 	/**
 	 * Set the playback rate of the audiosample.
 	 * 

@@ -53,6 +53,12 @@ public class SoundFile extends AudioSample {
 			try {
 				// load WAV or AIF using JSyn
 				this.sample = SampleLoader.loadFloatSample(fin);
+
+				// switching to JavaSound decoders is supposed to support 8bit
+				// unsigned WAV files as well, but doesn't actually seem to be
+				// the case
+				//SampleLoader.setJavaSoundPreferred(true);
+
 			} catch (IOException e) {
 				// try parsing as mp3
 				try {
