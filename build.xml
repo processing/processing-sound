@@ -34,7 +34,7 @@
 	<target name="deps" depends="checkandroid,android-deps" description="Get library dependencies">
 		<mkdir dir="library" />
 		<get src="http://www.softsynth.com/jsyn/developers/archives/jsyn-20171016.jar" dest="library/" usetimestamp="true" />
-		<get src="https://github.com/kevinstadler/JavaMP3/releases/download/v1.0.3/javamp3-1.0.3.jar" dest="library/" usetimestamp="true" />
+		<get src="https://github.com/kevinstadler/JavaMP3/releases/download/v1.0.4/javamp3-1.0.4.jar" dest="library/" usetimestamp="true" />
 	</target>
 
 	<target name="compile" depends="deps" description="Compile sources">
