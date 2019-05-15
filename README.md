@@ -4,7 +4,9 @@ The new Sound library for Processing 3 provides a simple way to work with audio.
 
 ### How to use
 
-The easiest way to install the Sound library is through Processing's Contribution Manager. The library comes with many example sketches, the full online reference can be found [here](https://www.processing.org/reference/libraries/sound/). Please report bugs [on the Github issues page](https://github.com/processing/processing-sound/issues).
+The easiest way to install the Sound library is through Processing's Contribution Manager. The library comes with many example sketches, the full online reference can be found [here](https://www.processing.org/reference/libraries/sound/).
+
+Please report bugs [on the Github issues page](https://github.com/processing/processing-sound/issues). Advanced users can also have a look at the library's full JavaDoc documentation [here](https://processing.github.io/processing-sound/index.html?processing/sound/package-summary.html).
 
 For detailed changelogs and to download older releases, have a look at the [Github releases page](https://github.com/processing/processing-sound/releases).
 
