@@ -75,6 +75,10 @@ public class SoundFile extends AudioSample {
 						this.sample = new FloatSample(data, mp3.isStereo() ? 2 : 1);
 					} catch (IOException ee) {
 						throw ee;
+					} catch (NullPointerException ee) {
+						throw new IOException();
+					} catch (ArrayIndexOutOfBoundsException ee) {
+						throw new IOException();
 					} finally {
 						mp3.close();
 					}
