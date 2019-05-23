@@ -9,6 +9,8 @@ import com.jsyn.devices.AudioDeviceOutputStream;
 import android.media.AudioAttributes;
 import android.media.AudioFormat;
 import android.media.AudioTrack;
+import android.media.AudioRecord;
+import android.media.MediaRecorder;
 
 class JSynAndroidAudioDeviceManager implements AudioDeviceManager {
 
@@ -23,7 +25,7 @@ class JSynAndroidAudioDeviceManager implements AudioDeviceManager {
 		DeviceInfo deviceInfo = new DeviceInfo();
 
 		deviceInfo.name = "Android Audio";
-		deviceInfo.maxInputs = 0;
+		deviceInfo.maxInputs = 1;
 		deviceInfo.maxOutputs = 2;
 		this.deviceRecords.add(deviceInfo);
 	}
@@ -46,7 +48,6 @@ class JSynAndroidAudioDeviceManager implements AudioDeviceManager {
 		short[] shortBuffer;
 		int frameRate;
 		int samplesPerFrame;
-		AudioTrack audioTrack;
 		int minBufferSize;
 		int bufferSize;
 
@@ -63,6 +64,8 @@ class JSynAndroidAudioDeviceManager implements AudioDeviceManager {
 	}
 
 	private class AndroidAudioOutputStream extends AndroidAudioStream implements AudioDeviceOutputStream {
+		AudioTrack audioTrack;
+
 		public AndroidAudioOutputStream(int deviceID, int frameRate, int samplesPerFrame) {
 			super(deviceID, frameRate, samplesPerFrame);
 		}
@@ -126,12 +129,26 @@ class JSynAndroidAudioDeviceManager implements AudioDeviceManager {
 	}
 
 	private class AndroidAudioInputStream extends AndroidAudioStream implements AudioDeviceInputStream {
+		AudioRecord audioRecord;
 
 		public AndroidAudioInputStream(int deviceID, int frameRate, int samplesPerFrame) {
 			super(deviceID, frameRate, samplesPerFrame);
 		}
 
 		public void start() {
+			this.minBufferSize = AudioRecord.getMinBufferSize(this.frameRate, AudioFormat.CHANNEL_OUT_STEREO,
+					AudioFormat.ENCODING_PCM_16BIT);
+			this.bufferSize = (3 * (this.minBufferSize / 2)) & ~3;
+			this.audioRecord = new AudioRecord.Builder()
+					.setAudioSource(MediaRecorder.AudioSource.MIC)
+					.setAudioFormat(new AudioFormat.Builder()
+							.setChannelMask(AudioFormat.CHANNEL_IN_MONO)
+							.setEncoding(AudioFormat.ENCODING_PCM_16BIT)
+							.setSampleRate(this.frameRate)
+							.build())
+					.setBufferSizeInBytes(this.bufferSize)
+					.build();
+			this.audioRecord.startRecording();
 		}
 
 		public double read() {
@@ -145,14 +162,39 @@ class JSynAndroidAudioDeviceManager implements AudioDeviceManager {
 		}
 
 		public int read(double[] buffer, int start, int count) {
-			return 0;
+			if ((this.shortBuffer == null) || (this.shortBuffer.length < count)) {
+				this.shortBuffer = new short[count];
+			}
+
+			int read = this.audioRecord.read(this.shortBuffer, 0, count, AudioRecord.READ_NON_BLOCKING);
+
+			if (read < 0) {
+				switch (read) {
+				case AudioRecord.ERROR_INVALID_OPERATION:
+					throw new RuntimeException("AudioRecord ERROR_INVALID_OPERATION: Device not properly initialized");
+				case AudioRecord.ERROR_BAD_VALUE:
+					throw new RuntimeException("AudioRecord ERROR_BAD_VALUE: Paramters don't resolve to valid data and indices");
+				case AudioRecord.ERROR_DEAD_OBJECT:
+					throw new RuntimeException("AudioRecord ERROR_DEAD_OBJECT: Object must be recreated");
+				case AudioRecord.ERROR:
+					throw new RuntimeException("AudioRecord ERROR: Unknown error");
+				}
+			}
+
+			for (int i = 0; i < read; i++) {
+				buffer[i + start] = shortBuffer[i] / 32767.0;
+			}
+
+			return read;
 		}
 
 		public void stop() {
+			this.audioRecord.stop();
+			this.audioRecord.release();
 		}
 
 		public int available() {
-			return 0;
+			return this.bufferSize;
 		}
 
 		public void close() {
