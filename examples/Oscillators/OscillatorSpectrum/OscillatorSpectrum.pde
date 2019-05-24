@@ -40,7 +40,7 @@ void setup() {
 
 void draw() {
   // Only play one of the four oscillators, based on mouseY
-  int nextOscillator = floor(map(mouseY, 0, height, 0, oscs.length));
+  int nextOscillator = constrain(floor(map(mouseY, 0, height, 0, oscs.length)), 0, oscs.length - 1);
 
   if (nextOscillator != current) {
     oscs[current].stop();
