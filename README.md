@@ -20,7 +20,7 @@ For detailed changelogs and to download older releases, have a look at the [Gith
 ### How to build
 
 1. `git clone git@github.com:processing/processing-sound.git`
-2. into the `library/` folder copy (or soft-link) your Processsing's `core.jar` (and, optionally, also your Android SDK's `android.jar`, API level 26 or higher). Other dependencies (in particular Phil Burk's [JSyn](http://www.softsynth.com/jsyn/) engine on which this library is based) are downloaded automatically.
+2. (optional: copy (or soft-link) `processing-core.zip` from your local [Processing for Android mode](https://github.com/processing/processing-android/releases/tag/latest) as well as your Android SDK's `android.jar`, API level 26 or higher, into the `library/` folder. If you don't do this, these will be downloaded from GitHub instead. Note that as of version 2.2 the sound library is compiled against android mode rather than the normal Processing `core.jar` in order to more smoothly support `AudioIn` on Android. Other dependencies, in particular Phil Burk's [JSyn](http://www.softsynth.com/jsyn/) engine on which this library is based, are also all downloaded automatically by ant.)
 3. `ant dist` (or, alternatively, run build.xml from within Eclipse)
 
 The resulting `sound.zip` can be extracted into your Processing installation's `libraries/` folder.

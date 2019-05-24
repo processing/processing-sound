@@ -4,35 +4,48 @@
 	<property file="./build.properties" />
 
 	<path id="classpath">
-		<fileset dir="..">
-			<!-- look for Processing's core.jar in ../processing -->
-			<!-- alternatively, this file can also be placed in -->
-			<!-- the local library folder -->
-			<include name="processing/core/library/core.jar" />
-		</fileset>
 		<fileset dir="library">
 			<include name="*.jar" />
+			<include name="processing-core.zip" />
 		</fileset>
 	</path>
 
 	<target name="clean" description="Clean the build directories">
 		<delete dir="bin" />
-		<delete file="library/sound.jar" />
+		<delete dir="library/sound.jar" />
 	</target>
 
-	<target name="checkandroid">
+	<target name="checkprocessingdeps">
+		<available file="library/processing-core.zip" property="hasprocessingcore" />
 		<available file="library/android.jar" property="hasandroid" />
 	</target>
 
-	<target name="android-deps" unless="hasandroid" description="Download an android.jar">
+	<!-- as of version 2.2, the sound library is compiled against the -->
+	<!-- processing-core.zip provided by Processing for Android mode -->
+	<!-- we can automatically retrieve the latest version from GitHub -->
+	<target name="processing-deps" depends="checkprocessingdeps" unless="hasprocessingcore" description="Download Android mode's processing-core">
+		<get src="https://github.com/processing/processing-android/releases/download/latest/AndroidMode.zip" dest="library/" usetimestamp="true" />
+		<unzip src="library/AndroidMode.zip" dest="library/">
+			<patternset>
+				<include name="AndroidMode/processing-core.zip" />
+			</patternset>
+			<mapper type="flatten"/>
+		</unzip>
+		<!-- no real need to keep parent zip -->
+		<!-- delete file="library/AndroidMode.zip"/ -->
+	</target>
+
+	<target name="android-deps" depends="checkprocessingdeps" unless="hasandroid" description="Download an android.jar">
 		<!-- this part of the Android SDK is required to build JSynAndroidAudioDeviceManager -->
 		<!-- preferrably you should soft-link or copy the android.jar of your locally
 			installed SDK into this project's library/ directory -->
 		<get src="https://github.com/marianadangelo/android-platforms/raw/master/android-26/android.jar" dest="library/" usetimestamp="true" />
 	</target>
 
-	<target name="deps" depends="checkandroid,android-deps" description="Get library dependencies">
+	<target name="deps" description="Get library dependencies">
 		<mkdir dir="library" />
+		<antcall target="processing-deps" />
+		<antcall target="android-deps" />
 		<get src="http://www.softsynth.com/jsyn/developers/archives/jsyn-20171016.jar" dest="library/" usetimestamp="true" />
 		<get src="https://github.com/kevinstadler/JavaMP3/releases/download/v1.0.4/javamp3-1.0.4.jar" dest="library/" usetimestamp="true" />
 	</target>
