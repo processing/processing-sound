@@ -3,6 +3,7 @@ package processing.sound;
 import com.jsyn.unitgen.ChannelIn;
 import com.jsyn.unitgen.Multiply;
 
+import android.Manifest;
 import processing.core.PApplet;
 
 /**
@@ -31,6 +32,17 @@ public class AudioIn extends SoundObject {
 	 */
 	public AudioIn(PApplet parent, int in) {
 		super(parent);
+		if (Engine.getAudioManager() instanceof JSynAndroidAudioDeviceManager) {
+			// we're on Android, check if the sketch has permission to capture Audio
+			if (!parent.hasPermission(Manifest.permission.RECORD_AUDIO)) {
+//			if (ContextCompat.checkSelfPermission(parent.getContext(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_DENIED) {
+				Engine.printWarning("sketch does not have permission to record audio from microphone, please request the permission in your AndroidManifest.xml or in your sketch initialization code (the Sound library's AudioInputAndroid example demonstrates how to do both)");
+				// requesting permission in here is problematic because the
+				// user dialogue and granting of permission are asynchronous
+//				ActivityCompat.requestPermissions(parent.getContext(), new String[]{ Manifest.permission.RECORD_AUDIO }, -1);
+//				parent.requestPermission("android.permission.RECORD_AUDIO", "notObviousHowThisApproachCouldBeUsed");
+			}
+		}
 		this.input = new ChannelIn(in);
 		this.multiplier = new Multiply();
 		this.multiplier.inputA.connect(this.input.output);
