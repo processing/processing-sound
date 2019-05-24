@@ -119,8 +119,10 @@ class JSynAndroidAudioDeviceManager implements AudioDeviceManager {
 		}
 
 		public void stop() {
-			this.audioTrack.stop();
-			this.audioTrack.release();
+			if (this.audioTrack != null) {
+				this.audioTrack.stop();
+				this.audioTrack.release();
+			}
 		}
 
 		public void close() {
@@ -189,8 +191,10 @@ class JSynAndroidAudioDeviceManager implements AudioDeviceManager {
 		}
 
 		public void stop() {
-			this.audioRecord.stop();
-			this.audioRecord.release();
+			if (this.audioRecord != null) {
+				this.audioRecord.stop();
+				this.audioRecord.release();
+			}
 		}
 
 		public int available() {
