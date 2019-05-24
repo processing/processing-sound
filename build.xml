@@ -32,7 +32,7 @@
 			<mapper type="flatten"/>
 		</unzip>
 		<!-- no real need to keep parent zip -->
-		<!-- delete file="library/AndroidMode.zip"/ -->
+		<delete file="library/AndroidMode.zip" />
 	</target>
 
 	<target name="android-deps" depends="checkprocessingdeps" unless="hasandroid" description="Download an android.jar">
@@ -81,7 +81,7 @@
 				<exclude name="docs/**" />
 				<exclude name="examples/**/application.*/**" />
 				<exclude name="library/android.jar" />
-				<exclude name="library/core.jar" />
+				<exclude name="library/processing-core.zip" />
 				<exclude name="src/**" />
 			</zipfileset>
 		</zip>
