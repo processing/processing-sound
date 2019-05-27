@@ -21,7 +21,7 @@ public class AudioIn extends SoundObject {
 	private Multiply multiplier;
 
 	private String ANDROID_PERMISSION_WARNING_MESSAGE =
-		"sketch does not have permission to record audio from microphone,\n" +
+		"\nsketch does not have permission to record audio from microphone,\n" +
 		"please request the permission in your AndroidManifest.xml and in\n" +
 		"your sketch initialization code (the Sound library's\n" +
 		"AudioInputAndroid example demonstrates how to do both)\n";
@@ -42,7 +42,8 @@ public class AudioIn extends SoundObject {
 		if (Engine.getAudioManager() instanceof JSynAndroidAudioDeviceManager) {
 			// we're on Android, check if the sketch has permission to capture Audio
 			if (!parent.hasPermission(Manifest.permission.RECORD_AUDIO)) {
-			    throw new AndroidPermissionException(ANDROID_PERMISSION_WARNING_MESSAGE);
+				Engine.printWarning(ANDROID_PERMISSION_WARNING_MESSAGE);
+				throw new AndroidPermissionException("RECORD_AUDIO permission not granted");
 			}
 		}
 
