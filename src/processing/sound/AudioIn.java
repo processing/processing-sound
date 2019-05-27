@@ -20,6 +20,12 @@ public class AudioIn extends SoundObject {
 	// port, so we need to control the amplitude via an extra multiplier unit
 	private Multiply multiplier;
 
+	private String ANDROID_PERMISSION_WARNING_MESSAGE =
+		"\nsketch does not have permission to record audio from microphone,\n" +
+		"please request the permission in your AndroidManifest.xml and in\n" +
+		"your sketch initialization code (the Sound library's\n" +
+		"AudioInputAndroid example demonstrates how to do both)\n";
+
 	public AudioIn(PApplet parent) {
 		this(parent, 0);
 	}
@@ -32,17 +38,15 @@ public class AudioIn extends SoundObject {
 	 */
 	public AudioIn(PApplet parent, int in) {
 		super(parent);
+
 		if (Engine.getAudioManager() instanceof JSynAndroidAudioDeviceManager) {
 			// we're on Android, check if the sketch has permission to capture Audio
 			if (!parent.hasPermission(Manifest.permission.RECORD_AUDIO)) {
-//			if (ContextCompat.checkSelfPermission(parent.getContext(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_DENIED) {
-				Engine.printWarning("sketch does not have permission to record audio from microphone, please request the permission in your AndroidManifest.xml or in your sketch initialization code (the Sound library's AudioInputAndroid example demonstrates how to do both)");
-				// requesting permission in here is problematic because the
-				// user dialogue and granting of permission are asynchronous
-//				ActivityCompat.requestPermissions(parent.getContext(), new String[]{ Manifest.permission.RECORD_AUDIO }, -1);
-//				parent.requestPermission("android.permission.RECORD_AUDIO", "notObviousHowThisApproachCouldBeUsed");
+				Engine.printWarning(ANDROID_PERMISSION_WARNING_MESSAGE);
+				throw new AndroidPermissionException("RECORD_AUDIO permission not granted");
 			}
 		}
+
 		this.input = new ChannelIn(in);
 		this.multiplier = new Multiply();
 		this.multiplier.inputA.connect(this.input.output);
