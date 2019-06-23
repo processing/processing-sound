@@ -14,44 +14,40 @@ import android.media.MediaRecorder;
 
 class JSynAndroidAudioDeviceManager implements AudioDeviceManager {
 
-	ArrayList<DeviceInfo> deviceRecords;
+	// see https://developer.android.com/reference/android/media/MediaRecorder.AudioSource.html
+	private static String[] ANDROIDDEVICENAMES = new String[] {
+		"default",
+		"mic",
+		"voice uplink",
+		"voice downlink",
+		"voice call",
+		"camcorder",
+		"voice recognition",
+		"voice communication",
+		"remote submix",
+		"unprocessed",
+		"voice performance"
+	};
+
 	private double suggestedOutputLatency = 0.1;
 	private double suggestedInputLatency = 0.1;
-	private int defaultInputDeviceID = 0;
-	private int defaultOutputDeviceID = 0;
-
-	public JSynAndroidAudioDeviceManager() {
-		this.deviceRecords = new ArrayList<DeviceInfo>();
-		DeviceInfo deviceInfo = new DeviceInfo();
-
-		deviceInfo.name = "Android Audio";
-		deviceInfo.maxInputs = 1;
-		deviceInfo.maxOutputs = 2;
-		this.deviceRecords.add(deviceInfo);
-	}
 
 	public String getName() {
-		return "JSyn Android Audio for Processing";
-	}
-
-	class DeviceInfo {
-		String name;
-		int maxInputs;
-		int maxOutputs;
-
-		public String toString() {
-			return "AudioDevice: " + name + ", max in = " + maxInputs + ", max out = " + maxOutputs;
-		}
+		return "JSyn Android Audio for Processing Sound";
 	}
 
 	private class AndroidAudioStream {
-		short[] shortBuffer;
-		int frameRate;
-		int samplesPerFrame;
-		int minBufferSize;
-		int bufferSize;
+		protected short[] shortBuffer;
+		protected int frameRate;
+		protected int samplesPerFrame;
+		protected int minBufferSize;
+		protected int bufferSize;
+
+		// only used for InputStream
+		protected int deviceID;
 
 		public AndroidAudioStream(int deviceID, int frameRate, int samplesPerFrame) {
+			this.deviceID = deviceID;
 			this.frameRate = frameRate;
 			this.samplesPerFrame = samplesPerFrame;
 		}
@@ -66,6 +62,7 @@ class JSynAndroidAudioDeviceManager implements AudioDeviceManager {
 	private class AndroidAudioOutputStream extends AndroidAudioStream implements AudioDeviceOutputStream {
 		AudioTrack audioTrack;
 
+		// deviceId is actually discarded for OutputStream, as there is only one output device
 		public AndroidAudioOutputStream(int deviceID, int frameRate, int samplesPerFrame) {
 			super(deviceID, frameRate, samplesPerFrame);
 		}
@@ -131,8 +128,10 @@ class JSynAndroidAudioDeviceManager implements AudioDeviceManager {
 	}
 
 	private class AndroidAudioInputStream extends AndroidAudioStream implements AudioDeviceInputStream {
-		AudioRecord audioRecord;
 
+		private AudioRecord audioRecord;
+
+		// deviceID refers to the corresponding Android MediaRecorder.AudioSource constants
 		public AndroidAudioInputStream(int deviceID, int frameRate, int samplesPerFrame) {
 			super(deviceID, frameRate, samplesPerFrame);
 		}
@@ -141,16 +140,21 @@ class JSynAndroidAudioDeviceManager implements AudioDeviceManager {
 			this.minBufferSize = AudioRecord.getMinBufferSize(this.frameRate, AudioFormat.CHANNEL_OUT_STEREO,
 					AudioFormat.ENCODING_PCM_16BIT);
 			this.bufferSize = (3 * (this.minBufferSize / 2)) & ~3;
-			this.audioRecord = new AudioRecord.Builder()
-					.setAudioSource(MediaRecorder.AudioSource.MIC)
-					.setAudioFormat(new AudioFormat.Builder()
-							.setChannelMask(AudioFormat.CHANNEL_IN_MONO)
-							.setEncoding(AudioFormat.ENCODING_PCM_16BIT)
-							.setSampleRate(this.frameRate)
-							.build())
-					.setBufferSizeInBytes(this.bufferSize)
-					.build();
-			this.audioRecord.startRecording();
+			try {
+				this.audioRecord = new AudioRecord.Builder()
+						.setAudioSource(this.deviceID)
+						.setAudioFormat(new AudioFormat.Builder()
+								.setChannelMask(AudioFormat.CHANNEL_IN_MONO)
+								.setEncoding(AudioFormat.ENCODING_PCM_16BIT)
+								.setSampleRate(this.frameRate)
+								.build())
+						.setBufferSizeInBytes(this.bufferSize)
+						.build();
+				this.audioRecord.startRecording();
+			} catch (UnsupportedOperationException e) {
+				// fail silently: if the user actually wants to capture audio,
+				// instantiating AudioIn will produce an informative exception
+			}
 		}
 
 		public double read() {
@@ -164,6 +168,10 @@ class JSynAndroidAudioDeviceManager implements AudioDeviceManager {
 		}
 
 		public int read(double[] buffer, int start, int count) {
+			if (this.audioRecord == null) {
+				return 0;
+			}
+
 			if ((this.shortBuffer == null) || (this.shortBuffer.length < count)) {
 				this.shortBuffer = new short[count];
 			}
@@ -222,11 +230,11 @@ class JSynAndroidAudioDeviceManager implements AudioDeviceManager {
 	}
 
 	public int getDefaultInputDeviceID() {
-		return this.defaultInputDeviceID;
+		return 0;
 	}
 
 	public int getDefaultOutputDeviceID() {
-		return this.defaultOutputDeviceID;
+		return 0;
 	}
 
 	public double getDefaultLowInputLatency(int deviceID) {
@@ -238,19 +246,19 @@ class JSynAndroidAudioDeviceManager implements AudioDeviceManager {
 	}
 
 	public int getDeviceCount() {
-		return this.deviceRecords.size();
+		return ANDROIDDEVICENAMES.length;
 	}
 
 	public String getDeviceName(int deviceID) {
-		return this.deviceRecords.get(deviceID).name;
+		return "Android " + JSynAndroidAudioDeviceManager.ANDROIDDEVICENAMES[deviceID] + " input";
 	}
 
 	public int getMaxInputChannels(int deviceID) {
-		return this.deviceRecords.get(deviceID).maxInputs;
+		return 1;
 	}
 
 	public int getMaxOutputChannels(int deviceID) {
-		return this.deviceRecords.get(deviceID).maxOutputs;
+		return 2;
 	}
 
 	public int setSuggestedOutputLatency(double latency) {
