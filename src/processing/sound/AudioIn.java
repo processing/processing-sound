@@ -45,7 +45,7 @@ public class AudioIn extends SoundObject {
 		if (Engine.getAudioManager() instanceof JSynAndroidAudioDeviceManager) {
 			if (in != 0) {
 				Engine.printWarning("if you want to capture audio from somewhere other than the default\n" +
-					"device on Android, use: new Sound(this).outputDevice(deviceID)\n" +
+					"device on Android, use: new Sound(this).inputDevice(deviceID)\n" +
 					"where for deviceID you can fill in any of Android's MediaRecorder.AudioSource constants.");
 			}
 			// we're on Android, check if the sketch has permission to capture Audio
