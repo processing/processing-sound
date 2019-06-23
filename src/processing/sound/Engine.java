@@ -156,6 +156,14 @@ class Engine {
 		}
 	}
 
+	protected static String getSelectedInputDeviceName() {
+		return Engine.getAudioManager().getDeviceName(Engine.singleton.inputDevice);
+	}
+
+	protected static String getSelectedOutputDeviceName() {
+		return Engine.getAudioManager().getDeviceName(Engine.singleton.outputDevice);
+	}
+
 	protected void setVolume(double volume) {
 		if (Engine.checkRange(volume, "volume")) {
 			this.leftOut.inputB.set(volume);
@@ -212,6 +220,10 @@ class Engine {
 			return false;
 		}
 		return true;
+	}
+
+	protected static void printMessage(String message) {
+		PApplet.println("Sound library: " + message);
 	}
 
 	protected static void printWarning(String message) {
