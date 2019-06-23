@@ -20,8 +20,8 @@ public class AudioIn extends SoundObject {
 	// port, so we need to control the amplitude via an extra multiplier unit
 	private Multiply multiplier;
 
-	private String ANDROID_PERMISSION_WARNING_MESSAGE =
-		"\nsketch does not have permission to record audio from microphone,\n" +
+	private static final String ANDROID_PERMISSION_WARNING_MESSAGE =
+		"sketch does not have permission to record audio from microphone,\n" +
 		"please request the permission in your AndroidManifest.xml and in\n" +
 		"your sketch initialization code (the Sound library's\n" +
 		"AudioInputAndroid example demonstrates how to do both)\n";
@@ -39,12 +39,21 @@ public class AudioIn extends SoundObject {
 	public AudioIn(PApplet parent, int in) {
 		super(parent);
 
+		// TODO check if the current input device actually has 'in' input channels,
+		// otherwise an ugly exception is thrown
+
 		if (Engine.getAudioManager() instanceof JSynAndroidAudioDeviceManager) {
+			if (in != 0) {
+				Engine.printWarning("if you want to capture audio from somewhere other than the default\n" +
+					"device on Android, use: new Sound(this).outputDevice(deviceID)\n" +
+					"where for deviceID you can fill in any of Android's MediaRecorder.AudioSource constants.");
+			}
 			// we're on Android, check if the sketch has permission to capture Audio
 			if (!parent.hasPermission(Manifest.permission.RECORD_AUDIO)) {
-				Engine.printWarning(ANDROID_PERMISSION_WARNING_MESSAGE);
+				Engine.printError(AudioIn.ANDROID_PERMISSION_WARNING_MESSAGE);
 				throw new AndroidPermissionException("RECORD_AUDIO permission not granted");
 			}
+			Engine.printMessage("capturing audio in from device " + Engine.getSelectedInputDeviceName());
 		}
 
 		this.input = new ChannelIn(in);
