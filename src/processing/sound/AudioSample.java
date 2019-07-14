@@ -4,6 +4,7 @@ import com.jsyn.data.FloatSample;
 import com.jsyn.unitgen.VariableRateDataReader;
 import com.jsyn.unitgen.VariableRateMonoReader;
 import com.jsyn.unitgen.VariableRateStereoReader;
+import com.softsynth.shared.time.TimeStamp;
 
 import processing.core.PApplet;
 
@@ -120,9 +121,24 @@ public class AudioSample extends SoundObject {
 		// as long as their dataQueue is empty
 		super.play(); // doesn't actually start playback, just adds the (silent) units
 
-		// this is kinda hack-ish, should maybe replace with its own boolean (and
-		// overwrite public boolean isPlaying() to return that boolean instead)
+		// as a consequence, the AudioSample class manages its isPlaying status
+		// explicitly (see the overridden public boolean isPlaying() method below)
 		this.isPlaying = false;
+	}
+
+	/**
+	 * Check whether this audiosample is currently playing.
+	 * @Override
+	 **/
+	public boolean isPlaying() {
+		// this used to just return dataQueue.hasMore(), but this raises false
+		// positives as .hasMore() still returns true for a split second after
+		// dataQueue.clear() has been called. the AudioSample class therefore
+		// manually sets the isPlaying boolean to true when playback commences,
+		// but every time the user queries the playing status we check if the
+		// queue has actually run out in the meantime.
+		this.isPlaying = this.isPlaying & this.player.dataQueue.hasMore();
+		return this.isPlaying;
 	}
 
 	/**
@@ -380,7 +396,8 @@ public class AudioSample extends SoundObject {
 
 	private void playInternal(int startFrame, int numFrames) {
 		this.setStartFrameCountOffset();
-		this.player.dataQueue.queue(this.sample, startFrame, numFrames);
+		// only queueImmediate() guarantees that a directly subsequent call to .hasMore() returns true
+		this.player.dataQueue.queueImmediate(this.sample, startFrame, numFrames, new TimeStamp(0.0));
 		this.isPlaying = true;
 	}
 
@@ -617,7 +634,7 @@ public class AudioSample extends SoundObject {
 			this.startFrame = this.positionFrame();
 			this.setStartFrameCountOffset();
 		} else {
-			Engine.printWarning("audio sample is already paused");
+			Engine.printWarning("trying to pause an audio sample that is not playing");
 		}
 	}
 
