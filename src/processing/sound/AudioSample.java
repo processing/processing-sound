@@ -58,6 +58,10 @@ public class AudioSample extends SoundObject {
 		this.initiatePlayer();
 	}
 
+	public AudioSample(PApplet parent, int frames, int frameRate) {
+		this(parent, frames, false, frameRate);
+	}
+
 	// TODO add another set of constructors: AudioSample(PApplet parent, float
 	// duration)?
 	// risk of accidental overloading through int/float, but could be interesting..
