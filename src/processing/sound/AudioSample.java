@@ -15,7 +15,6 @@ import processing.core.PApplet;
  * If you want to pre-load your audio sample with an audio file from disk you
  * can do so using the SoundFile subclass.
  * 
- * @see SoundFile
  * @webref sound
  */
 public class AudioSample extends SoundObject {
