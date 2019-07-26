@@ -360,7 +360,7 @@ public class AudioSample extends SoundObject {
 	 * @param add
 	 *            offset the output of the generator by the given value
 	 * @webref sound
-	 */
+	 **/
 	public void loop(float rate, float pos, float amp, float add) {
 		this.add(add);
 		this.loop(rate, pos, amp);
