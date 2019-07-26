@@ -134,7 +134,6 @@ public class SoundFile extends AudioSample {
 	 * 
 	 * @webref sound
 	 * @return The number of frames of this soundfile.
-	 * @see duration()
 	 **/
 	public int frames() {
 		return super.frames();

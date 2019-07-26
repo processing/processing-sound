@@ -212,7 +212,6 @@ public class AudioSample extends SoundObject {
 	 * 
 	 * @webref sound
 	 * @return The number of frames of the audiosample.
-	 * @see duration()
 	 **/
 	public int frames() {
 		return this.sample.getNumFrames();
