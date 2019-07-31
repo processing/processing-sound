@@ -4,7 +4,6 @@ import com.jsyn.data.FloatSample;
 import com.jsyn.unitgen.VariableRateDataReader;
 import com.jsyn.unitgen.VariableRateMonoReader;
 import com.jsyn.unitgen.VariableRateStereoReader;
-import com.softsynth.shared.time.TimeStamp;
 
 import processing.core.PApplet;
 
@@ -260,8 +259,10 @@ public class AudioSample extends SoundObject {
 		// FIXME this currently only works for simply *playing* files, if the
 		// current playback was a loop, all of the looping information is lost
 		if (this.setStartTime(time)) {
-			this.stop();
-			this.play(); // if the file wasn't playing when jump() was called, just start playing it
+			this.player.dataQueue.clear();
+			// if the file wasn't playing when jump() was called, just start
+			// playing it -- use internal function to guarantee same player is re-used
+			this.playInternal();
 		}
 	}
 
@@ -401,11 +402,14 @@ public class AudioSample extends SoundObject {
 	private void playInternal(int startFrame, int numFrames) {
 		this.setStartFrameCountOffset();
 		// only queueImmediate() guarantees that a directly subsequent call to .hasMore() returns true
-		this.player.dataQueue.queueImmediate(this.sample, startFrame, numFrames, new TimeStamp(0.0));
+		this.player.dataQueue.queue(this.sample, startFrame, numFrames);
 		this.isPlaying = true;
 	}
 
 	public void play() {
+		// play() is different from jump() in that, if the current sample is
+		// already playing back, it creates a new player object to play from
+		// in chorus
 		AudioSample source = this.getUnusedPlayer();
 		source.playInternal();
 		// for improved handling by the user, could return a reference to
