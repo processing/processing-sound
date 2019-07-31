@@ -14,7 +14,6 @@ import processing.core.PApplet;
  * If you want to pre-load your audio sample with an audio file from disk you
  * can do so using the SoundFile subclass.
  * 
- * @see SoundFile
  * @webref sound
  */
 public class AudioSample extends SoundObject {
@@ -212,7 +211,6 @@ public class AudioSample extends SoundObject {
 	 * 
 	 * @webref sound
 	 * @return The number of frames of the audiosample.
-	 * @see duration()
 	 **/
 	public int frames() {
 		return this.sample.getNumFrames();
@@ -361,7 +359,7 @@ public class AudioSample extends SoundObject {
 	 * @param add
 	 *            offset the output of the generator by the given value
 	 * @webref sound
-	 */
+	 **/
 	public void loop(float rate, float pos, float amp, float add) {
 		this.add(add);
 		this.loop(rate, pos, amp);
