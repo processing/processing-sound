@@ -27,6 +27,10 @@ public class AudioSample extends SoundObject {
 	// position within the sample
 	protected long startFrameCountOffset = 0;
 
+	// helper variable for making isPlaying() return true for the fraction of a
+	// second after play() was called but audio data hasn't been queued yet
+	private long isPlayingAtLeastUntil = 0;
+
 	public AudioSample(PApplet parent, int frames) {
 		this(parent, frames, false);
 	}
@@ -133,13 +137,20 @@ public class AudioSample extends SoundObject {
 	 * @Override
 	 **/
 	public boolean isPlaying() {
-		// this used to just return dataQueue.hasMore(), but this raises false
-		// positives as .hasMore() still returns true for a split second after
-		// dataQueue.clear() has been called. the AudioSample class therefore
-		// manually sets the isPlaying boolean to true when playback commences,
-		// but every time the user queries the playing status we check if the
-		// queue has actually run out in the meantime.
-		this.isPlaying = this.isPlaying & this.player.dataQueue.hasMore();
+		// relying on dataQueue.hasMore() alone is problematic because it can
+		// raise both false positives (return true for a split second after
+		// dataQueue.clear() has been called) as well as false negatives
+		// (return false for a split second after audio data has been queued
+		// but hasn't been transferred into the queue yet). The AudioSample class
+		// therefore manually sets the isPlaying boolean to true when playback
+		// commences and false when it is stopped, but also every time the
+		// playing status is queried we update the boolean based on additional
+		// checks:
+		if (this.isPlaying) {
+			// set isPlaying to false if the queue is empty, UNLESS too little
+			// time has passed since the last playback command
+			this.isPlaying = this.player.dataQueue.hasMore() || System.currentTimeMillis() < this.isPlayingAtLeastUntil;
+		}
 		return this.isPlaying;
 	}
 
@@ -315,6 +326,7 @@ public class AudioSample extends SoundObject {
 		} else {
 			this.player.dataQueue.queueLoop(this.sample, startFrame, numFrames);
 		}
+		this.isPlayingAtLeastUntil = System.currentTimeMillis() + 50;
 		this.isPlaying = true;
 	}
 
@@ -401,6 +413,7 @@ public class AudioSample extends SoundObject {
 		this.setStartFrameCountOffset();
 		// only queueImmediate() guarantees that a directly subsequent call to .hasMore() returns true
 		this.player.dataQueue.queue(this.sample, startFrame, numFrames);
+		this.isPlayingAtLeastUntil = System.currentTimeMillis() + 50;
 		this.isPlaying = true;
 	}
 
