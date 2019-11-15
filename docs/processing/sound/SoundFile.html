@@ -26,7 +26,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":10,"i22":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -166,6 +166,12 @@ extends <a href="../../processing/sound/AudioSample.html" title="class in proces
 <tr class="altColor">
 <th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="../../processing/sound/SoundFile.html#SoundFile-processing.core.PApplet-java.lang.String-">SoundFile</a></span>&#8203;(processing.core.PApplet&nbsp;parent,
          java.lang.String&nbsp;path)</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="../../processing/sound/SoundFile.html#SoundFile-processing.core.PApplet-java.lang.String-boolean-">SoundFile</a></span>&#8203;(processing.core.PApplet&nbsp;parent,
+         java.lang.String&nbsp;path,
+         boolean&nbsp;cache)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 </table>
@@ -333,6 +339,15 @@ extends <a href="../../processing/sound/AudioSample.html" title="class in proces
 </td>
 </tr>
 <tr id="i21" class="rowColor">
+<td class="colFirst"><code>boolean</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../processing/sound/SoundFile.html#removeFromCache--">removeFromCache</a></span>&#8203;()</code></th>
+<td class="colLast">
+<div class="block">Remove this SoundFile's decoded audio sample from the cache, allowing
+ it to be garbage collected once there are no more references to this
+ SoundFile.</div>
+</td>
+</tr>
+<tr id="i22" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../processing/sound/SoundFile.html#stop--">stop</a></span>&#8203;()</code></th>
 <td class="colLast">
@@ -378,15 +393,30 @@ extends <a href="../../processing/sound/AudioSample.html" title="class in proces
 <a name="SoundFile-processing.core.PApplet-java.lang.String-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>SoundFile</h4>
 <pre>public&nbsp;SoundFile&#8203;(processing.core.PApplet&nbsp;parent,
                  java.lang.String&nbsp;path)</pre>
+</li>
+</ul>
+<a name="SoundFile-processing.core.PApplet-java.lang.String-boolean-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>SoundFile</h4>
+<pre>public&nbsp;SoundFile&#8203;(processing.core.PApplet&nbsp;parent,
+                 java.lang.String&nbsp;path,
+                 boolean&nbsp;cache)</pre>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>parent</code> - typically use "this"</dd>
 <dd><code>path</code> - filename of the sound file to be loaded</dd>
+<dd><code>cache</code> - keep the sound data in RAM once it has been decoded (default: true).
+            Note that caching essentially disables garbage collection for the
+            SoundFile data, so if you are planning to load a large number of audio
+            files, you should set this to false.</dd>
 </dl>
 </li>
 </ul>
@@ -398,6 +428,23 @@ extends <a href="../../processing/sound/AudioSample.html" title="class in proces
 <!--   -->
 </a>
 <h3>Method Detail</h3>
+<a name="removeFromCache--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>removeFromCache</h4>
+<pre>public&nbsp;boolean&nbsp;removeFromCache&#8203;()</pre>
+<div class="block">Remove this SoundFile's decoded audio sample from the cache, allowing
+ it to be garbage collected once there are no more references to this
+ SoundFile.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>true if the sample was removed from the cache, false if it wasn't
+.        actually cached in the first place.</dd>
+</dl>
+</li>
+</ul>
 <a name="channels--">
 <!--   -->
 </a>
@@ -461,8 +508,6 @@ extends <a href="../../processing/sound/AudioSample.html" title="class in proces
 <dd><code><a href="../../processing/sound/AudioSample.html#frames--">frames</a></code>&nbsp;in class&nbsp;<code><a href="../../processing/sound/AudioSample.html" title="class in processing.sound">AudioSample</a></code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The number of frames of this soundfile.</dd>
-<dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../processing/sound/SoundFile.html#duration--"><code>duration()</code></a></dd>
 </dl>
 </li>
 </ul>
@@ -615,7 +660,7 @@ extends <a href="../../processing/sound/AudioSample.html" title="class in proces
 <div class="block">Check whether this soundfile is currently playing.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code><a href="../../processing/sound/SoundObject.html#isPlaying--">isPlaying</a></code>&nbsp;in class&nbsp;<code><a href="../../processing/sound/SoundObject.html" title="class in processing.sound">SoundObject</a></code></dd>
+<dd><code><a href="../../processing/sound/AudioSample.html#isPlaying--">isPlaying</a></code>&nbsp;in class&nbsp;<code><a href="../../processing/sound/AudioSample.html" title="class in processing.sound">AudioSample</a></code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>`true` if the soundfile is currently playing, `false` if it is not.</dd>
 </dl>

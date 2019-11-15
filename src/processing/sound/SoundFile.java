@@ -23,6 +23,10 @@ public class SoundFile extends AudioSample {
 
 	private static Map<String, FloatSample> SAMPLECACHE = new HashMap<String, FloatSample>();
 
+	public SoundFile(PApplet parent, String path) {
+		this(parent, path, true);
+	}
+
 	// the original library only printed an error if the file wasn't found,
 	// but then later threw a NullPointerException when trying to play() the file.
 	// it might be a better idea to throw an exception to the user in some cases,
@@ -32,9 +36,14 @@ public class SoundFile extends AudioSample {
 	 *            typically use "this"
 	 * @param path
 	 *            filename of the sound file to be loaded
+	 * @param cache
+	 *            keep the sound data in RAM once it has been decoded (default: true).
+	 *            Note that caching essentially disables garbage collection for the
+	 *            SoundFile data, so if you are planning to load a large number of audio
+	 *            files, you should set this to false.
 	 * @webref sound
 	 */
-	public SoundFile(PApplet parent, String path) {
+	public SoundFile(PApplet parent, String path, boolean cache) {
 		super(parent);
 
 		this.sample = SoundFile.SAMPLECACHE.get(path);
@@ -88,9 +97,24 @@ public class SoundFile extends AudioSample {
 					return;
 				}
 			}
-			SoundFile.SAMPLECACHE.put(path, this.sample);
+			if (cache) {
+				SoundFile.SAMPLECACHE.put(path, this.sample);
+			}
 		}
 		this.initiatePlayer();
+	}
+
+	/**
+	 * Remove this SoundFile's decoded audio sample from the cache, allowing
+	 * it to be garbage collected once there are no more references to this
+	 * SoundFile.
+	 * 
+	 * @return true if the sample was removed from the cache, false if it wasn't
+	 *.        actually cached in the first place.
+	 * @webref sound
+	 **/
+	public boolean removeFromCache() {
+		return SoundFile.SAMPLECACHE.values().remove(this.sample);
 	}
 
 	// Below are just duplicated methods from the AudioSample superclass which
