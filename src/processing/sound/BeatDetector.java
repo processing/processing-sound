@@ -7,31 +7,76 @@ import com.jsyn.ports.UnitVariablePort;
 import com.jsyn.unitgen.UnitGenerator;
 import processing.core.PApplet;
 
+/**
+ * The BeatDetector analyzer looks for spikes in the energy of an audio signal
+ * which are often associated with rhythmic musical beats and can be used to trigger a
+ * response whenever the incoming audio signal pulses. Note that this
+ * implementation does not return a tempo or BPM (beats per minute) value — it
+ * can only tell you whether the current moment of audio contains a beat or not.
+ *
+ * @webref sound
+ **/
 public class BeatDetector extends Analyzer {
   private final BeatDetectorUGen detector;
 
+  /**
+   * @param parent Typically "this"
+   */
   public BeatDetector(PApplet parent) {
     super(parent);
     this.detector = new BeatDetectorUGen();
   }
 
+  @Override
   protected void removeInput() {
     this.input = null;
   }
 
+  @Override
   protected void setInput(UnitOutputPort input) {
     Engine.getEngine().add(this.detector);
     this.detector.start();
     this.detector.input.connect(input);
   }
 
-  public boolean analyze() {
-    // TODO check if input exists, print warning if not
+  /**
+   * Returns whether or not the current moment of audio contains a beat or not.
+   * A "beat" is defined as a spike in the energy of the audio signal — it may
+   * or may not coincide exactly with a musical beat.
+   *
+   * @webref sound
+   *
+   * @return True if the audio signal currently contains a beat, false otherwise.
+   */
+  public boolean isBeat() {
     return this.detector.current.getValue() == 1;
   }
 
-  public void sensitivity(double sensitivity) {
+  /**
+   * Sets the sensitivity, in milliseconds, of the beat detection algorithm.
+   * The sensitivity determines how long the detector will wait after detecting
+   * a beat to detect the next one. For example, a sensitivity of 10 will cause the
+   * detector to wait 10ms before returning any new beats.
+   *
+   * A higher sensitivity value means the algorithm will be less sensitive. You
+   * can tune this appropriately if you notice the detector returning too many
+   * false positive beats.
+   *
+   * @webref sound
+   *
+   * @param sensitivity Sensitivity in milliseconds. Must be a positive number.
+   */
+  public void sensitivity(int sensitivity) {
     this.detector.sensitivity.set(sensitivity);
+  }
+
+  /**
+   * @webref sound
+   *
+   * @return The sensitivity in milliseconds.
+   */
+  public int sensitivity() {
+    return (int) this.detector.sensitivity.get();
   }
 
   public double[] getEnergyBuffer() {
@@ -53,35 +98,25 @@ public class BeatDetector extends Analyzer {
     public UnitInputPort sensitivity;
     public UnitOutputPort output;
 
-    // time incremented after every call to detect, to know how many milliseconds of audio we have processed so far.
-    // this value is used as part of the the sensitivity implementation
-    private long detectTimeMillis;
-    // for circular buffer support
-    private int insertAt;
-    // vars for sEnergy
-    private boolean isOnset;
-    private final double[] buffer;
+    private final double[] audioBuffer;
     private double[] energyBuffer;
     private double[] deltaBuffer;
     private boolean[] beatBuffer;
-    // a millisecond timer used to prevent reporting onsets until the sensitivity threshold has been reached
-    // see the sEnergy method
+
+    private int audioBufferCursor;
+    private int energyBufferCursor;
+
+    private long detectTimeMillis;
     private long sensitivityTimer;
-    private int cursor;
 
     public BeatDetectorUGen() {
       this.addPort(this.input = new UnitInputPort("Input"));
       this.addPort(this.current = new UnitVariablePort("Current"));
       this.addPort(this.output = new UnitOutputPort("Output"));
       this.addPort(this.sensitivity = new UnitInputPort("Sensitivity"));
+      sensitivity.set(10);
 
-      buffer = new double[CHUNK_SIZE];
-      sensitivity.set(20);
-      detectTimeMillis = 0;
-      isOnset = false;
-      sensitivityTimer = 0;
-      insertAt = 0;
-      detectTimeMillis = 0;
+      audioBuffer = new double[CHUNK_SIZE];
     }
 
     @Override
@@ -98,24 +133,23 @@ public class BeatDetector extends Analyzer {
       double[] inputs = input.getValues();
       double[] outputs = output.getValues();
 
-      // System.out.println(start + " " + limit);
       for (int i = start; i < limit; i++) {
         double inputValue = inputs[i];
 
-        buffer[cursor] = inputs[i];
-        ++cursor;
+        audioBuffer[audioBufferCursor] = inputs[i];
+        ++audioBufferCursor;
         // When it is full, do the FFT.
-        if (cursor == buffer.length) {
-          sEnergy(buffer);
-          current.set(isOnset ? 1 : 0);
-          cursor = 0;
+        if (audioBufferCursor == audioBuffer.length) {
+          boolean beatDetected = detect(audioBuffer);
+          current.set(beatDetected ? 1 : 0);
+          audioBufferCursor = 0;
         }
 
         outputs[i] = inputValue;
       }
     }
 
-    private void sEnergy(double[] samples) {
+    private boolean detect(double[] samples) {
       // compute the energy level
       float level = 0;
       for (int i = 0; i < samples.length; i++) {
@@ -138,44 +172,33 @@ public class BeatDetector extends Analyzer {
       float diff2 = Math.max(diff - dAvg, 0);
       // report false if it's been less than 'sensitivity'
       // milliseconds since the last true value
+
+      boolean beatDetected = false;
+
       if (detectTimeMillis - sensitivityTimer < sensitivity.get()) {
-        isOnset = false;
+        beatDetected = false;
       }
       // if we've made it this far then we're allowed to set a new
       // value, so set it true if it deserves to be, restart the timer
       else if (diff2 > 0 && instant > 2) {
-        isOnset = true;
+        beatDetected = true;
         sensitivityTimer = detectTimeMillis;
       }
       // OMG it wasn't true!
       else {
-        isOnset = false;
+        beatDetected = false;
       }
-      energyBuffer[insertAt] = instant;
-      deltaBuffer[insertAt] = diff;
-      beatBuffer[insertAt] = isOnset;
-      insertAt++;
-      if (insertAt == energyBuffer.length) {
-        insertAt = 0;
+      energyBuffer[energyBufferCursor] = instant;
+      deltaBuffer[energyBufferCursor] = diff;
+      beatBuffer[energyBufferCursor] = beatDetected;
+      energyBufferCursor++;
+      if (energyBufferCursor == energyBuffer.length) {
+        energyBufferCursor = 0;
       }
       // advance the current time by the number of milliseconds this buffer represents
       detectTimeMillis += (long) (((float) samples.length / getFrameRate()) * 1000);
-    }
 
-    public double[] getEnergyBuffer() {
-      return energyBuffer;
-    }
-
-    public double[] getDeltaBuffer() {
-      return deltaBuffer;
-    }
-
-    public boolean[] getBeatBuffer() {
-      return beatBuffer;
-    }
-
-    public int getEnergyCursor() {
-      return insertAt;
+      return beatDetected;
     }
 
     private float average(double[] arr) {
@@ -203,13 +226,28 @@ public class BeatDetector extends Analyzer {
     }
 
     private float variance(double[] arr, float val) {
-      float V = 0;
+      float v = 0;
       for (int i = 0; i < arr.length; i++) {
-        V += (float) Math.pow(arr[i] - val, 2);
+        v += (float) Math.pow(arr[i] - val, 2);
       }
-      V /= arr.length;
-      return V;
+      v /= arr.length;
+      return v;
+    }
+
+    public double[] getEnergyBuffer() {
+      return energyBuffer;
+    }
+
+    public double[] getDeltaBuffer() {
+      return deltaBuffer;
+    }
+
+    public boolean[] getBeatBuffer() {
+      return beatBuffer;
+    }
+
+    public int getEnergyCursor() {
+      return energyBufferCursor;
     }
   }
-
 }
