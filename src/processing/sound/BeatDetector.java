@@ -149,6 +149,8 @@ public class BeatDetector extends Analyzer {
       }
     }
 
+    // This algorithm is adapted from Damien Quartz's Minim audio library
+    // http://code.compartmental.net/tools/minim/
     private boolean detect(double[] samples) {
       // compute the energy level
       float level = 0;
