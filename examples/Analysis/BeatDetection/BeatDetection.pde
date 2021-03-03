@@ -28,7 +28,7 @@ void setup() {
   
   // The sensitivity determines how long the detector will wait after detecting
   // a beat to detect the next one.
-  beatDetector.sensitivity(50);
+  beatDetector.sensitivity(140);
 }
 
 void draw() {

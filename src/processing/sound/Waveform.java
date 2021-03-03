@@ -1,6 +1,8 @@
 package processing.sound;
 
+import com.jsyn.data.FloatSample;
 import com.jsyn.ports.UnitOutputPort;
+import com.jsyn.unitgen.FixedRateMonoWriter;
 
 import processing.core.PApplet;
 
@@ -17,7 +19,9 @@ public class Waveform extends Analyzer {
 
 	public float[] data;
 
-	private JSynWaveform waveform;
+	private FixedRateMonoWriter writer;
+	private FloatSample buffer;
+	private int lastAnalysisOffset;
 	
 	/**
 	 * @param parent
@@ -32,21 +36,25 @@ public class Waveform extends Analyzer {
 			// TODO throw RuntimeException?
 			Engine.printError("number of waveform frames needs to be greater than 0");
 		} else {
-			this.waveform = new JSynWaveform(nsamples);
 			this.data = new float[nsamples];
+
+			this.writer = new FixedRateMonoWriter();
+			this.buffer = new FloatSample(nsamples);
+			// write any connected input into the output buffer ad infinitum
+			this.writer.dataQueue.queueLoop(this.buffer);
 		}
 	}
 
 	protected void removeInput() {
-		this.waveform.input.disconnectAll();
+		this.writer.input.disconnectAll();
 		this.input = null;
 	}
 
 	protected void setInput(UnitOutputPort input) {
 		// superclass makes sure that input unit is actually playing, just connect it
-		Engine.getEngine().add(this.waveform);
-		this.waveform.input.connect(input);
-		this.waveform.start();
+		Engine.getEngine().add(this.writer);
+		this.writer.input.connect(input);
+		this.writer.start();
 	}
 
 	/**
@@ -74,9 +82,35 @@ public class Waveform extends Analyzer {
 		if (this.input == null) {
 			Engine.printWarning("this Waveform has no sound source connected to it, nothing to analyze");
 		}
-		this.waveform.calculateWaveform(value);
+
+		this.lastAnalysisOffset = (int) this.writer.dataQueue.getFrameCount() % this.buffer.getNumFrames();
+		// if initiating this read takes too long the first couple samples might actually
+		// already be overwritten by the next loop, so fingers crossed...
+		this.buffer.read(lastAnalysisOffset, value, 0, this.buffer.getNumFrames() - lastAnalysisOffset);
+		this.buffer.read(0, value, this.buffer.getNumFrames() - lastAnalysisOffset, lastAnalysisOffset);
+		// the original implementation did a *2 on all values...?
 		return value;
 	}
+
+/*
+	public float[] analyzeCircular() {
+		return this.analyzeCircular(this.data);
+	}
+
+	public float[] analyzeCircular(float[] value) {
+		if (this.input == null) {
+			Engine.printWarning("this Waveform has no sound source connected to it, nothing to analyze");
+		}
+
+		this.lastAnalysisOffset = (int) this.writer.dataQueue.getFrameCount() % this.buffer.getNumFrames();
+		this.buffer.read(value);
+		return value;
+	}
+
+	public int getLastAnalysisOffset() {
+		return this.lastAnalysisOffset;
+	}
+*/
 
 	// Below are just duplicated methods from superclasses which are required
 	// for the online reference to build the corresponding pages.
