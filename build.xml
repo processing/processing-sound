@@ -87,4 +87,8 @@
 		</zip>
 		<copy file="library.properties" toFile="../sound.txt" />
 	</target>
+
+	<target name="install" depends="dist" description="Local installation for testing/developing">
+		<unzip src="../sound.zip" dest="../Documents/Processing/libraries/" />
+	</target>
 </project>
