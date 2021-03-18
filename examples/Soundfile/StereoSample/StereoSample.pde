@@ -8,7 +8,7 @@ import processing.sound.*;
 SoundFile soundfile;
 
 void setup() {
-  // Load a soundfile
+  // load a stereo soundfile with out of phase sine waves in the left and right channel
   soundfile = new SoundFile(this, "stereo441hzoutofphase.wav");
 
   println("This sound file of duration " + soundfile.duration() + " seconds" +

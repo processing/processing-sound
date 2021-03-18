@@ -725,18 +725,36 @@ public class AudioSample extends SoundObject {
 	}
 
 	/**
-	 * @param index
+	 * @param frameIndex
 	 *            the index of the single frame of the audiosample that should be
-	 *            read and returned as a float
-	 * @return the value of the audio sample at the given frame
+	 *            read and returned. `frameIndex` has to be between 0 and
+	 *            `sample.frames() * sample.channels() - 1` (inclusive)`.
+	 *            For mono files, `read(frameIndex)` is identical to `read(frameIndex, 0)`.
+	 *            For stereo files, unless you also specify a `channelIndex`,
+	 *            `read(frameIndex)` will return the samples from both the left and
+	 *            right channel in interleaved order. (See the Soundfile > StereoSample
+	 *            example for a demonstration.)
+	 * @return float: the value of the audio sample at the given index
+	 * @webref sound
 	 */
-	public float read(int index) {
-		if (this.channels() == 2) {
-			Engine.printWarning(
-					"read(int) only returns data for the left channel of a stereo file, please use one of the other read() methods to access data for all channels");
-		}
+	public float read(int frameIndex) {
 		// TODO catch exception and print understandable error message
-		return (float) this.sample.readDouble(index);
+		return (float) this.sample.readDouble(frameIndex);
+	}
+
+	/**
+	 * @param channelIndex
+	 *            the channel from which to extract the frame value (0 for left,
+	 *            1 for right). `read(frameIndex, channelIndex)` is the same as
+	 *            calling `read(frameIndex * this.channels() + channelIndex)`.
+	 * @webref sound
+         */
+	public float read(int frameIndex, int channelIndex) {
+		if (channelIndex < 0 || channelIndex >= this.channels()) {
+			Engine.printWarning("trying to read() from audiosample channel #" + channelIndex + " which does not exist, returning left channel value instead");
+			channelIndex = 0;
+		}
+		return this.read(frameIndex * this.channels() + channelIndex);
 	}
 
 	/**
