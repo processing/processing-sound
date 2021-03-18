@@ -19,7 +19,7 @@
 <script type="text/javascript" src="../../script-dir/jquery-ui.js"></script>
 </head>
 <body class="class-declaration">
-<script type="text/javascript">var data = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":10,"i22":10,"i23":10,"i24":10,"i25":10,"i26":10,"i27":10,"i28":10,"i29":10,"i30":10,"i31":10,"i32":10,"i33":10,"i34":10,"i35":10,"i36":10,"i37":10,"i38":10};
+<script type="text/javascript">var data = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":10,"i22":10,"i23":10,"i24":10,"i25":10,"i26":10,"i27":10,"i28":10,"i29":10,"i30":10,"i31":10,"i32":10,"i33":10,"i34":10,"i35":10,"i36":10,"i37":10,"i38":10,"i39":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -405,7 +405,7 @@ float&nbsp;cue)</code></th>
 </tr>
 <tr class="rowColor" id="i29">
 <td class="colFirst"><code>float</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#read(int)">read</a></span>&#8203;(int&nbsp;index)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#read(int)">read</a></span>&#8203;(int&nbsp;frameIndex)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="altColor" id="i30">
@@ -419,11 +419,17 @@ int&nbsp;numFrames)</code></th>
 </td>
 </tr>
 <tr class="rowColor" id="i31">
+<td class="colFirst"><code>float</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#read(int,int)">read</a></span>&#8203;(int&nbsp;frameIndex,
+int&nbsp;channelIndex)</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr class="altColor" id="i32">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#resize(int)">resize</a></span>&#8203;(int&nbsp;frames)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="altColor" id="i32">
+<tr class="rowColor" id="i33">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#resize(int,boolean)">resize</a></span>&#8203;(int&nbsp;frames,
 boolean&nbsp;stereo)</code></th>
@@ -432,14 +438,14 @@ boolean&nbsp;stereo)</code></th>
  frames.</div>
 </td>
 </tr>
-<tr class="rowColor" id="i33">
+<tr class="altColor" id="i34">
 <td class="colFirst"><code>int</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#sampleRate()">sampleRate</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Returns the underlying sample rate of the audiosample.</div>
 </td>
 </tr>
-<tr class="altColor" id="i34">
+<tr class="rowColor" id="i35">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#set(float,float,float,float)">set</a></span>&#8203;(float&nbsp;rate,
 float&nbsp;pos,
@@ -449,27 +455,27 @@ float&nbsp;add)</code></th>
 <div class="block">Set multiple parameters at once</div>
 </td>
 </tr>
-<tr class="rowColor" id="i35">
+<tr class="altColor" id="i36">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#stop()">stop</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Stops the playback.</div>
 </td>
 </tr>
-<tr class="altColor" id="i36">
+<tr class="rowColor" id="i37">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#write(float%5B%5D)">write</a></span>&#8203;(float[]&nbsp;data)</code></th>
 <td class="colLast">
 <div class="block">Overwrite the sample with the data from the given array.</div>
 </td>
 </tr>
-<tr class="rowColor" id="i37">
+<tr class="altColor" id="i38">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#write(int,float)">write</a></span>&#8203;(int&nbsp;index,
 float&nbsp;value)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="altColor" id="i38">
+<tr class="rowColor" id="i39">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#write(int,float%5B%5D,int,int)">write</a></span>&#8203;(int&nbsp;startFrame,
 float[]&nbsp;data,
@@ -1034,13 +1040,32 @@ int&nbsp;numFrames)</span></div>
 <li class="blockList">
 <section class="detail">
 <h3><a id="read(int)">read</a></h3>
-<div class="memberSignature"><span class="modifiers">public</span>&nbsp;<span class="returnType">float</span>&nbsp;<span class="memberName">read</span>&#8203;(<span class="arguments">int&nbsp;index)</span></div>
+<div class="memberSignature"><span class="modifiers">public</span>&nbsp;<span class="returnType">float</span>&nbsp;<span class="memberName">read</span>&#8203;(<span class="arguments">int&nbsp;frameIndex)</span></div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>index</code> - the index of the single frame of the audiosample that should be
-            read and returned as a float</dd>
+<dd><code>frameIndex</code> - the index of the single frame of the audiosample that should be
+            read and returned. `frameIndex` has to be between 0 and
+            `sample.frames() * sample.channels() - 1` (inclusive)`.
+            For mono files, `read(frameIndex)` is identical to `read(frameIndex, 0)`.
+            For stereo files, unless you also specify a `channelIndex`,
+            `read(frameIndex)` will return the samples from both the left and
+            right channel in interleaved order. (See the Soundfile > StereoSample
+            example for a demonstration.)</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>the value of the audio sample at the given frame</dd>
+<dd>float: the value of the audio sample at the given index</dd>
+</dl>
+</section>
+</li>
+<li class="blockList">
+<section class="detail">
+<h3><a id="read(int,int)">read</a></h3>
+<div class="memberSignature"><span class="modifiers">public</span>&nbsp;<span class="returnType">float</span>&nbsp;<span class="memberName">read</span>&#8203;(<span class="arguments">int&nbsp;frameIndex,
+int&nbsp;channelIndex)</span></div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>channelIndex</code> - the channel from which to extract the frame value (0 for left,
+            1 for right). `read(frameIndex, channelIndex)` is the same as
+            calling `read(frameIndex * this.channels() + channelIndex)`.</dd>
 </dl>
 </section>
 </li>
