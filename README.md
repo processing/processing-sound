@@ -1,6 +1,6 @@
 ## Processing Sound library
 
-[![Release](https://img.shields.io/github/v/release/processing/processing-sound?sort=semver)](https://github.com/processing/processing-sound/releases) ![License](https://img.shields.io/github/license/processing/processing-sound)
+[![Release](https://img.shields.io/github/v/release/processing/processing-sound?sort=semver)](https://github.com/processing/processing-sound/releases) ![License](https://img.shields.io/github/license/processing/processing-sound) [![Documentation](https://img.shields.io/badge/Docs-processing.org-black)](https://www.processing.org/reference/libraries/sound/) [![Javadoc](https://img.shields.io/badge/Docs-Javadoc-lightgray)](https://processing.github.io/processing-sound/)
 
 The new Sound library for Processing 3 provides a simple way to work with audio. It can play, analyze, and synthesize sound. The library comes with a collection of oscillators for basic wave forms, a variety of noise generators, and effects and filters to alter sound files and other generated sounds. The syntax is minimal to make it easy for beginners who want a straightforward way to add some sound to their Processing sketches!
 
