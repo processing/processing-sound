@@ -35,7 +35,6 @@ public abstract class SoundObject {
 	/**
 	 * Offset the output of this generator by given value
 	 *
-	 * @webref sound
 	 * @param add
 	 *            A value for offsetting the audio signal.
 	 **/
@@ -53,7 +52,6 @@ public abstract class SoundObject {
 	 * @param amp
 	 *            A float value between 0.0 (complete silence) and 1.0 (full volume)
 	 *            controlling the amplitude/volume of this sound.
-	 * @webref sound
 	 **/
 	public void amp(float amp) {
 		if (Engine.checkAmp(amp)) {
@@ -67,7 +65,6 @@ public abstract class SoundObject {
 	/**
 	 * Check if this sound object is currently playing.
 	 *
-	 * @webref sound
 	 * @return `true` if this sound object is currently playing, `false` if it is
 	 *         not.
 	 */
@@ -78,7 +75,6 @@ public abstract class SoundObject {
 	/**
 	 * Move the sound in a stereo panorama.
 	 *
-	 * @webref sound
 	 * @param pos
 	 *            The panoramic position of this sound unit as a float from -1.0
 	 *            (left) to 1.0 (right).
@@ -94,7 +90,6 @@ public abstract class SoundObject {
 	/**
 	 * Start the generator
 	 *
-	 * @webref sound
 	 **/
 	public void play() {
 		// TODO print info message if it's already playing?
@@ -110,7 +105,6 @@ public abstract class SoundObject {
 	/**
 	 * Stop the generator
 	 *
-	 * @webref sound
 	 **/
 	public void stop() {
 		this.isPlaying = false;

@@ -14,7 +14,9 @@ import processing.core.PApplet;
  * If you want to pre-load your audio sample with an audio file from disk you
  * can do so using the SoundFile subclass.
  * 
- * @webref sound
+ * @webref sampling
+ * @webBrief This class allows you low-level access to an audio buffer to create, access,
+ * manipulate and play back sound samples.
  */
 public class AudioSample extends SoundObject {
 
@@ -51,7 +53,8 @@ public class AudioSample extends SoundObject {
 	 * @param stereo
 	 *            whether to treat the audiosample as 2-channel (stereo) or not
 	 *            (default: false)
-	 * @webref sound
+	 * @webref audiosample
+	 * @webBrief Allocate a new audiosample buffer with the given number of frames.
 	 */
 	public AudioSample(PApplet parent, int frames, boolean stereo, int frameRate) {
 		super(parent);
@@ -73,7 +76,6 @@ public class AudioSample extends SoundObject {
 	 *            an array of float values to be used as this audiosample's sound
 	 *            data. The audiosample will consequently have as many frames as the
 	 *            length of the given array.
-	 * @webref sound
 	 */
 	public AudioSample(PApplet parent, float[] data) {
 		this(parent, data, false);
@@ -155,12 +157,13 @@ public class AudioSample extends SoundObject {
 	}
 
 	/**
-	 * Change the amplitude/volume of this audiosample.
+	 * Change the amplitude/volume of the player. Values are between 0.0 and 1.0.
 	 *
 	 * @param amp
 	 *            A float value between 0.0 (complete silence) and 1.0 (full volume)
 	 *            controlling the amplitude/volume of this sound.
-	 * @webref sound
+	 * @webref audiosample
+	 * @webBrief Changes the amplitude/volume of the player.
 	 **/
 	public void amp(float amp) {
 		if (Engine.checkAmp(amp)) {
@@ -169,22 +172,24 @@ public class AudioSample extends SoundObject {
 	}
 
 	/**
-	 * Returns the number of channels in the audiosample.
+	 * Returns the number of channels in the audiosample as an int (1 for mono, 2 for stereo).
 	 * 
 	 * @return the number of channels in the audiosample (1 for mono, 2 for stereo)
-	 * @webref sound
+	 * @webref audiosample
+	 * @webBrief Returns the number of channels in the audiosample as an int (1 for mono, 2 for stereo).
 	 **/
 	public int channels() {
 		return this.sample.getChannelsPerFrame();
 	}
 
 	/**
-	 * Cues the playhead to a fixed position in the audiosample.
+	 * Cues the playhead to a fixed position in the audiosample. Note that <b>cue()</b> only affects the playhead for future calls to <b>play()</b>, but not to <b>loop()</b>.
 	 * 
 	 * @param time
 	 *            position in the audiosample that the next playback should start
 	 *            from, in seconds.
-	 * @webref sound
+	 * @webref audiosample
+	 * @webBrief Cues the playhead to a fixed position in the audiosample.
 	 **/
 	public void cue(float time) {
 		if (this.setStartTime(time)) {
@@ -196,7 +201,8 @@ public class AudioSample extends SoundObject {
 	/**
 	 * Cues the playhead to a fixed position in the audiosample.
 	 * 
-	 * @webref sound
+	 * @webref audiosample
+	 * @webBrief Cues the playhead to a fixed position in the audiosample.
 	 * @param frameNumber
 	 *            frame number to start playback from.
 	 **/
@@ -210,7 +216,8 @@ public class AudioSample extends SoundObject {
 	/**
 	 * Returns the duration of the audiosample in seconds.
 	 * 
-	 * @webref sound
+	 * @webref audiosample
+	 * @webBrief Returns the duration of the audiosample in seconds.
 	 * @return The duration of the audiosample in seconds.
 	 **/
 	public float duration() {
@@ -218,9 +225,10 @@ public class AudioSample extends SoundObject {
 	}
 
 	/**
-	 * Returns the number of frames of the audiosample.
+	 * Returns the number of frames of the audiosample as an int.
 	 * 
-	 * @webref sound
+	 * @webref audiosample
+	 * @webBrief Returns the number of frames of the audiosample as an int.
 	 * @return The number of frames of the audiosample.
 	 **/
 	public int frames() {
@@ -256,13 +264,14 @@ public class AudioSample extends SoundObject {
 	}
 
 	/**
-	 * Jump to a specific position in the audiosample without interrupting playback.
+	 * Jump to a specific position in the audiosample while continuing to play (or starting to play if it wasn't playing already).
 	 * 
 	 * @param time
 	 *            position to jump to, in seconds.
 	 * @see cue
 	 * @see play
-	 * @webref sound
+	 * @webref audiosample
+	 * @webBrief Jump to a specific position in the audiosample while continuing to play (or starting to play if it wasn't playing already).
 	 **/
 	public void jump(float time) {
 		// FIXME this currently only works for simply *playing* files, if the
@@ -283,6 +292,7 @@ public class AudioSample extends SoundObject {
 	 * @see cue
 	 * @see play
 	 * @webref sound
+	 * @webBrief Jump to a specific position in the audiosample without interrupting playback.
 	 **/
 	public void jumpFrame(int frameNumber) {
 		if (this.setStartFrame(frameNumber)) {
@@ -356,7 +366,8 @@ public class AudioSample extends SoundObject {
 	}
 
 	/**
-	 * Starts playback which loops from the beginning to the end of the sample.
+	 * Starts the playback of the audiosample. Only plays to the end of the audiosample 
+	 * once. If <b>cue()</b> or <b>pause()</b> were called previously, playback will resume from the cued position.
 	 * 
 	 * @param rate
 	 *            relative playback rate to use. 1 is the original speed. 0.5 is
@@ -370,7 +381,8 @@ public class AudioSample extends SoundObject {
 	 *            0.0 (complete silence) to 1.0 (full volume)
 	 * @param add
 	 *            offset the output of the generator by the given value
-	 * @webref sound
+	 * @webref audiosample
+	 * @webBrief Starts the playback of the audiosample.
 	 **/
 	public void loop(float rate, float pos, float amp, float add) {
 		this.add(add);
@@ -450,8 +462,8 @@ public class AudioSample extends SoundObject {
 	}
 
 	/**
-	 * Starts the playback of the audiosample. Only plays to the end of the
-	 * audiosample once.
+	 * Starts the playback of the audiosample. Only plays to the end of the audiosample 
+	 * once. If <b>cue()</b> or <b>pause()</b> were called previously, playback will resume from the cued position.
 	 * 
 	 * @param rate
 	 *            relative playback rate to use. 1 is the original speed. 0.5 is
@@ -468,7 +480,8 @@ public class AudioSample extends SoundObject {
 	 *            seconds.
 	 * @param add
 	 *            offset the output of the generator by the given value
-	 * @webref sound
+	 * @webref audiosample
+	 * @webBrief Starts the playback of the audiosample.
 	 **/
 	public void play(float rate, float pos, float amp, float add, float cue) {
 		this.cue(cue);
@@ -497,6 +510,8 @@ public class AudioSample extends SoundObject {
 	 *            position in the audiosample that playback should start from, in
 	 *            seconds.
 	 * @webref sound
+	 * @webBrief Starts the playback of the audiosample for the specified duration or to the
+	 * end of the audiosample, whichever comes first.
 	 **/
 	public void playFor(float duration, float cue) {
 		this.cue(cue);
@@ -504,13 +519,15 @@ public class AudioSample extends SoundObject {
 	}
 
 	/**
-	 * Set the playback rate of the audiosample.
+	 * Set the relative playback rate of the audiosample. 1 is the original speed. 
+	 * 0.5 is half speed and one octave down. 2 is double the speed and one octave up.
 	 * 
 	 * @param rate
 	 *            Relative playback rate to use. 1 is the original speed. 0.5 is
 	 *            half speed and one octave down. 2 is double the speed and one
 	 *            octave up.
-	 * @webref sound
+	 * @webref audiosample
+	 * @webBrief Set the relative playback rate of the audiosample.
 	 **/
 	public void rate(float rate) {
 		if (rate <= 0) {
@@ -522,15 +539,17 @@ public class AudioSample extends SoundObject {
 	}
 
 	/**
-	 * Resizes the underlying buffer of the audiosample to the given number of
-	 * frames.
+	 * Resizes the underlying buffer of the audiosample to the given number of frames. 
+	 * Calling this method allocates a completely new buffer, so any ongoing playback 
+	 * will be stopped and all data currently stored in the sample will be lost.
 	 * 
 	 * @param frames
 	 *            the desired number of frames for this audiosample
 	 * @param stereo
 	 *            whether to treat the audiosample as 2-channel (stereo) or not
 	 *            (default: false)
-	 * @webref sound
+	 * @webref audiosample
+	 * @webBrief Resizes the underlying buffer of the audiosample to the given number of frames.
 	 */
 	public void resize(int frames, boolean stereo) {
 		this.stop();
@@ -541,7 +560,8 @@ public class AudioSample extends SoundObject {
 	/**
 	 * Returns the underlying sample rate of the audiosample.
 	 * 
-	 * @webref sound
+	 * @webref audiosample
+	 * @webBrief Returns the underlying sample rate of the audiosample.
 	 * @return Returns the underlying sample rate of the audiosample as an int.
 	 **/
 	public int sampleRate() {
@@ -549,9 +569,11 @@ public class AudioSample extends SoundObject {
 	}
 
 	/**
-	 * Move the sound in a stereo panorama. Only works for mono audiosamples!
+	 * Pan the soundfile in a stereo panorama. -1.0 pans to the left channel and 1.0 to the right channel. 
+	 * Note that panning is only supported for mono (1 channel) audiosamples.
 	 *
-	 * @webref sound
+	 * @webref audiosample
+	 * @webBrief Pan the soundfile in a stereo panorama.
 	 * @param pos
 	 *            the panoramic position of this sound unit from -1.0 (left) to 1.0
 	 *            (right).
@@ -561,9 +583,10 @@ public class AudioSample extends SoundObject {
 	}
 
 	/**
-	 * Set multiple parameters at once
+	 * Set multiple parameters at once.
 	 * 
-	 * @webref sound
+	 * @webref audiosample
+	 * @webBrief Set multiple parameters at once.
 	 * @param rate
 	 *            Relative playback rate to use. 1 is the original speed. 0.5 is
 	 *            half speed and one octave down. 2 is double the speed and one
@@ -587,7 +610,8 @@ public class AudioSample extends SoundObject {
 	/**
 	 * Stops the playback.
 	 * 
-	 * @webref sound
+	 * @webref audiosample
+	 * @webBrief Stops the playback.
 	 **/
 	public void stop() {
 		this.player.dataQueue.clear();
@@ -605,7 +629,8 @@ public class AudioSample extends SoundObject {
 	 * not necessarily the last one that was triggered.
 	 * 
 	 * @return The current position of the audio sample playback in seconds
-	 * @webref sound
+	 * @webref audiosample
+	 * @webBrief Get current sound file playback position in seconds.
 	 */
 	public float position() {
 		return this.positionFrame() / (float) this.sampleRate();
@@ -615,12 +640,13 @@ public class AudioSample extends SoundObject {
 	 * Get frame index of current sound file playback position.
 	 * 
 	 * Note that, if this audio sample was at some point played back in parallel
-	 * (triggered by another call to play() before the original playback had finished),
+	 * (triggered by another call to <b>play()</b> before the original playback had finished),
 	 * the position returned by this function can be of any of the concurrent playbacks,
 	 * not necessarily the last one that was triggered.
 	 * 
 	 * @return The current frame index position of the audio sample playback
 	 * @webref sound
+	 * @webBrief Get frame index of current sound file playback position.
 	 */
 	public int positionFrame() {
 		return (int) (this.startFrame + this.player.dataQueue.getFrameCount() - this.startFrameCountOffset) % this.frames();
@@ -629,23 +655,26 @@ public class AudioSample extends SoundObject {
 	 * Get current sound file playback position in percent.
 	 * 
 	 * Note that, if this audio sample was at some point played back in parallel
-	 * (triggered by another call to play() before the original playback had finished),
+	 * (triggered by another call to <b>play()</b> before the original playback had finished),
 	 * the position returned by this function can be of any of the concurrent playbacks,
 	 * not necessarily the last one that was triggered.
 	 * 
 	 * @return The current position of the audio sample playback in percent (a value
 	 *         between 0 and 100).
 	 * @webref sound
+	 * @webBrief Get current sound file playback position in percent.
 	 */
 	public float percent() {
 		return 100f * this.positionFrame() / (float) this.frames();
 	}
 
 	/**
-	 * Stop the playback of the sample, but cue it to the current position.
+	 * Stop the playback of the sample, but cue it to the current position. 
+	 * The next call to <b>play()</b> will continue playing where it left off.
 	 * 
 	 * @see cue
-	 * @webref sound
+	 * @webref audiosample
+	 * @webBrief Stop the playback of the sample, but cue it to the current position.
 	 */
 	public void pause() {
 		if (this.isPlaying()) {
@@ -696,8 +725,15 @@ public class AudioSample extends SoundObject {
 	}
 
 	/**
-	 * Read some frames of this audio sample into an array. Stereo samples
-	 * contain two data points per frame.
+	 * The underlying data of the audiosample can be read and written in several different ways:
+	 * the method taking a single float array `data` gets the current sample data and write it 
+	 * into the given array. The array has to be able to store as many floats as there are frames 
+	 * in this sample.
+	 * It is also possible to only read parts of the sample data using the method with four arguments, 
+	 * which allows you to specify the index of the first frame to read, the position in the array to 
+	 * write it to, as well as how many frames to copy over into the array in total.
+	 * Finally, the method taking a single integer argument `index` returns the value of the single 
+	 * audio frame of the sample at this index as a float.
 	 *
 	 * @param startFrame
 	 *            the index of the first frame of the audiosample that should be
@@ -708,7 +744,8 @@ public class AudioSample extends SoundObject {
 	 * @param numFrames
 	 *            the number of frames that should be read (can't be greater than
 	 *            audiosample.channels() * data.length - startIndex)
-	 * @webref sound
+	 * @webref audiosample
+	 * @webBrief The underlying data of the audiosample can be read and written in several different.
 	 */
 	public void read(int startFrame, float[] data, int startIndex, int numFrames) {
 		if (this.checkStartFrame(startFrame)) {
@@ -735,7 +772,6 @@ public class AudioSample extends SoundObject {
 	 *            right channel in interleaved order. (See the Soundfile > StereoSample
 	 *            example for a demonstration.)
 	 * @return float: the value of the audio sample at the given index
-	 * @webref sound
 	 */
 	public float read(int frameIndex) {
 		// TODO catch exception and print understandable error message
@@ -747,7 +783,6 @@ public class AudioSample extends SoundObject {
 	 *            the channel from which to extract the frame value (0 for left,
 	 *            1 for right). `read(frameIndex, channelIndex)` is the same as
 	 *            calling `read(frameIndex * this.channels() + channelIndex)`.
-	 * @webref sound
          */
 	public float read(int frameIndex, int channelIndex) {
 		if (channelIndex < 0 || channelIndex >= this.channels()) {
@@ -778,8 +813,14 @@ public class AudioSample extends SoundObject {
 	}
 
 	/**
-	 * Write some frames of this audio sample. Stereo samples require two data
-	 *.points per frame.
+	 * The underlying data of the audiosample can be read and (over)written in several different ways:
+	 * the method taking a single float array `data` replaces the sample data with the content of the 
+	 * given array. The array has to contain as many floats as there are frames in this sample.
+	 * It is also possible to only write parts of the sample data using the method with four arguments, 
+	 * which allows you to specify the index of the first frame to write, the position in the array to 
+	 * take the data from, as well as how many frames should be copied over.
+	 * Finally, the method taking two arguments simply sets the value of the single audio frame 
+	 * specified by the first argument to the given float value.
 	 *
 	 * @param startFrame
 	 *            the index of the first frame of the audiosample that should be
@@ -790,7 +831,8 @@ public class AudioSample extends SoundObject {
 	 * @param numFrames
 	 *            the number of frames that should be written (can't be greater than
 	 *            audiosample.channels() * data.length - startIndex)
-	 * @webref sound
+	 * @webref audiosample
+	 * @webBrief The underlying data of the audiosample can be read and (over)written in several different ways.
 	 */
 	public void write(int startFrame, float[] data, int startIndex, int numFrames) {
 		// FIXME check stereo case

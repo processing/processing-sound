@@ -4,13 +4,13 @@ import processing.core.PApplet;
 
 /**
 * This is a pink noise generator. Pink Noise has a decrease of 3dB per octave.
-* @webref sound
+* @webref noise
+* @webBrief This is a pink noise generator.
 **/
 public class PinkNoise extends Noise<com.jsyn.unitgen.PinkNoise> {
 
 	/**
 	 * @param parent typically use "this"	
-	 * @webref sound
 	 */
 	public PinkNoise(PApplet parent) {
 		super(parent, new com.jsyn.unitgen.PinkNoise());
@@ -33,22 +33,24 @@ public class PinkNoise extends Noise<com.jsyn.unitgen.PinkNoise> {
 	}
 
 	/**
-	 * Start the generator
+	 * Start the generator.
 	 * @param amp the amplitude of the noise as a value from 0.0 (complete silence) to 1.0 (full volume)
 	 * @param add offset the output of the noise by given value
 	 * @param pos pan the generator in stereo panorama. Allowed values are between -1.0 and 1.0.
-	 * @webref sound
+	 * @webref pinknoise
+	 * @webBrief Start the generator.
 	 **/
 	public void play(float amp, float add, float pos) {
 		super.play(amp, add, pos);
 	}
 
 	/**
-	 * Set multiple parameters at once.
+	 * Sets amplitude, add and pan position with one method.
 	 * @param amp the amplitude of the noise as a value from 0.0 (complete silence) to 1.0 (full volume)
 	 * @param add offset the output of the noise by given value
 	 * @param pos pan the generator in stereo panorama. Allowed values are between -1.0 and 1.0.
-	 * @webref sound
+	 * @webref pinknoise
+	 * @webBrief Sets amplitude, add and pan position with one method.
 	 **/
 	public void set(float amp, float add, float pos) {
 		super.set(amp, add, pos);
@@ -57,7 +59,8 @@ public class PinkNoise extends Noise<com.jsyn.unitgen.PinkNoise> {
 	/**
 	 * Change the amplitude/volume of this sound.
 	 * @param amp the amplitude of the noise as a value from 0.0 (complete silence) to 1.0 (full volume)
-	 * @webref sound
+	 * @webref pinknoise
+	 * @webBrief Change the amplitude/volume of this sound.
 	 **/
 	public void amp(float amp) {
 		// the JSyn Brownian noise generator can drift to exceed one, so tone down the volume a bit
@@ -65,28 +68,31 @@ public class PinkNoise extends Noise<com.jsyn.unitgen.PinkNoise> {
 	}
 
 	/**
-	 * Offset the output of this generator by a fixed value
+	 * Offset the output of this generator by a fixed value.
 	 * @param add offset the output of the generator by the given value
-	 * @webref sound
+	 * @webref pinknoise
+	 * @webBrief Offset the output of this generator by a fixed value.
 	 **/
 	public void add(float add) {
 		super.add(add);
 	}
 
 	/**
-	 * Move the sound in a stereo panorama.
+	 * Pan the generator in a stereo panorama. -1.0 pans to the left channel and 1.0 to the right channel.
 	 * @param pos
 	 *            the panoramic position of this sound unit from -1.0 (left) to 1.0
 	 *            (right).
-	 * @webref sound
+	 * @webref pinknoise
+	 * @webBrief Pan the generator in a stereo panorama.
 	 **/
 	public void pan(float pos) {
 		super.pan(pos);
 	}
 
 	/**
-	 * Stop the generator
-	 * @webref sound
+	 * Stops the Pink Noise generator.
+	 * @webref pinknoise
+	 * @webBrief Stops the Pink Noise generator.
 	 **/
 	public void stop() {
 		super.stop();

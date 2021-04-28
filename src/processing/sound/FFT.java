@@ -9,7 +9,8 @@ import processing.core.PApplet;
  * power spectrum of an audio stream the moment it is queried with the analyze()
  * method.
  * 
- * @webref sound
+ * @webref analysis
+ * @webBrief This is a Fast Fourier Transform (FFT) analyzer.
  **/
 public class FFT extends Analyzer {
 
@@ -28,7 +29,6 @@ public class FFT extends Analyzer {
 	 *            number of frequency bands for the FFT as an integer (default 512).
 	 *            This parameter needs to be a power of 2 (e.g. 16, 32, 64, 128,
 	 *            ...).
-	 * @webref sound
 	 */
 	public FFT(PApplet parent, int bands) {
 		super(parent);
@@ -66,14 +66,15 @@ public class FFT extends Analyzer {
 	}
 
 	/**
-	 * Calculates the current frequency spectrum from the input source.
+	 * Calculates the current frequency spectrum and returns it as an array with as many elements as frequency bands.
 	 *
 	 * @param value
 	 *            an array with as many elements as this FFT analyzer's number of
 	 *            frequency bands
 	 * @return The current frequency spectrum of the input source. The array has as
 	 *         many elements as this FFT analyzer's number of frequency bands.
-	 * @webref sound
+	 * @webref fft
+	 * @webBrief Calculates the current frequency spectrum and returns it as an array with as many elements as frequency bands.
 	 **/
 	public float[] analyze(float[] value) {
 		if (this.input == null) {
@@ -92,7 +93,8 @@ public class FFT extends Analyzer {
 	 * @param input
 	 *            the input sound source. Can be an oscillator, noise generator,
 	 *            SoundFile or AudioIn.
-	 * @webref sound
+	 * @webref fft
+	 * @webBrief Define the audio input for the analyzer.
 	 **/
 	public void input(SoundObject input) {
 		super.input(input);

@@ -12,9 +12,10 @@ import processing.core.PApplet;
  * rate or global output volume.
  *
  * Information on available input and output devices can be obtained by calling
- * Sound.list()
+ * <b>Sound.list()</b>
  * 
- * @webref sound
+ * @webref configuration
+ * @webBrief This class can be used for configuring the Processing Sound library.
  */
 public class Sound {
 
@@ -39,7 +40,6 @@ public class Sound {
 	 *            captured
 	 * @param volume
 	 *            the overall output volume of the library (default 1.0)
-	 * @webref sound
 	 */
 	public Sound(PApplet parent, int sampleRate, int outputDevice, int inputDevice, float volume) {
 		this(parent);
@@ -52,10 +52,17 @@ public class Sound {
 	/**
 	 * Print and return information on available audio devices and their number of
 	 * input/output channels.
+	 * Under normal circumstances you will not want to call <b>Sound.list()</b> in 
+	 * your actual sketch code, but only for testing to figure out which sound cards 
+	 * are available on a new system and how to select them. However, if the order 
+	 * of devices on your system is prone to fluctuate from reboot to reboot, you 
+	 * can also use the device name array returned by the function to automate device 
+	 * selection by name in your own code.
 	 * 
 	 * @return an array giving the names of all audio devices available on this
 	 *         computer
 	 * @webref sound
+	 * @webBrief Print and return information on available audio devices and their number of input/output channels.
 	 */
 	public static String[] list() {
 		AudioDeviceManager audioManager = Engine.getAudioManager();
@@ -86,6 +93,7 @@ public class Sound {
 	 *            the sample rate to be used by the synthesis engine (default 44100)
 	 * @return the internal sample rate used by the synthesis engine
 	 * @webref sound
+	 * @webBrief Get or set the internal sample rate of the synthesis engine.
 	 */
 	public int sampleRate(int sampleRate) {
 		this.engine.setSampleRate(sampleRate);
@@ -94,12 +102,16 @@ public class Sound {
 
 	/**
 	 * Choose the device (sound card) which should be used for grabbing audio input
-	 * using AudioIn.
+	 * using AudioIn.  Note that this setting affects the choice of sound card, which 
+	 * is not necessarily the same as the number of the input channel. If your sound 
+	 * card has more than one input channel, you can specify which channel to use in
+	 * the constructor of the AudioIn class.
 	 * 
 	 * @param deviceId
 	 *            the device id obtained from Sound.list()
 	 * @seealso Sound.list()
 	 * @webref sound
+	 * @webBrief Choose the device (sound card) which should be used for grabbing audio input using AudioIn.
 	 */
 	public void inputDevice(int deviceId) {
 		this.engine.selectInputDevice(deviceId);
@@ -107,12 +119,13 @@ public class Sound {
 
 	/**
 	 * Choose the device (sound card) which the Sound library's audio output should
-	 * be sent to.
+	 * be sent to. The output device should support stereo output (2 channels).
 	 * 
 	 * @param deviceId
 	 *            the device id obtained from list()
 	 * @seealso list()
 	 * @webref sound
+	 * @webBrief Choose the device (sound card) which the Sound library's audio output should be sent to.
 	 */
 	public void outputDevice(int deviceId) {
 		this.engine.selectOutputDevice(deviceId);
@@ -125,6 +138,7 @@ public class Sound {
 	 *            the desired output volume, normally between 0.0 and 1.0 (default
 	 *            is 1.0)
 	 * @webref sound
+	 * @webBrief Set the overall output volume of the Processing sound library.
 	 */
 	public void volume(float volume) {
 		this.engine.setVolume(volume);

@@ -5,14 +5,14 @@ import com.jsyn.unitgen.SineOscillator;
 import processing.core.PApplet;
 
 /**
- * This is a simple Sine Wave Oscillator
+ * This is a simple Sine Wave Oscillator.
  *
- * @webref sound
+ * @webref oscillators
+ * @webBrief This is a simple Sine Wave Oscillator.
  **/
 public class SinOsc extends Oscillator<SineOscillator> {
 
 	/**
-	 * @webref sound
 	 * @param parent
 	 *            typically use "this"
 	 */
@@ -36,7 +36,7 @@ public class SinOsc extends Oscillator<SineOscillator> {
 	}
 
 	/**
-	 * Starts the oscillator
+	 * Starts the oscillator.
 	 *
 	 * @param freq
 	 *            The frequency value of the oscillator in Hz.
@@ -47,16 +47,18 @@ public class SinOsc extends Oscillator<SineOscillator> {
 	 * @param pos
 	 *            The panoramic position of the oscillator as a float from -1.0 to
 	 *            1.0.
-	 * @webref sound
+	 * @webref sinosc
+	 * @webBrief Starts the oscillator.
 	 **/
 	public void play(float freq, float amp, float add, float pos) {
 		super.play(freq, amp, add, pos);
 	}
 
 	/**
-	 * Set multiple parameters at once
+	 * Set multiple parameters at once.
 	 *
-	 * @webref sound
+	 * @webref sinosc
+	 * @webBrief Set multiple parameters at once.
 	 * @param freq
 	 *            The frequency value of the oscillator in Hz.
 	 * @param amp
@@ -74,7 +76,8 @@ public class SinOsc extends Oscillator<SineOscillator> {
 	/**
 	 * Set the frequency of the oscillator in Hz.
 	 *
-	 * @webref sound
+	 * @webref sinosc
+	 * @webBrief Set the frequency of the oscillator in Hz.
 	 * @param freq
 	 *            A floating point value of the oscillator in Hz.
 	 **/
@@ -83,9 +86,10 @@ public class SinOsc extends Oscillator<SineOscillator> {
 	}
 
 	/**
-	 * Change the amplitude/volume of this sound.
+	 * Changes the amplitude/volume of the sine oscillator. Allowed values are between 0.0 and 1.0.
 	 *
-	 * @webref sound
+	 * @webref sinosc
+	 * @webBrief Changes the amplitude/volume of the sine oscillator.
 	 * @param amp
 	 *            A float value between 0.0 (complete silence) and 1.0 (full volume)
 	 *            controlling the amplitude/volume of this sound.
@@ -95,9 +99,10 @@ public class SinOsc extends Oscillator<SineOscillator> {
 	}
 
 	/**
-	 * Offset the output of this generator by given value
+	 * Offset the output of this generator by given value.
 	 *
-	 * @webref sound
+	 * @webref sinosc
+	 * @webBrief Offset the output of this generator by given value.
 	 * @param add
 	 *            Offset the output of the oscillator by given value
 	 **/
@@ -106,9 +111,10 @@ public class SinOsc extends Oscillator<SineOscillator> {
 	}
 
 	/**
-	 * Move the sound in a stereo panorama.
+	 * Pan the oscillator in a stereo panorama. -1.0 pans to the left channel and 1.0 to the right channel.
 	 *
-	 * @webref sound
+	 * @webref sinosc
+	 * @webBrief Pan the oscillator in a stereo panorama.
 	 * @param pos
 	 *            the panoramic position of this sound unit from -1.0 (left) to 1.0
 	 *            (right).
@@ -120,7 +126,8 @@ public class SinOsc extends Oscillator<SineOscillator> {
 	/**
 	 * Stop the oscillator.
 	 *
-	 * @webref sound
+	 * @webref sinosc
+	 * @webBrief Stops the oscillator.
 	 **/
 	public void stop() {
 		super.stop();

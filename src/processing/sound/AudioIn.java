@@ -9,7 +9,8 @@ import processing.core.PApplet;
 /**
  * AudioIn lets you grab the audio input from your sound card.
  * 
- * @webref sound
+ * @webref I/O
+ * @webBrief AudioIn lets you grab the audio input from your sound card.
  **/
 public class AudioIn extends SoundObject {
 
@@ -92,7 +93,8 @@ public class AudioIn extends SoundObject {
 	 * @param pos
 	 *            pan the audio input in a stereo panorama. Allowed values are
 	 *            between -1.0 (left) and 1.0 (right)
-	 * @webref sound
+	 * @webref audioin
+	 * @webBrief Start capturing the input stream and route it to the audio output
 	 **/
 	public void play(float amp, float add, float pos) {
 		this.set(amp, add, pos);
@@ -125,7 +127,8 @@ public class AudioIn extends SoundObject {
 	 * @param pos
 	 *            pan the audio input in a stereo panorama. Allowed values are
 	 *            between -1.0 (left) and 1.0 (right)
-	 * @webref sound
+	 * @webref audioin
+	 * @webBrief Start the input stream without routing it to the audio output. 
 	 */
 	public void start(float amp, float add, float pos) {
 		this.set(amp, add, pos);
@@ -135,7 +138,8 @@ public class AudioIn extends SoundObject {
 	/**
 	 * Sets amplitude, add and pan position with one method.
 	 * 
-	 * @webref sound
+	 * @webref audioin
+	 * @webBrief Sets amplitude, add and pan position with one method.
 	 * @param amp
 	 *            the volume to grab the input at as a value from 0.0 (complete
 	 *            silence) to 1.0 (full volume)

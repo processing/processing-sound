@@ -8,12 +8,13 @@ import processing.core.PApplet;
 
 /**
  * This is a Waveform analyzer. It returns the waveform of the 
- * of an audio stream the moment it is queried with the analyze()
+ * of an audio stream the moment it is queried with the <b>analyze()</b>
  * method.
  * 
  * @author icalvin102
  * 
- * @webref sound
+ * @webref analysis
+ * @webBrief This is a Waveform analyzer.
  **/
 public class Waveform extends Analyzer {
 
@@ -28,7 +29,6 @@ public class Waveform extends Analyzer {
 	 *            typically use "this"
 	 * @param nsamples
 	 *            number of waveform samples that you want to be able to read at once (a positive integer).
-	 * @webref sound
 	 */
 	public Waveform(PApplet parent, int nsamples) {
 		super(parent);
@@ -76,7 +76,8 @@ public class Waveform extends Analyzer {
 	 *            samples
 	 * @return the current audiobuffer of the input source. The array has as
 	 *         many elements as this Waveform analyzer's number of samples
-	 * @webref sound
+	 * @webref waveform
+	 * @webBrief Gets the content of the current audiobuffer from the input source.
 	 **/
 	public float[] analyze(float[] value) {
 		if (this.input == null) {
@@ -121,7 +122,8 @@ public class Waveform extends Analyzer {
 	 * @param input
 	 *            the input sound source. Can be an oscillator, noise generator,
 	 *            SoundFile or AudioIn.
-	 * @webref sound
+	 * @webref waveform
+	 * @webBrief Define the audio input for the analyzer.
 	 **/
 	public void input(SoundObject input) {
 		super.input(input);

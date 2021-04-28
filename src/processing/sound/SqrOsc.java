@@ -5,13 +5,13 @@ import com.jsyn.unitgen.SquareOscillator;
 import processing.core.PApplet;
 
 /**
- * This is a simple Square Wave Oscillator 
- * @webref sound
+ * This is a simple Square Wave Oscillator.
+ * @webref oscillators
+ * @webBrief This is a simple Square Wave Oscillator.
  **/
 public class SqrOsc extends Oscillator<SquareOscillator> {
 
 	/**
-	 * @webref sound
 	 * @param parent typically use "this"
 	 */
 	public SqrOsc(PApplet parent) {
@@ -34,20 +34,22 @@ public class SqrOsc extends Oscillator<SquareOscillator> {
 	}
 
 	/**
-	 * Starts the oscillator
+	 * Starts the oscillator.
 	 * @param freq The frequency value of the oscillator in Hz.
 	 * @param amp The amplitude of the oscillator as a value between 0.0 and 1.0.
 	 * @param add Offset the output of the oscillator by given value
 	 * @param pos The panoramic position of the oscillator as a float from -1.0 to 1.0.
-	 * @webref sound
+	 * @webref sqrosc
+	 * @webBrief Starts the oscillator.
 	 **/
 	public void play(float freq, float amp, float add, float pos) {
 		super.play(freq, amp, add, pos);
 	}
 
 	/**
-	 * Set multiple parameters at once
-	 * @webref sound
+	 * Set multiple parameters at once.
+	 * @webref sqrosc
+	 * @webBrief Set multiple parameters at once.
 	 * @param freq The frequency value of the oscillator in Hz.
 	 * @param amp The amplitude of the oscillator as a value between 0.0 and 1.0.
 	 * @param add Offset the output of the oscillator by given value
@@ -59,7 +61,8 @@ public class SqrOsc extends Oscillator<SquareOscillator> {
 	
 	/**
 	 * Set the frequency of the oscillator in Hz.
-	 * @webref sound
+	 * @webref sqrosc
+	 * @webBrief Set the frequency of the oscillator in Hz.
 	 * @param freq A floating point value of the oscillator in Hz.
 	 **/
 	public void freq(float freq) {
@@ -67,9 +70,11 @@ public class SqrOsc extends Oscillator<SquareOscillator> {
 	}
 
 	/**
-	 * Change the amplitude/volume of this sound.
+	 * Change the amplitude/volume of of the square oscillator. 
+	 * Allowed values are between 0.0 and 1.0.
 	 *
-	 * @webref sound
+	 * @webref sqrosc
+	 * @webBrief Change the amplitude/volume of of the square oscillator. 
 	 * @param amp
 	 *            A float value between 0.0 (complete silence) and 1.0 (full volume)
 	 *            controlling the amplitude/volume of this sound.
@@ -79,9 +84,10 @@ public class SqrOsc extends Oscillator<SquareOscillator> {
 	}
 
 	/**
-	 * Offset the output of this generator by given value
+	 * Offset the output of this generator by given value.
 	 *
-	 * @webref sound
+	 * @webref sqrosc
+	 * @webBrief Offset the output of this generator by given value.
 	 * @param add Offset the output of the oscillator by given value
 	 **/
 	public void add(float add) {
@@ -91,7 +97,8 @@ public class SqrOsc extends Oscillator<SquareOscillator> {
 	/**
 	 * Move the sound in a stereo panorama.
 	 *
-	 * @webref sound
+	 * @webref sqrosc
+	 * @webBrief Move the sound in a stereo panorama.
 	 * @param pos
 	 *            The panoramic position of this sound unit as a float from -1.0
 	 *            (left) to 1.0 (right).
@@ -103,7 +110,8 @@ public class SqrOsc extends Oscillator<SquareOscillator> {
 	/**
 	 * Stop the oscillator.
 	 *
-	 * @webref sound
+	 * @webref sqrosc
+	 * @webBrief Stop the oscillator.
 	 **/
 	public void stop() {
 		super.stop();

@@ -5,13 +5,13 @@ import com.jsyn.unitgen.TriangleOscillator;
 import processing.core.PApplet;
 
 /**
- * This is a simple triangle (or "saw") wave oscillator
- * @webref sound
+ * This is a simple triangle (or "saw") wave oscillator.
+ * @webref oscillators
+ * @webBrief This is a simple triangle (or "saw") wave oscillator.
  **/
 public class TriOsc extends Oscillator<TriangleOscillator> {
 
 	/**
-	 * @webref sound
 	 * @param parent typically use "this"
 	 */
 	public TriOsc(PApplet parent) {
@@ -34,20 +34,22 @@ public class TriOsc extends Oscillator<TriangleOscillator> {
 	}
 
 	/**
-	 * Starts the oscillator
+	 * Starts the oscillator.
 	 * @param freq The frequency value of the oscillator in Hz.
 	 * @param amp The amplitude of the oscillator as a value between 0.0 and 1.0.
 	 * @param add Offset the output of the oscillator by given value
 	 * @param pos The panoramic position of the oscillator as a float from -1.0 to 1.0.
-	 * @webref sound
+	 * @webref triosc
+	 * @webBrief Starts the oscillator.
 	 **/
 	public void play(float freq, float amp, float add, float pos) {
 		super.play(freq, amp, add, pos);
 	}
 
 	/**
-	 * Set multiple parameters at once
-	 * @webref sound
+	 * Set multiple parameters at once.
+	 * @webref triosc
+	 * @webBrief Set multiple parameters at once.
 	 * @param freq The frequency value of the oscillator in Hz.
 	 * @param amp The amplitude of the oscillator as a value between 0.0 and 1.0.
 	 * @param add Offset the output of the oscillator by given value
@@ -59,7 +61,8 @@ public class TriOsc extends Oscillator<TriangleOscillator> {
 	
 	/**
 	 * Set the frequency of the oscillator in Hz.
-	 * @webref sound
+	 * @webref triosc
+	 * @webBrief Set the frequency of the oscillator in Hz.
 	 * @param freq A floating point value of the oscillator in Hz.
 	 **/
 	public void freq(float freq) {
@@ -67,9 +70,11 @@ public class TriOsc extends Oscillator<TriangleOscillator> {
 	}
 
 	/**
-	 * Change the amplitude/volume of this sound.
+	 * Changes the amplitude/volume of the triangle oscillator. 
+	 * Allowed values are between 0.0 and 1.0.
 	 *
-	 * @webref sound
+	 * @webref triosc
+	 * @webBrief Changes the amplitude/volume of the triangle oscillator. 
 	 * @param amp
 	 *            A float value between 0.0 (complete silence) and 1.0 (full volume)
 	 *            controlling the amplitude/volume of this sound.
@@ -79,9 +84,10 @@ public class TriOsc extends Oscillator<TriangleOscillator> {
 	}
 
 	/**
-	 * Offset the output of this generator by given value
+	 * Offset the output of this generator by given value.
 	 *
-	 * @webref sound
+	 * @webref triosc
+	 * @webBrief Offset the output of this generator by given value.
 	 * @param add Offset the output of the oscillator by given value
 	 **/
 	public void add(float add) {
@@ -89,9 +95,10 @@ public class TriOsc extends Oscillator<TriangleOscillator> {
 	}
 
 	/**
-	 * Move the sound in a stereo panorama.
+	 * Move the sound in a stereo panorama. -1.0 pans to the left channel and 1.0 to the right channel.
 	 *
-	 * @webref sound
+	 * @webref triosc
+	 * @webBrief Move the sound in a stereo panorama.
 	 * @param pos
 	 *            The panoramic position of this sound unit as a float from -1.0
 	 *            (left) to 1.0 (right).
@@ -103,7 +110,8 @@ public class TriOsc extends Oscillator<TriangleOscillator> {
 	/**
 	 * Stop the oscillator.
 	 *
-	 * @webref sound
+	 * @webref triosc
+	 * @webBrief Stop the oscillator.
 	 **/
 	public void stop() {
 		super.stop();
