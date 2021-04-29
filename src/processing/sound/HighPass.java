@@ -5,8 +5,9 @@ import com.jsyn.unitgen.FilterHighPass;
 import processing.core.PApplet;
 
 /**
- * This is a high pass filter
- * @sound webref
+ * This is a high pass filter.
+ * @webref effects
+ * @webBrief This is a high pass filter.
  * @param parent PApplet: typically use "this"
  **/
 public class HighPass extends Effect<FilterHighPass> {
@@ -21,8 +22,9 @@ public class HighPass extends Effect<FilterHighPass> {
 	}
 
 	/**
-	 * Set the cut off frequency for the filter
-	 * @webref sound
+	 * Set the cut off frequency for the filter.
+	 * @webref highpass
+	 * @webBrief Set the cut off frequency for the filter.
 	 * @param freq the cutoff frequency in Hertz
 	 */
 	public void freq(float freq) {

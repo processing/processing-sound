@@ -5,13 +5,13 @@ import com.jsyn.unitgen.SawtoothOscillator;
 import processing.core.PApplet;
 
 /**
- * This is a simple Saw Wave Oscillator 
- * @webref sound
+ * This is a simple Saw Wave Oscillator.
+ * @webref oscillators
+ * @webBrief This is a simple Saw Wave Oscillator.
  **/
 public class SawOsc extends Oscillator<SawtoothOscillator> {
 
 	/**
-	 * @webref sound
 	 * @param parent typically use "this"
 	 */
 	public SawOsc(PApplet parent) {
@@ -34,20 +34,22 @@ public class SawOsc extends Oscillator<SawtoothOscillator> {
 	}
 
 	/**
-	 * Starts the oscillator
+	 * Starts the oscillator.
 	 * @param freq The frequency value of the oscillator in Hz.
 	 * @param amp The amplitude of the oscillator as a value between 0.0 and 1.0.
 	 * @param add Offset the output of the oscillator by given value
 	 * @param pos The panoramic position of the oscillator as a float from -1.0 to 1.0.
-	 * @webref sound
+	 * @webref sawosc
+	 * @webBrief Starts the oscillator. 
 	 **/
 	public void play(float freq, float amp, float add, float pos) {
 		super.play(freq, amp, add, pos);
 	}
 
 	/**
-	 * Set multiple parameters at once
-	 * @webref sound
+	 * Set multiple parameters at once.
+	 * @webref sawosc
+	 * @webBrief Set multiple parameters at once.
 	 * @param freq The frequency value of the oscillator in Hz.
 	 * @param amp The amplitude of the oscillator as a value between 0.0 and 1.0.
 	 * @param add Offset the output of the oscillator by given value
@@ -59,7 +61,8 @@ public class SawOsc extends Oscillator<SawtoothOscillator> {
 	
 	/**
 	 * Set the frequency of the oscillator in Hz.
-	 * @webref sound
+	 * @webref sawosc
+	 * @webBrief Set the frequency of the oscillator in Hz.
 	 * @param freq A floating point value of the oscillator in Hz.
 	 **/
 	public void freq(float freq) {
@@ -67,9 +70,10 @@ public class SawOsc extends Oscillator<SawtoothOscillator> {
 	}
 
 	/**
-	 * Change the amplitude/volume of this sound.
+	 * Changes the amplitude/volume of the saw oscillator. Allowed values are between 0.0 and 1.0.
 	 *
-	 * @webref sound
+	 * @webref sawosc
+	 * @webBrief Changes the amplitude/volume of the saw oscillator.
 	 * @param amp
 	 *            A float value between 0.0 (complete silence) and 1.0 (full volume)
 	 *            controlling the amplitude/volume of this sound.
@@ -79,9 +83,10 @@ public class SawOsc extends Oscillator<SawtoothOscillator> {
 	}
 
 	/**
-	 * Offset the output of this generator by given value
+	 * Offset the output of this generator by given value.
 	 *
-	 * @webref sound
+	 * @webref sawosc
+	 * @webBrief Offset the output of this generator by given value.
 	 * @param add Offset the output of the oscillator by given value
 	 **/
 	public void add(float add) {
@@ -91,8 +96,9 @@ public class SawOsc extends Oscillator<SawtoothOscillator> {
 	/**
 	 * Move the sound in a stereo panorama.
 	 *
-	 * @webref sound
-	 * @param pos
+	 * @webref sawosc
+	 * @webBrief Move the sound in a stereo panorama.
+	 * @param pos Move the sound in a stereo panorama.
 	 *            The panoramic position of this sound unit as a float from -1.0
 	 *            (left) to 1.0 (right).
 	 **/
@@ -103,7 +109,8 @@ public class SawOsc extends Oscillator<SawtoothOscillator> {
 	/**
 	 * Stop the oscillator.
 	 *
-	 * @webref sound
+	 * @webref sawosc
+	 * @webBrief Move the sound in a stereo panorama.
 	 **/
 	public void stop() {
 		super.stop();

@@ -7,8 +7,9 @@ import com.softsynth.shared.time.TimeStamp;
 import processing.core.PApplet;
 
 /**
-* This is an ASR (Attack Sustain Release) Envelope Generator
-* @webref sound
+* This is an ASR (Attack Sustain Release) Envelope Generator.
+* @webref envelopes
+* @webBrief This is an ASR (Attack Sustain Release) Envelope Generator.
 * @param parent PApplet: typically use "this"
 **/
 public class Env {
@@ -18,8 +19,9 @@ public class Env {
 	}
 
 	/**
-	* Triggers the envelope
-	* @webref sound
+	* Triggers the envelope.
+	* @webref env
+	* @webBrief Triggers the envelope.
 	* @param input Input sound source
 	* @param attackTime Attack time value as a float.
 	* @param sustainTime Sustain time value as a float. 
