@@ -3,9 +3,14 @@ package processing.sound;
 import processing.core.PApplet;
 
 /**
- * This is a brown noise generator. Brown noise has a decrease of 6db per octave.
+ * Brown noise (also called red noise) has higher energy at lower frequencies. Its power density
+ * decreases 6dB per octave.
+ * 
+ * Please be aware that, because most of its power resides in the bass frequencies, the subjective
+ * loudness of brown noise relative to other sounds can vary dramatically depending on how well
+ * your sound system can reproduce low frequency sounds!
  * @webref noise
- * @webBrief This is a brown noise generator.
+ * @webBrief Brown noise (also called red noise) has higher energy at lower frequencies.
  * @param parent typically use "this"	
  **/
 public class BrownNoise extends Noise<com.jsyn.unitgen.BrownNoise> {
@@ -18,6 +23,17 @@ public class BrownNoise extends Noise<com.jsyn.unitgen.BrownNoise> {
 		this.amplitude = this.noise.amplitude;
 		// explicitly set amplitude to override default (see amp() below)
 		this.amp(1.0f);
+	}
+
+	/**
+	 * Changes the amplitude/volume of the noise generator. Allowed values are between 0.0 and 1.0.
+	 * @param amp the amplitude of the noise as a value from 0.0 (complete silence) to 1.0 (full volume)
+	 * @webref brownnoise
+	 * @webBrief Changes the amplitude/volume of the noise generator.
+	 **/
+	public void amp(float amp) {
+		// the JSyn Brownian noise generator can drift to exceed one, so tone down the volume a bit
+		super.amp(amp / 16);
 	}
 
 	// Below are just duplicated methods from the Noise and SoundObject superclass which
@@ -57,17 +73,6 @@ public class BrownNoise extends Noise<com.jsyn.unitgen.BrownNoise> {
 	 **/
 	public void set(float amp, float add, float pos) {
 		super.set(amp, add, pos);
-	}
-
-	/**
-	 * Changes the amplitude/volume of the noise generator. Allowed values are between 0.0 and 1.0.
-	 * @param amp the amplitude of the noise as a value from 0.0 (complete silence) to 1.0 (full volume)
-	 * @webref brownnoise
-	 * @webBrief Changes the amplitude/volume of the noise generator.
-	 **/
-	public void amp(float amp) {
-		// the JSyn Brownian noise generator can drift to exceed one, so tone down the volume a bit
-		super.amp(amp / 4);
 	}
 
 	/**
