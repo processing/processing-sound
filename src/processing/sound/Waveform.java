@@ -7,8 +7,8 @@ import com.jsyn.unitgen.FixedRateMonoWriter;
 import processing.core.PApplet;
 
 /**
- * This is a Waveform analyzer. It returns the waveform of the 
- * of an audio stream the moment it is queried with the <b>analyze()</b>
+ * This is a Waveform analyzer. It returns the waveform of an 
+ * audio stream the moment it is queried with the <b>analyze()</b>
  * method.
  * 
  * @author icalvin102
