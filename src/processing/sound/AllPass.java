@@ -1,6 +1,6 @@
 package processing.sound;
 
-import com.jsyn.unitgen.FilterAllPass
+import com.jsyn.unitgen.FilterAllPass;
 
 import processing.core.PApplet;
 
@@ -13,7 +13,6 @@ public class AllPass extends Effect<FilterAllPass> {
 
 	public AllPass(PApplet parent) {
 		super(parent);
-		gain = 0.0;
 	}
 
 	@Override
@@ -27,7 +26,7 @@ public class AllPass extends Effect<FilterAllPass> {
 	}
 
 	public void process(SoundObject input, float g) {
-		this.setGain(g);
+		this.gain(g);
 		this.process(input);
 	}
 }
