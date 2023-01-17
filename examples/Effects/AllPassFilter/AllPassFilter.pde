@@ -1,26 +1,39 @@
-/**
- * This is a simple WhiteNoise generator, run through a LowPass filter which only lets
- * the lower frequency components of the noise through. The cutoff frequency of the
- * filter can be controlled through the left/right position of the mouse.
- */
-
 import processing.sound.*;
 
-PinkNoise noise;
+// Create square wave oscillator.
+SawOsc saw;
 AllPass allPass;
 
 void setup() {
-  size(640, 360);
-
-  // Create the noise generator + filter
-  noise = new PinkNoise(this);
+  size(512,360);
+  background(255);
+  
+  // Create a sawtooth wave and an AllPass filter
+  saw = new SawOsc(this);
+  saw.freq(200);
   allPass = new AllPass(this);
-
-  noise.play(0.5);
-  allPass.process(noise);
-}      
+  
+  // Start the saw wave and push it through the allpass
+  saw.play();
+  allPass.process(saw);
+}
 
 void draw() {
-  // Map the left/right mouse position to a cutoff frequency between 20 and 10000 Hz
-  allPass.gain(map(sin(mouseX), -PI, PI, -1., 1.));
+  background(0);
+  
+  // Set the drive of the allPass with the mouse
+  float g = map(mouseX, 0, width, 0., 1);
+  allPass.gain(g);
+  
+  // Draw some visuals for intuition
+  float a = 50;
+  strokeWeight(4);
+  for (float i = 0; i < width; i = i + 3) {
+    // Draw a wave
+    stroke(255, 0, 0);
+    point(i, sin(i) * a + width/2);
+    // Draw that wave again after being driven by g
+    stroke(0, 255, 0);
+    point(i + g * TWO_PI, a * sin(i) + width/2);
+  }
 }
