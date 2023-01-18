@@ -1,6 +1,5 @@
 import processing.sound.*;
 
-// Create square wave oscillator.
 SawOsc saw;
 AllPass allPass;
 
