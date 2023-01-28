@@ -13,7 +13,7 @@ void setup() {
   size(640, 360);
   background(255);
 
-  // Create and start the saw oscillator.
+  // Create and start the sawtooth wave oscillator.
   saw = new SawOsc(this);
   saw.play();
 }
