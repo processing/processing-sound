@@ -39,8 +39,28 @@ class JSynFFT extends FixedRateMonoWriter {
 		Arrays.fill(this.imaginary, 0);
 		FourierMath.fft(this.real.length, this.real, this.imaginary);
 		FourierMath.calculateMagnitudes(this.real, this.imaginary, this.magnitude);
+
 		for (int i = 0; i < target.length; i++) {
 			target[i] = (float) (2 * this.magnitude[i]);
+		}
+	}
+
+	protected void calculateMagnitudesFromSample(float[] sample, float[] target) {
+
+		double[] real = new double[sample.length];
+		double[] imaginary = new double[sample.length];
+		double[] magnitude = new double[target.length];
+		Arrays.fill(imaginary, 0);
+
+		for (int i = 0; i < sample.length; i++) {
+			real[i] = sample[i];
+		}
+
+		FourierMath.fft(target.length, real, imaginary);
+		FourierMath.calculateMagnitudes(real, imaginary, magnitude);
+
+		for (int i = 0; i < target.length; i++) {
+			target[i] = (float) magnitude[i];
 		}
 	}
 }

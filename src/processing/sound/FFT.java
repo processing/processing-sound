@@ -84,6 +84,31 @@ public class FFT extends Analyzer {
 		return value;
 	}
 
+	/**
+	 * Calculates the frequency spectrum of the given sample and returns an array of magnitudes, one
+	 * for each frequency band.
+	 *
+	 * This version is intended to be used in non-real time processing, particularly when you are
+	 * creating an animation in non-real time and want to get the FFT for a particular chunk of an audio sample.
+	 *
+	 * For stereo samples, you can call this function once for each channel, so you can display the left and right
+	 * fft values separately.
+	 *
+	 * @param sample
+	 *            an array with sound samples
+	 * @param numBands
+	 *            the number of fft bands requested. Must be a power of 2 (one of 2, 4, 8, 16 etc.)
+	 * @return The current frequency spectrum of the input source. The array has as
+	 *         many elements as this FFT analyzer's number of frequency bands.
+	 * @webref fft
+	 * @webBrief Calculates the frequency spectrum of the given sample, returning an array of magnitudes.
+	 **/
+	public float[] analyzeSample(float[] sample, int numBands) {
+		float[] target = new float[numBands];
+		fft.calculateMagnitudesFromSample(sample, target);
+		return target;
+	}
+
 	// Below are just duplicated methods from superclasses which are required
 	// for the online reference to build the corresponding pages.
 
