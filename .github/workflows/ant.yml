@@ -8,7 +8,7 @@ on:
 
 jobs:
 
-  setup:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -18,16 +18,8 @@ jobs:
         with:
           java-version: '11'
           distribution: 'temurin'
-
-  build:
-    needs: setup
-    steps:
       - name: Build library with Ant
         run: ant
-
-  javadoc:
-    needs: setup
-    steps:
       - name: Build Javadoc
         run: ant javadoc
       - name: Upload GitHub Pages Artifact
@@ -36,7 +28,7 @@ jobs:
           path: docs/
 
   deploy-javadoc:
-    needs: javadoc
+    needs: build
 
     # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
     permissions:
