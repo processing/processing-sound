@@ -27,12 +27,12 @@ jobs:
   javadoc:
     needs: setup
     steps:
-      - name: Build Javadoc
-        run: ant javadoc
-      - name: Upload GitHub Pages Artifact
-        uses: actions/upload-pages-artifact@v1
-        with:
-          path: docs/
+    - name: Build Javadoc
+      run: ant javadoc
+    - name: Upload GitHub Pages Artifact
+      uses: actions/upload-pages-artifact@v1
+      with:
+        path: docs/
 
   deploy-javadoc:
     needs: javadoc
