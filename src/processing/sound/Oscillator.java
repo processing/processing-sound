@@ -66,7 +66,6 @@ public abstract class Oscillator<JSynOscillator extends UnitOscillator> extends 
 	public void set(float freq, float amp, float pos) {
 		this.freq(freq);
 		this.amp(amp);
-		this.add(add);
 		this.pan(pos);
 	}
 
