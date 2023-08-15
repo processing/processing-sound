@@ -8,7 +8,7 @@ import processing.core.PApplet;
 
 /**
 * This is an ASR (Attack Sustain Release) Envelope Generator.
-* @webref envelopes
+* @webref Envelopes
 * @webBrief This is an ASR (Attack Sustain Release) Envelope Generator.
 * @param parent PApplet: typically use "this"
 **/
@@ -20,7 +20,7 @@ public class Env {
 
 	/**
 	* Triggers the envelope.
-	* @webref env
+	* @webref Envelopes:Env
 	* @webBrief Triggers the envelope.
 	* @param input Input sound source
 	* @param attackTime Attack time value as a float.

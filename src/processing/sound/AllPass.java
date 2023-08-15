@@ -10,7 +10,7 @@ import processing.core.PApplet;
  * but have their phase relationship modified using a delayline of one sample.
  * 	>> y(k) = -z * x(k) + x(k - 1) + z * y(k - 1)
  * Where: y is the output, x is the input, z is the gain coefficient, and k is the signal.
- * @webref effects
+ * @webref Effects:AllPass
  * @webBrief This is a all pass filter. It outputs all frequencies at the same amplitude but changes their phase relationship.
  * @param parent PApplet: typically use "this"
  **/
@@ -27,7 +27,7 @@ public class AllPass extends Effect<FilterAllPass> {
 
 	/**
 	 * Set the gain for the filter.
-	 * @webref allpass
+	 * @webref Effects:AllPass
 	 * @webBrief Set the gain for the filter. Takes float from 0.0 - 1.0 where larger values increase phase displacement.
 	 * @param gain Phase displacement as float 0.0 - 1.0
 	 **/

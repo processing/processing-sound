@@ -51,10 +51,10 @@ public abstract class Effect<EffectType extends UnitFilter> {
 	}
 
 	/**
-	* Start the Filter
-	* @webref sound
-	* @param input Input sound source
-	**/
+	 * Start the effect.
+	 * @param input Input sound source
+	 * @webref Effects
+	 */
 	public void process(SoundObject input) {
 		if (this.inputs.add(input)) {
 			// attach effect to circuit until removed with effect.stop()
@@ -65,7 +65,8 @@ public abstract class Effect<EffectType extends UnitFilter> {
 	}
 
 	/**
-	 * 	Stop the effect.
+	 * Stop the effect.
+	 * @webref Effects
 	 */
 	public void stop() {
 		if (this.inputs.isEmpty()) {

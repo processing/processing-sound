@@ -9,7 +9,7 @@ import processing.core.PApplet;
  * power spectrum of an audio stream the moment it is queried with the analyze()
  * method.
  * 
- * @webref analysis
+ * @webref Analysis:FFT
  * @webBrief This is a Fast Fourier Transform (FFT) analyzer.
  **/
 public class FFT extends Analyzer {
@@ -60,6 +60,7 @@ public class FFT extends Analyzer {
 	 *
 	 * @return the current frequency spectrum of the input source. The array has as
 	 *         many elements as this FFT analyzer's number of frequency bands
+	 * @webref Analysis:FFT
 	 */
 	public float[] analyze() {
 		return this.analyze(this.spectrum);
@@ -73,7 +74,7 @@ public class FFT extends Analyzer {
 	 *            frequency bands
 	 * @return The current frequency spectrum of the input source. The array has as
 	 *         many elements as this FFT analyzer's number of frequency bands.
-	 * @webref fft
+	 * @webref Analysis:FFT
 	 * @webBrief Calculates the current frequency spectrum and returns it as an array with as many elements as frequency bands.
 	 **/
 	public float[] analyze(float[] value) {
@@ -100,7 +101,7 @@ public class FFT extends Analyzer {
 	 *            the number of fft bands requested. Must be a power of 2 (one of 2, 4, 8, 16 etc.)
 	 * @return The current frequency spectrum of the input source. The array has as
 	 *         many elements as this FFT analyzer's number of frequency bands.
-	 * @webref fft
+	 * @webref Analysis:FFT
 	 * @webBrief Calculates the frequency spectrum of the given sample, returning an array of magnitudes.
 	 **/
 	public float[] analyzeSample(float[] sample, int numBands) {
@@ -109,19 +110,4 @@ public class FFT extends Analyzer {
 		return target;
 	}
 
-	// Below are just duplicated methods from superclasses which are required
-	// for the online reference to build the corresponding pages.
-
-	/**
-	 * Define the audio input for the analyzer.
-	 * 
-	 * @param input
-	 *            the input sound source. Can be an oscillator, noise generator,
-	 *            SoundFile or AudioIn.
-	 * @webref fft
-	 * @webBrief Define the audio input for the analyzer.
-	 **/
-	public void input(SoundObject input) {
-		super.input(input);
-	}
 }

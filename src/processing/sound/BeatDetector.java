@@ -14,7 +14,7 @@ import processing.core.PApplet;
  * implementation does not return a tempo or BPM (beats per minute) value — it
  * can only tell you whether the current moment of audio contains a beat or not.
  *
- * @webref analysis
+ * @webref Analysis:BeatDetector
  * @webBrief Looks for spikes in the energy of an audio signal
  * which are often associated with rhythmic musical beats and can be used to trigger a
  * response whenever the incoming audio signal pulses.
@@ -47,7 +47,7 @@ public class BeatDetector extends Analyzer {
    * A "beat" is defined as a spike in the energy of the audio signal — it may
    * or may not coincide exactly with a musical beat.
    *
-   * @webref beatdetector
+   * @webref Analysis:BeatDetector
    * @webBrief Returns whether or not the current moment of audio contains a beat or not.
    *
    * @return True if the audio signal currently contains a beat, false otherwise.
@@ -66,7 +66,7 @@ public class BeatDetector extends Analyzer {
    * can tune this appropriately if you notice the detector returning too many
    * false positive beats.
    *
-   * @webref beatdetector
+   * @webref Analysis:BeatDetector
    * @webBrief Sets the sensitivity, in milliseconds, of the beat detection algorithm.
    *
    * @param sensitivity Sensitivity in milliseconds. Must be a positive number.
@@ -77,7 +77,7 @@ public class BeatDetector extends Analyzer {
 
   /**
    * Sets the sensitivity of the beat detector.
-   * @webref beatdetector
+   * @webref Analysis:BeatDetector
    * @webBrief Sets the sensitivity of the beat detector.
    *
    * @return The sensitivity in milliseconds.

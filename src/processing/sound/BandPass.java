@@ -6,7 +6,7 @@ import processing.core.PApplet;
 
 /**
  * This is a band pass filter.
- * @webref effects
+ * @webref Effects:BandPass
  * @webBrief This is a band pass filter.
  * @param parent PApplet: typically use "this"
  **/
@@ -23,7 +23,7 @@ public class BandPass extends Effect<FilterBandPass> {
 
 	/**
 	 * Set the bandwidth for the filter.
-	 * @webref bandpass
+	 * @webref Effects:BandPass
 	 * @webBrief Set the bandwidth for the filter.
 	 * @param freq Bandwidth in Hz
 	 **/
@@ -35,7 +35,7 @@ public class BandPass extends Effect<FilterBandPass> {
 
 	/**
 	 * Set the cutoff frequency for the filter.
-	 * @webref bandpass
+	 * @webref Effects:BandPass
 	 * @webBrief Set the cutoff frequency for the filter.
 	 * @param freq Cutoff frequency between 0 and 20000
 	 **/
@@ -49,6 +49,13 @@ public class BandPass extends Effect<FilterBandPass> {
 		this.process(input);
 	}
 
+	/**
+	 * Start applying this bandpass filter to an input signal.
+	 * @webref Effects:BandPass
+	 * @param input the sound source to apply the filter to
+	 * @param freq Cutoff frequency between 0 and 20000
+	 * @param bw Set the bandwidth
+	 **/
 	public void process(SoundObject input, float freq, float bw) {
 		this.freq(freq);
 		this.bw(bw);
@@ -57,7 +64,7 @@ public class BandPass extends Effect<FilterBandPass> {
 
 	/**
 	 * Sets frequency and bandwidth of the filter with one method. 
-	 * @webref bandpass
+	 * @webref Effects:BandPass
 	 * @webBrief Sets frequency and bandwidth of the filter with one method.
 	 * @param freq Set the frequency
 	 * @param bw Set the bandwidth

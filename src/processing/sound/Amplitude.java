@@ -9,7 +9,7 @@ import processing.core.PApplet;
  * This is a volume analyzer. It calculates the root mean square of the
  * amplitude of each audio block and returns that value.
  * 
- * @webref analysis
+ * @webref Analysis:Amplitude
  * @webBrief This is a volume analyzer.
  */
 public class Amplitude extends Analyzer {
@@ -18,7 +18,7 @@ public class Amplitude extends Analyzer {
 
 	/**
 	 * @param parent typically use "this"
-	 * @webref sound
+	 * @webref Analysis:Amplitude
 	 */
 	public Amplitude(PApplet parent) {
 		super(parent);
@@ -40,7 +40,7 @@ public class Amplitude extends Analyzer {
 	/**
 	 * Queries a value from the analyzer and returns a float between 0. and 1.
 	 * 
-	 * @webref amplitude
+	 * @webref Analysis:Amplitude
 	 * @webBrief Queries a value from the analyzer and returns a float between 0. and 1.
 	 * @return amp An amplitude value between 0-1.
 	 **/
@@ -59,7 +59,7 @@ public class Amplitude extends Analyzer {
 	 * @param input
 	 *            the input sound source. Can be an oscillator, noise generator,
 	 *            SoundFile or AudioIn.
-	 * @webref amplitude
+	 * @webref Analysis:Amplitude
 	 * @webBrief Define the audio input for the analyzer.
 	 **/
 	public void input(SoundObject input) {

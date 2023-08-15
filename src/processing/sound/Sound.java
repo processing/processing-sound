@@ -14,7 +14,7 @@ import processing.core.PApplet;
  * Information on available input and output devices can be obtained by calling
  * <b>Sound.list()</b>
  * 
- * @webref configuration
+ * @webref Configuration:Sound
  * @webBrief This class can be used for configuring the Processing Sound library.
  */
 public class Sound {
@@ -61,7 +61,7 @@ public class Sound {
 	 * 
 	 * @return an array giving the names of all audio devices available on this
 	 *         computer
-	 * @webref sound
+	 * @webref Configuration:Sound
 	 * @webBrief Print and return information on available audio devices and their number of input/output channels.
 	 */
 	public static String[] list() {
@@ -92,7 +92,7 @@ public class Sound {
 	 * @param sampleRate
 	 *            the sample rate to be used by the synthesis engine (default 44100)
 	 * @return the internal sample rate used by the synthesis engine
-	 * @webref sound
+	 * @webref Configuration:Sound
 	 * @webBrief Get or set the internal sample rate of the synthesis engine.
 	 */
 	public int sampleRate(int sampleRate) {
@@ -110,7 +110,7 @@ public class Sound {
 	 * @param deviceId
 	 *            the device id obtained from Sound.list()
 	 * @seealso Sound.list()
-	 * @webref sound
+	 * @webref Configuration:Sound
 	 * @webBrief Choose the device (sound card) which should be used for grabbing audio input using AudioIn.
 	 */
 	public void inputDevice(int deviceId) {
@@ -124,7 +124,7 @@ public class Sound {
 	 * @param deviceId
 	 *            the device id obtained from list()
 	 * @seealso list()
-	 * @webref sound
+	 * @webref Configuration:Sound
 	 * @webBrief Choose the device (sound card) which the Sound library's audio output should be sent to.
 	 */
 	public void outputDevice(int deviceId) {
@@ -137,7 +137,7 @@ public class Sound {
 	 * @param volume
 	 *            the desired output volume, normally between 0.0 and 1.0 (default
 	 *            is 1.0)
-	 * @webref sound
+	 * @webref Configuration:Sound
 	 * @webBrief Set the overall output volume of the Processing sound library.
 	 */
 	public void volume(float volume) {

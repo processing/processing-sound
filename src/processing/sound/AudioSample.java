@@ -12,9 +12,9 @@ import processing.core.PApplet;
  * manipulate and play back sound samples.
  * 
  * If you want to pre-load your audio sample with an audio file from disk you
- * can do so using the SoundFile subclass.
+ * can do so using the {@link SoundFile} subclass.
  * 
- * @webref sampling
+ * @webref Sampling:AudioSample
  * @webBrief This class allows you low-level access to an audio buffer to create, access,
  * manipulate and play back sound samples.
  */
@@ -53,7 +53,7 @@ public class AudioSample extends SoundObject {
 	 * @param stereo
 	 *            whether to treat the audiosample as 2-channel (stereo) or not
 	 *            (default: false)
-	 * @webref audiosample
+	 * @webref Sampling:AudioSample
 	 * @webBrief Allocate a new audiosample buffer with the given number of frames.
 	 */
 	public AudioSample(PApplet parent, int frames, boolean stereo, int frameRate) {
@@ -162,7 +162,7 @@ public class AudioSample extends SoundObject {
 	 * @param amp
 	 *            A float value between 0.0 (complete silence) and 1.0 (full volume)
 	 *            controlling the amplitude/volume of this sound.
-	 * @webref audiosample
+	 * @webref Sampling:AudioSample
 	 * @webBrief Changes the amplitude/volume of the player.
 	 **/
 	public void amp(float amp) {
@@ -175,7 +175,7 @@ public class AudioSample extends SoundObject {
 	 * Returns the number of channels in the audiosample as an int (1 for mono, 2 for stereo).
 	 * 
 	 * @return the number of channels in the audiosample (1 for mono, 2 for stereo)
-	 * @webref audiosample
+	 * @webref Sampling:AudioSample
 	 * @webBrief Returns the number of channels in the audiosample as an int (1 for mono, 2 for stereo).
 	 **/
 	public int channels() {
@@ -188,7 +188,7 @@ public class AudioSample extends SoundObject {
 	 * @param time
 	 *            position in the audiosample that the next playback should start
 	 *            from, in seconds.
-	 * @webref audiosample
+	 * @webref Sampling:AudioSample
 	 * @webBrief Cues the playhead to a fixed position in the audiosample.
 	 **/
 	public void cue(float time) {
@@ -201,7 +201,7 @@ public class AudioSample extends SoundObject {
 	/**
 	 * Cues the playhead to a fixed position in the audiosample.
 	 * 
-	 * @webref audiosample
+	 * @webref Sampling:AudioSample
 	 * @webBrief Cues the playhead to a fixed position in the audiosample.
 	 * @param frameNumber
 	 *            frame number to start playback from.
@@ -216,7 +216,7 @@ public class AudioSample extends SoundObject {
 	/**
 	 * Returns the duration of the audiosample in seconds.
 	 * 
-	 * @webref audiosample
+	 * @webref Sampling:AudioSample
 	 * @webBrief Returns the duration of the audiosample in seconds.
 	 * @return The duration of the audiosample in seconds.
 	 **/
@@ -227,7 +227,7 @@ public class AudioSample extends SoundObject {
 	/**
 	 * Returns the number of frames of the audiosample as an int.
 	 * 
-	 * @webref audiosample
+	 * @webref Sampling:AudioSample
 	 * @webBrief Returns the number of frames of the audiosample as an int.
 	 * @return The number of frames of the audiosample.
 	 **/
@@ -268,9 +268,9 @@ public class AudioSample extends SoundObject {
 	 * 
 	 * @param time
 	 *            position to jump to, in seconds.
-	 * @see cue
-	 * @see play
-	 * @webref audiosample
+	 * @see AudioSample#cue(float)
+	 * @see AudioSample#play()
+	 * @webref Sampling:AudioSample
 	 * @webBrief Jump to a specific position in the audiosample while continuing to play (or starting to play if it wasn't playing already).
 	 **/
 	public void jump(float time) {
@@ -289,9 +289,9 @@ public class AudioSample extends SoundObject {
 	 * 
 	 * @param time
 	 *            frame number to jump to.
-	 * @see cue
-	 * @see play
-	 * @webref sound
+	 * @see AudioSample#cue(float)
+	 * @see AudioSample#play()
+	 * @webref Sampling:AudioSample
 	 * @webBrief Jump to a specific position in the audiosample without interrupting playback.
 	 **/
 	public void jumpFrame(int frameNumber) {
@@ -381,7 +381,7 @@ public class AudioSample extends SoundObject {
 	 *            0.0 (complete silence) to 1.0 (full volume)
 	 * @param add
 	 *            offset the output of the generator by the given value
-	 * @webref audiosample
+	 * @webref Sampling:AudioSample
 	 * @webBrief Starts the playback of the audiosample.
 	 **/
 	public void loop(float rate, float pos, float amp, float add) {
@@ -480,7 +480,7 @@ public class AudioSample extends SoundObject {
 	 *            seconds.
 	 * @param add
 	 *            offset the output of the generator by the given value
-	 * @webref audiosample
+	 * @webref Sampling:AudioSample
 	 * @webBrief Starts the playback of the audiosample.
 	 **/
 	public void play(float rate, float pos, float amp, float add, float cue) {
@@ -509,7 +509,7 @@ public class AudioSample extends SoundObject {
 	 * @param cue
 	 *            position in the audiosample that playback should start from, in
 	 *            seconds.
-	 * @webref sound
+	 * @webref Sampling:AudioSample
 	 * @webBrief Starts the playback of the audiosample for the specified duration or to the
 	 * end of the audiosample, whichever comes first.
 	 **/
@@ -526,7 +526,7 @@ public class AudioSample extends SoundObject {
 	 *            Relative playback rate to use. 1 is the original speed. 0.5 is
 	 *            half speed and one octave down. 2 is double the speed and one
 	 *            octave up.
-	 * @webref audiosample
+	 * @webref Sampling:AudioSample
 	 * @webBrief Set the relative playback rate of the audiosample.
 	 **/
 	public void rate(float rate) {
@@ -548,7 +548,7 @@ public class AudioSample extends SoundObject {
 	 * @param stereo
 	 *            whether to treat the audiosample as 2-channel (stereo) or not
 	 *            (default: false)
-	 * @webref audiosample
+	 * @webref Sampling:AudioSample
 	 * @webBrief Resizes the underlying buffer of the audiosample to the given number of frames.
 	 */
 	public void resize(int frames, boolean stereo) {
@@ -560,7 +560,7 @@ public class AudioSample extends SoundObject {
 	/**
 	 * Returns the underlying sample rate of the audiosample.
 	 * 
-	 * @webref audiosample
+	 * @webref Sampling:AudioSample
 	 * @webBrief Returns the underlying sample rate of the audiosample.
 	 * @return Returns the underlying sample rate of the audiosample as an int.
 	 **/
@@ -572,7 +572,7 @@ public class AudioSample extends SoundObject {
 	 * Pan the soundfile in a stereo panorama. -1.0 pans to the left channel and 1.0 to the right channel. 
 	 * Note that panning is only supported for mono (1 channel) audiosamples.
 	 *
-	 * @webref audiosample
+	 * @webref Sampling:AudioSample
 	 * @webBrief Pan the soundfile in a stereo panorama.
 	 * @param pos
 	 *            the panoramic position of this sound unit from -1.0 (left) to 1.0
@@ -585,7 +585,7 @@ public class AudioSample extends SoundObject {
 	/**
 	 * Set multiple parameters at once.
 	 * 
-	 * @webref audiosample
+	 * @webref Sampling:AudioSample
 	 * @webBrief Set multiple parameters at once.
 	 * @param rate
 	 *            Relative playback rate to use. 1 is the original speed. 0.5 is
@@ -610,7 +610,7 @@ public class AudioSample extends SoundObject {
 	/**
 	 * Stops the playback.
 	 * 
-	 * @webref audiosample
+	 * @webref Sampling:AudioSample
 	 * @webBrief Stops the playback.
 	 **/
 	public void stop() {
@@ -629,7 +629,7 @@ public class AudioSample extends SoundObject {
 	 * not necessarily the last one that was triggered.
 	 * 
 	 * @return The current position of the audio sample playback in seconds
-	 * @webref audiosample
+	 * @webref Sampling:AudioSample
 	 * @webBrief Get current sound file playback position in seconds.
 	 */
 	public float position() {
@@ -645,7 +645,7 @@ public class AudioSample extends SoundObject {
 	 * not necessarily the last one that was triggered.
 	 * 
 	 * @return The current frame index position of the audio sample playback
-	 * @webref sound
+	 * @webref Sampling:AudioSample
 	 * @webBrief Get frame index of current sound file playback position.
 	 */
 	public int positionFrame() {
@@ -661,7 +661,7 @@ public class AudioSample extends SoundObject {
 	 * 
 	 * @return The current position of the audio sample playback in percent (a value
 	 *         between 0 and 100).
-	 * @webref sound
+	 * @webref Sampling:AudioSample
 	 * @webBrief Get current sound file playback position in percent.
 	 */
 	public float percent() {
@@ -672,8 +672,8 @@ public class AudioSample extends SoundObject {
 	 * Stop the playback of the sample, but cue it to the current position. 
 	 * The next call to <b>play()</b> will continue playing where it left off.
 	 * 
-	 * @see cue
-	 * @webref audiosample
+	 * @see AudioSample#cue(float)
+	 * @webref Sampling:AudioSample
 	 * @webBrief Stop the playback of the sample, but cue it to the current position.
 	 */
 	public void pause() {
@@ -744,7 +744,7 @@ public class AudioSample extends SoundObject {
 	 * @param numFrames
 	 *            the number of frames that should be read (can't be greater than
 	 *            audiosample.channels() * data.length - startIndex)
-	 * @webref audiosample
+	 * @webref Sampling:AudioSample
 	 * @webBrief The underlying data of the audiosample can be read and written in several different.
 	 */
 	public void read(int startFrame, float[] data, int startIndex, int numFrames) {
@@ -831,7 +831,7 @@ public class AudioSample extends SoundObject {
 	 * @param numFrames
 	 *            the number of frames that should be written (can't be greater than
 	 *            audiosample.channels() * data.length - startIndex)
-	 * @webref audiosample
+	 * @webref Sampling:AudioSample
 	 * @webBrief The underlying data of the audiosample can be read and (over)written in several different ways.
 	 */
 	public void write(int startFrame, float[] data, int startIndex, int numFrames) {

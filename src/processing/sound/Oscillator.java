@@ -6,6 +6,7 @@ import processing.core.PApplet;
 
 /**
  * For advanced users: common superclass of all oscillator sound sources
+ * @webref Oscillators
  */
 public abstract class Oscillator<JSynOscillator extends UnitOscillator> extends SoundObject {
 
@@ -20,7 +21,7 @@ public abstract class Oscillator<JSynOscillator extends UnitOscillator> extends 
 
 	/**
 	 * Set the frequency of the oscillator in Hz.
-	 * @webref sound
+	 * @webref Oscillators:Oscillator
 	 * @param freq A floating point value of the oscillator in Hz.
 	 **/
 	public void freq(float freq) {
@@ -28,10 +29,6 @@ public abstract class Oscillator<JSynOscillator extends UnitOscillator> extends 
 		this.oscillator.frequency.set(freq);
 	}
 
-	/**
-	 * Starts the oscillator
-	 * @webref sound
-	 **/
 	public void play() {
 		super.play();
 	}
@@ -47,6 +44,13 @@ public abstract class Oscillator<JSynOscillator extends UnitOscillator> extends 
 		this.play(freq, amp);
 	}
 
+	/**
+	 * Starts the oscillator
+	 * @webref Oscillators:Oscillator
+	 * @param freq The frequency value of the oscillator in Hz.
+	 * @param amp The amplitude of the oscillator as a value between 0.0 and 1.0.
+	 * @param pos The panoramic position of the oscillator as a float from -1.0 to 1.0.
+	 **/
 	public void play(float freq, float amp, float add, float pos) {
 		this.set(freq, amp, add, pos);
 		this.play();
@@ -54,12 +58,18 @@ public abstract class Oscillator<JSynOscillator extends UnitOscillator> extends 
 
 	/**
 	 * Set multiple parameters at once
-	 * @webref sound
+	 * @webref Oscillators:Oscillator
 	 * @param freq The frequency value of the oscillator in Hz.
 	 * @param amp The amplitude of the oscillator as a value between 0.0 and 1.0.
-	 * @param add A value for modulating other audio signals.
 	 * @param pos The panoramic position of the oscillator as a float from -1.0 to 1.0.
 	 **/
+	public void set(float freq, float amp, float pos) {
+		this.freq(freq);
+		this.amp(amp);
+		this.add(add);
+		this.pan(pos);
+	}
+
 	public void set(float freq, float amp, float add, float pos) {
 		this.freq(freq);
 		this.amp(amp);

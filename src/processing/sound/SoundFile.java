@@ -18,7 +18,7 @@ import processing.core.PApplet;
  * files. Supported formats are: WAV, AIF/AIFF, and MP3.
  * 
  * MP3 decoding can be very slow on ARM processors (Android/Raspberry Pi), we generally recommend you use lossless WAV or AIF files.
- * @webref sampling
+ * @webref Sampling:SoundFile
  * @webBrief This is a Soundfile Player which allows to play back and manipulate soundfiles.
  **/
 public class SoundFile extends AudioSample {
@@ -112,7 +112,7 @@ public class SoundFile extends AudioSample {
 	 * 
 	 * @return true if the sample was removed from the cache, false if it wasn't
 	 *.        actually cached in the first place.
-	 * @webref soundfile
+	 * @webref Sampling:SoundFile
 	 * @webBrief Remove this SoundFile's decoded audio sample from the cache, allowing
 	 * it to be garbage collected once there are no more references to this
 	 * SoundFile.
@@ -129,7 +129,7 @@ public class SoundFile extends AudioSample {
 	 * 
 	 * @return Returns the number of channels of the soundfile (1 for mono, 2 for
 	 *         stereo)
-	 * @webref soundfile
+	 * @webref Sampling:SoundFile
 	 * @webBrief Returns the number of channels of the soundfile as an int (1 for mono, 2 for stereo).
 	 **/
 	public int channels() {
@@ -143,7 +143,7 @@ public class SoundFile extends AudioSample {
 	 * @param time
 	 *            position in the soundfile that the next playback should start
 	 *            from, in seconds.
-	 * @webref soundfile
+	 * @webref Sampling:SoundFile
 	 * @webBrief Cues the playhead to a fixed position in the soundfile.
 	 **/
 	public void cue(float time) {
@@ -153,7 +153,7 @@ public class SoundFile extends AudioSample {
 	/**
 	 * Returns the duration of the soundfile in seconds.
 	 * 
-	 * @webref soundfile
+	 * @webref Sampling:SoundFile
 	 * @webBrief Returns the duration of the soundfile in seconds.
 	 * @return The duration of the soundfile in seconds.
 	 **/
@@ -164,7 +164,7 @@ public class SoundFile extends AudioSample {
 	/**
 	 * Returns the number of frames of this soundfile.
 	 * 
-	 * @webref soundfile
+	 * @webref Sampling:SoundFile
 	 * @webBrief Returns the number of frames of this soundfile.
 	 * @return The number of frames of this soundfile.
 	 **/
@@ -212,7 +212,7 @@ public class SoundFile extends AudioSample {
 	 *            seconds.
 	 * @param add
 	 *            offset the output of the generator by the given value
-	 * @webref soundfile
+	 * @webref Sampling:SoundFile
 	 * @webBrief Starts the playback of the soundfile.
 	 **/
 	public void play(float rate, float pos, float amp, float add, float cue) {
@@ -224,7 +224,7 @@ public class SoundFile extends AudioSample {
 	 * Jump to a specific position in the soundfile while continuing to play 
 	 * (or starting to play if it wasn't playing already).
 	 * 
-	 * @webref soundfile
+	 * @webref Sampling:SoundFile
 	 * @webBrief Jump to a specific position in the soundfile while continuing to play (or starting to play if it wasn't playing already).
 	 * @param time
 	 *            position to jump to, in seconds.
@@ -237,8 +237,8 @@ public class SoundFile extends AudioSample {
 	 * Stop the playback of the file, but cue it to the current position. The
 	 * next call to <b>play()</b> will continue playing where it left off.
 	 * 
-	 * @see stop
-	 * @webref soundfile
+	 * @see SoundFile#stop()
+	 * @webref Sampling:SoundFile
 	 * @webBrief Stop the playback of the file, but cue it to the current position.
 	 */
 	public void pause() {
@@ -249,7 +249,7 @@ public class SoundFile extends AudioSample {
 	 * Check whether this soundfile is currently playing.
 	 *
 	 * @return `true` if the soundfile is currently playing, `false` if it is not.
-	 * @webref soundfile
+	 * @webref Sampling:SoundFile
 	 * @webBrief Check whether this soundfile is currently playing.
 	 */
 	public boolean isPlaying() {
@@ -287,7 +287,7 @@ public class SoundFile extends AudioSample {
 	 *            0.0 (complete silence) to 1.0 (full volume)
 	 * @param add
 	 *            offset the output of the generator by the given value
-	 * @webref soundfile
+	 * @webref Sampling:SoundFile
 	 * @webBrief Starts playback which will loop at the end of the soundfile.
 	 */
 	public void loop(float rate, float pos, float amp, float add) {
@@ -310,7 +310,7 @@ public class SoundFile extends AudioSample {
 	 * @param amp
 	 *            A float value between 0.0 (complete silence) and 1.0 (full volume)
 	 *            controlling the amplitude/volume of this sound.
-	 * @webref soundfile
+	 * @webref Sampling:SoundFile
 	 * @webBrief Changes the amplitude/volume of the player.
 	 **/
 	public void amp(float amp) {
@@ -324,7 +324,7 @@ public class SoundFile extends AudioSample {
 	 * @param pos
 	 *            the panoramic position of this sound unit from -1.0 (left) to 1.0
 	 *            (right).
-	 * @webref soundfile
+	 * @webref Sampling:SoundFile
 	 * @webBrief Move the sound in a stereo panorama.
 	 **/
 	public void pan(float pos) {
@@ -339,7 +339,7 @@ public class SoundFile extends AudioSample {
 	 *            Relative playback rate to use. 1 is the original speed. 0.5 is
 	 *            half speed and one octave down. 2 is double the speed and one
 	 *            octave up.
-	 * @webref soundfile
+	 * @webref Sampling:SoundFile
 	 * @webBrief Set the playback rate of the soundfile.
 	 **/
 	public void rate(float rate) {
@@ -349,8 +349,8 @@ public class SoundFile extends AudioSample {
 	/**
 	 * Stops the playback.
 	 * 
-	 * @see pause
-	 * @webref soundfile
+	 * @see SoundFile#pause()
+	 * @webref Sampling:SoundFile
 	 * @webBrief Stops the playback.
 	 **/
 	public void stop() {

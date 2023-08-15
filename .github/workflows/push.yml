@@ -1,8 +1,8 @@
-name: Build library and Javaoc
+name: Build library and Javadoc
 
 on:
   push:
-    branches: [ 'master' ]
+    branches: [ 'main' ]
 
 jobs:
 
@@ -17,12 +17,12 @@ jobs:
           distribution: 'temurin'
       - name: Build library with Ant
         run: ant
-      - name: Build Javadoc
-        run: ant javadoc
-      - name: Upload GitHub Pages Artifact
-        uses: actions/upload-pages-artifact@v1
+      - name: Release
+        uses: softprops/action-gh-release@v1
         with:
-          path: docs/
+          name: Automatic development test build
+          prerelease: true
+          files: sound.zip
 
   deploy-javadoc:
     needs: build

@@ -13,7 +13,7 @@ import processing.core.PApplet;
  * 
  * @author icalvin102
  * 
- * @webref analysis
+ * @webref Analysis:Waveform
  * @webBrief This is a Waveform analyzer.
  **/
 public class Waveform extends Analyzer {
@@ -76,7 +76,7 @@ public class Waveform extends Analyzer {
 	 *            samples
 	 * @return the current audiobuffer of the input source. The array has as
 	 *         many elements as this Waveform analyzer's number of samples
-	 * @webref waveform
+	 * @webref Analysis:Waveform
 	 * @webBrief Gets the content of the current audiobuffer from the input source.
 	 **/
 	public float[] analyze(float[] value) {
@@ -122,7 +122,7 @@ public class Waveform extends Analyzer {
 	 * @param input
 	 *            the input sound source. Can be an oscillator, noise generator,
 	 *            SoundFile or AudioIn.
-	 * @webref waveform
+	 * @webref Analysis:Waveform
 	 * @webBrief Define the audio input for the analyzer.
 	 **/
 	public void input(SoundObject input) {

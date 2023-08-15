@@ -32,12 +32,13 @@ public abstract class SoundObject {
 		this.amplitude.set(this.amp);
 	}
 
-	/**
+	/*
 	 * Offset the output of this generator by given value
 	 *
 	 * @param add
 	 *            A value for offsetting the audio signal.
-	 **/
+	 * @deprecated
+	 */
 	public void add(float add) {
 		if (this.circuit.processor == null) {
 			Engine.printError("stereo sound sources do not support adding");
@@ -104,7 +105,6 @@ public abstract class SoundObject {
 
 	/**
 	 * Stop the generator
-	 *
 	 **/
 	public void stop() {
 		this.isPlaying = false;

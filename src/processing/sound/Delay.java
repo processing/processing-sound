@@ -5,7 +5,7 @@ import processing.core.PApplet;
 /**
  * This is a simple delay effect.
  * 
- * @webref effects
+ * @webref Effects:Delay
  * @webBrief This is a simple delay effect.
  * @param parent
  *            PApplet: typically use "this"
@@ -24,8 +24,8 @@ public class Delay extends Effect<JSynDelay> {
 	/**
 	 * Start the delay effect.
 	 * 
-	 * @webref delay
-     * @webBrief Start the delay effect.
+	 * @webref Effects:Delay
+	 * @webBrief Start the delay effect.
 	 * @param input
 	 *            Input audio source
 	 * @param maxDelayTime Maximum delay time in seconds.
@@ -47,7 +47,7 @@ public class Delay extends Effect<JSynDelay> {
 	/**
 	 * Set delay time and feedback values at once.
 	 * 
-	 * @webref delay
+	 * @webref Effects:Delay
 	 * @webBrief Set delay time and feedback values at once.
 	 * @param delayTime
 	 *            Maximum delay time in seconds.
@@ -62,7 +62,7 @@ public class Delay extends Effect<JSynDelay> {
 	/**
 	 * Changes the delay time of the effect.
 	 * 
-	 * @webref delay
+	 * @webref Effects:Delay
 	 * @webBrief Changes the delay time of the effect.
 	 * @param delayTime
 	 *            Delay time in seconds.
@@ -76,7 +76,7 @@ public class Delay extends Effect<JSynDelay> {
 	/**
 	 * Change the feedback of the delay effect.
 	 * 
-	 * @webref delay
+	 * @webref Effects:Delay
 	 * @webBrief Change the feedback of the delay effect.
 	 * @param feedback
 	 *            Feedback amount as a float.

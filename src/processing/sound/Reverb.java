@@ -5,7 +5,7 @@ import processing.core.PApplet;
 /**
  * This is a simple reverb effect.
  * 
- * @webref effects
+ * @webref Effects:Reverb
  * @webBrief This is a simple reverb effect.
  * @param parent
  *            PApplet: typically use "this"
@@ -26,7 +26,7 @@ public class Reverb extends Effect<JSynReverb> {
 	/**
 	 * Changes the damping factor of the reverb effect.
 	 * 
-	 * @webref reverb
+	 * @webref Effects:Reverb
 	 * @webBrief Changes the damping factor of the reverb effect.
 	 * @param damp
 	 *            A float value controlling the damping factor of the reverb
@@ -41,7 +41,7 @@ public class Reverb extends Effect<JSynReverb> {
 	/**
 	 * Change the room size of the reverb effect.
 	 * 
-	 * @webref reverb
+	 * @webref Effects:Reverb
 	 * @webBrief Change the room size of the reverb effect.
 	 * @param room
 	 *            A float value controlling the room size of the effect.
@@ -56,7 +56,7 @@ public class Reverb extends Effect<JSynReverb> {
 	/**
 	 * Set multiple parameters of the reverb. Parameters have to be in the right order.
 	 * 
-	 * @webref reverb
+	 * @webref Effects:Reverb
 	 * @webBrief Set multiple parameters of the reverb.
 	 * @param room
 	 *            A value controlling the room size of the effect
@@ -74,7 +74,7 @@ public class Reverb extends Effect<JSynReverb> {
 	/**
 	 * Change the wet/dry ratio of the reverb.
 	 * 
-	 * @webref reverb
+	 * @webref Effects:Reverb
 	 * @webBrief Change the wet/dry ratio of the reverb.
 	 * @param wet
 	 *            A float value controlling the wet/dry ratio of the reverb. TODO
