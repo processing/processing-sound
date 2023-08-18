@@ -83,6 +83,7 @@ public class SoundFile extends AudioSample {
 						float data[] = new float[os.size() / 2];
 						SampleLoader.decodeLittleI16ToF32(os.toByteArray(), 0, os.size(), data, 0);
 						this.sample = new FloatSample(data, mp3.isStereo() ? 2 : 1);
+						this.sample.setFrameRate(mp3.getSamplingFrequency());
 					} catch (IOException ee) {
 						throw ee;
 					} catch (NullPointerException ee) {
