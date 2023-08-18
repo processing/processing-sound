@@ -1,6 +1,8 @@
 package processing.sound;
 
+import com.jsyn.data.FloatSample;
 import com.jsyn.devices.AudioDeviceManager;
+import com.jsyn.Synthesizer;
 
 import processing.core.PApplet;
 
@@ -109,7 +111,7 @@ public class Sound {
 	 * 
 	 * @param deviceId
 	 *            the device id obtained from Sound.list()
-	 * @seealso Sound.list()
+	 * @see Sound#list()
 	 * @webref Configuration:Sound
 	 * @webBrief Choose the device (sound card) which should be used for grabbing audio input using AudioIn.
 	 */
@@ -123,7 +125,7 @@ public class Sound {
 	 * 
 	 * @param deviceId
 	 *            the device id obtained from list()
-	 * @seealso list()
+	 * @see Sound#list()
 	 * @webref Configuration:Sound
 	 * @webBrief Choose the device (sound card) which the Sound library's audio output should be sent to.
 	 */
@@ -144,4 +146,27 @@ public class Sound {
 		this.engine.setVolume(volume);
 	}
 
+	/**
+	 * Prints information about the sound library's current memory and CPU usage to the console.
+	 * @webref Configuration:Sound
+	 */
+	public void status() {
+		Engine.printMessage(String.format("%.2f", this.engine.synth.getCurrentTime()) + " seconds elapsed, generated " + this.engine.synth.getFrameCount() + " frames (framerate " + this.engine.synth.getFrameRate() + ")");
+		Engine.printMessage("  CPU usage: " + Math.round(100 * this.engine.synth.getUsage()) + "%");
+		Engine.printMessage("  elements in synthesizer network: " + this.engine.nCircuits);
+		Engine.printMessage("  sound sources currently playing: " + this.engine.nPlayingCircuits);
+		long nSamples = 0;
+		for (FloatSample s : SoundFile.SAMPLECACHE.values()) {
+			nSamples += s.getNumFrames() * s.getChannelsPerFrame();
+		}
+		Engine.printMessage("  decoded audio samples held in cache: " + SoundFile.SAMPLECACHE.size() + " (" + nSamples + " frames total)");
+		// might return something useful later
+	}
+
+	/**
+	 * Use at your own risk.
+	 */
+	public Synthesizer getSynthesizer() {
+		return this.engine.synth;
+	}
 }

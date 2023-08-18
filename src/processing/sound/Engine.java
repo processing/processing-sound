@@ -14,6 +14,9 @@ import com.jsyn.unitgen.UnitSource;
 
 import processing.core.PApplet;
 
+/**
+ * Singleton wrapper around the JSyn `Synthesizer`.
+ */
 class Engine {
 
 	private static AudioDeviceManager audioManager;
@@ -31,6 +34,10 @@ class Engine {
 	// set in constructor
 	private int inputDevice;
 	private int outputDevice;
+
+	// keep track of the number of objects connected to the synthesizer circuit
+	protected int nCircuits = 0;
+	protected int nPlayingCircuits = 0;
 
 	protected static Engine getEngine(PApplet parent) {
 		if (Engine.singleton == null) {
@@ -178,22 +185,27 @@ class Engine {
 	protected void add(UnitGenerator generator) {
 		if (generator.getSynthesisEngine() == null) {
 			this.synth.add(generator);
+			this.nCircuits++;
 		}
 	}
 
 	protected void remove(UnitGenerator generator) {
+		// TODO check generator.getSynthesisEngine
 		this.synth.remove(generator);
+		this.nCircuits--;
 	}
 
 	protected void play(UnitSource source) {
 		// TODO check if unit is already connected
 		source.getOutput().connect(0, this.leftOut.inputA, 0);
 		source.getOutput().connect(1, this.rightOut.inputA, 0);
+		this.nPlayingCircuits++;
 	}
 
 	protected void stop(UnitSource source) {
 		source.getOutput().disconnect(0, this.leftOut.inputA, 0);
 		source.getOutput().disconnect(1, this.rightOut.inputA, 0);
+		this.nPlayingCircuits--;
 	}
 
 	protected static boolean checkAmp(float amp) {

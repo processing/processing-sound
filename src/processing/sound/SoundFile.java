@@ -23,7 +23,7 @@ import processing.core.PApplet;
  **/
 public class SoundFile extends AudioSample {
 
-	private static Map<String, FloatSample> SAMPLECACHE = new HashMap<String, FloatSample>();
+	protected static Map<String, FloatSample> SAMPLECACHE = new HashMap<String, FloatSample>();
 
 	public SoundFile(PApplet parent, String path) {
 		this(parent, path, true);
@@ -344,17 +344,6 @@ public class SoundFile extends AudioSample {
 	 **/
 	public void rate(float rate) {
 		super.rate(rate);
-	}
-
-	/**
-	 * Stops the playback.
-	 * 
-	 * @see SoundFile#pause()
-	 * @webref Sampling:SoundFile
-	 * @webBrief Stops the playback.
-	 **/
-	public void stop() {
-		super.stop();
 	}
 
 }
