@@ -18,7 +18,7 @@ jobs:
         run: ant
       - uses: actions/upload-artifact@v3
         with:
-          name: sound-library-build-${{ github.sha }}
+          name: sound-jar-${{ github.sha }}
           path: library/sound.jar
       - name: Build Javadoc
         run: ant javadoc

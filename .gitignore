@@ -1,2 +1,4 @@
 /bin/
+/docs/
 *.jar
+.DS_Store

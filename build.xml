@@ -46,7 +46,7 @@
 		<mkdir dir="library" />
 		<antcall target="processing-deps" />
 		<antcall target="android-deps" />
-		<get src="http://www.softsynth.com/jsyn/developers/archives/jsyn-20171016.jar" dest="library/" usetimestamp="true" />
+		<get src="https://github.com/philburk/jsyn/releases/download/v17.1.0/jsyn-17.1.0.jar" dest="library/" usetimestamp="true" />
 		<get src="https://github.com/kevinstadler/JavaMP3/releases/download/v1.0.4/javamp3-1.0.4.jar" dest="library/" usetimestamp="true" />
 	</target>
 
@@ -89,6 +89,6 @@
 	</target>
 
 	<target name="install" depends="dist" description="Local installation for testing/developing">
-		<unzip src="../sound.zip" dest="../Documents/Processing/libraries/" />
+		<unzip src="../sound.zip" dest="../../Documents/Processing/libraries/" />
 	</target>
 </project>
