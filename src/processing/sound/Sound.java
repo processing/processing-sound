@@ -1,8 +1,8 @@
 package processing.sound;
 
+import com.jsyn.Synthesizer;
 import com.jsyn.data.FloatSample;
 import com.jsyn.devices.AudioDeviceManager;
-import com.jsyn.Synthesizer;
 
 import processing.core.PApplet;
 
@@ -78,8 +78,8 @@ public class Sound {
 			boolean isDefaultInput = (i == audioManager.getDefaultInputDeviceID());
 			boolean isDefaultOutput = (i == audioManager.getDefaultOutputDeviceID());
 			System.out.println("device id " + i + ": " + deviceName);
-			System.out.println("  max inputs : " + maxInputs + (isDefaultInput ? "   (default)" : ""));
-			System.out.println("  max outputs: " + maxOutputs + (isDefaultOutput ? "   (default)" : ""));
+			System.out.println("  input channels : " + maxInputs + (isDefaultInput ? "   (default)" : ""));
+			System.out.println("  output channels: " + maxOutputs + (isDefaultOutput ? "   (default)" : ""));
 		}
 		return devices;
 	}
@@ -111,6 +111,8 @@ public class Sound {
 	 * 
 	 * @param deviceId
 	 *            the device id obtained from Sound.list()
+	 * @param deviceName
+	 *            the device name obtained from Sound.list()
 	 * @see Sound#list()
 	 * @webref Configuration:Sound
 	 * @webBrief Choose the device (sound card) which should be used for grabbing audio input using AudioIn.
@@ -119,18 +121,38 @@ public class Sound {
 		this.engine.selectInputDevice(deviceId);
 	}
 
+	public void inputDevice(String deviceName) {
+		this.engine.selectInputDevice(Engine.getDeviceIdByName(deviceName));
+	}
+
 	/**
 	 * Choose the device (sound card) which the Sound library's audio output should
 	 * be sent to. The output device should support stereo output (2 channels).
 	 * 
 	 * @param deviceId
-	 *            the device id obtained from list()
+	 *            the device id obtained from Sound.list()
+	 * @param deviceName
+	 *            the device name obtained from Sound.list()
 	 * @see Sound#list()
 	 * @webref Configuration:Sound
 	 * @webBrief Choose the device (sound card) which the Sound library's audio output should be sent to.
 	 */
 	public void outputDevice(int deviceId) {
 		this.engine.selectOutputDevice(deviceId);
+	}
+
+	public void outputDevice(String deviceName) {
+		this.engine.selectOutputDevice(Engine.getDeviceIdByName(deviceName));
+	}
+
+	// TODO implement method that returns number of input/output channels of a (specific) device
+
+	/**
+	 * Select the output channel.
+	 * @webref Configuration:Sound
+	 */
+	public void outputChannel(int channel) {
+		this.engine.selectOutputChannel(channel);
 	}
 
 	/**
