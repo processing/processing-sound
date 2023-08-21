@@ -4,6 +4,10 @@ import com.jsyn.ports.UnitOutputPort;
 
 import processing.core.PApplet;
 
+/**
+ * Common superclass of all audio analysis classes
+ * @webref Analysis
+ */
 abstract class Analyzer {
 
 	protected SoundObject input;
@@ -16,6 +20,7 @@ abstract class Analyzer {
 	 * Define the audio input for the analyzer.
 	 * 
 	 * @param input The input sound source
+	 * @webref Analysis:Analyzer
 	 **/
 	public void input(SoundObject input) {
 		if (this.input == input) {

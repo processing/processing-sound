@@ -69,10 +69,21 @@ public abstract class Oscillator<JSynOscillator extends UnitOscillator> extends 
 		this.pan(pos);
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void set(float freq, float amp, float add, float pos) {
 		this.freq(freq);
 		this.amp(amp);
 		this.add(add);
 		this.pan(pos);
+	}
+
+	/**
+	 * Stop the oscillator from playing back
+	 * @webref Oscillators:Oscillator
+	 */
+	public void stop() {
+		super.stop();
 	}
 }
