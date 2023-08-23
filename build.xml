@@ -91,4 +91,22 @@
 	<target name="install" depends="dist" description="Local installation for testing/developing">
 		<unzip src="../sound.zip" dest="../../Documents/Processing/libraries/" />
 	</target>
+
+	<target name="justcompile" description="Compile sources">
+		<mkdir dir="bin" />
+		<javac source="1.8" target="1.8" srcdir="src" destdir="bin" encoding="UTF-8" includeAntRuntime="false" nowarn="true">
+			<classpath refid="classpath" />
+		</javac>
+	</target>
+
+	<target name="quickbuild" depends="justcompile" description="Build Sound library jar">
+		<jar destfile="library/sound.jar">
+			<fileset dir="bin" />
+		</jar>
+	</target>
+
+	<target name="quickinstall" depends="quickbuild" description="Local installation for testing/developing">
+		<move file="library/sound.jar" todir="../../Documents/Processing/libraries/sound/library/" />
+	</target>
+
 </project>
