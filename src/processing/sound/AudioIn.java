@@ -54,7 +54,7 @@ public class AudioIn extends SoundObject {
 				Engine.printError(AudioIn.ANDROID_PERMISSION_WARNING_MESSAGE);
 				throw new AndroidPermissionException("RECORD_AUDIO permission not granted");
 			}
-			Engine.printMessage("capturing audio in from device " + Engine.getSelectedInputDeviceName());
+			Engine.printMessage("capturing audio in from device " + Engine.getEngine().getSelectedInputDeviceName());
 		}
 
 		this.input = new ChannelIn(in);

@@ -116,6 +116,17 @@ public abstract class SoundObject {
 		Engine.getEngine().remove(this.circuit);
 	}
 
+
+	/**
+	 * The 'true' number of underlying channels of this sound. All SoundObjects are put into
+	 * a stereo-pannable wrapper, but for multi-channel purposes, anything that's not a true
+	 * stereo sample should be considered to be mono.
+	 * @see MultiChannel
+	 */
+	public int channels() {
+		return 1;
+	}
+
 	protected void setEffect(Effect<? extends UnitFilter> effect) {
 		if (this.circuit.effect == effect) {
 			Engine.printWarning("this effect is already processing the given sound source");
