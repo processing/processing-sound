@@ -28,7 +28,7 @@ jobs:
       - name: Build and package library with Ant
         run: ant dist
 
-      - name: v* tags only: create version release draft
+      - name: "v* tags only: create version release draft"
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/v')
         with:
@@ -38,7 +38,7 @@ jobs:
             ../sound.zip
             ../sound.txt
 
-      - name: latest tag only: build latest library download release
+      - name: "`latest` tag only: build latest library download release"
         uses: softprops/action-gh-release@v1
         if: github.ref == 'refs/tags/latest'
         # just override the assets, otherwise leave the existing release unchanged
@@ -47,7 +47,7 @@ jobs:
             ../sound.zip
             ../sound.txt
 
-      - name: all other tags: create preliminary test build release
+      - name: "all other tags: create preliminary test build release"
         uses: softprops/action-gh-release@v1
         if: github.ref != 'refs/tags/latest' && !startsWith(github.ref, 'refs/tags/v')
         with:

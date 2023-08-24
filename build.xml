@@ -1,12 +1,13 @@
 <?xml version="1.0"?>
-<project name="Processing Sound Library" default="build">
-
-	<property file="./build.properties" />
+<project name="Processing Sound Library" default="jar">
 
 	<path id="classpath">
 		<fileset dir="library">
 			<include name="*.jar" />
+		</fileset>
+		<fileset dir="lib">
 			<include name="processing-core.zip" />
+			<include name="*.jar" />
 		</fileset>
 	</path>
 
@@ -16,8 +17,8 @@
 	</target>
 
 	<target name="checkprocessingdeps">
-		<available file="library/processing-core.zip" property="hasprocessingcore" />
-		<available file="library/android.jar" property="hasandroid" />
+		<available file="lib/processing-core.zip" property="hasprocessingcore" />
+		<available file="lib/android.jar" property="hasandroid" />
 	</target>
 
 	<!-- as of version 2.2, the sound library is compiled against the -->
@@ -25,7 +26,7 @@
 	<!-- we can automatically retrieve the latest version from GitHub -->
 	<target name="processing-deps" depends="checkprocessingdeps" unless="hasprocessingcore" description="Download Android mode's processing-core">
 		<get src="https://github.com/processing/processing-android/releases/download/latest/AndroidMode.zip" dest="library/" usetimestamp="true" />
-		<unzip src="library/AndroidMode.zip" dest="library/">
+		<unzip src="library/AndroidMode.zip" dest="lib/">
 			<patternset>
 				<include name="AndroidMode/processing-core.zip" />
 			</patternset>
@@ -39,13 +40,13 @@
 		<!-- this part of the Android SDK is required to build JSynAndroidAudioDeviceManager -->
 		<!-- preferrably you should soft-link or copy the android.jar of your locally
 			installed SDK into this project's library/ directory -->
-		<get src="https://github.com/marianadangelo/android-platforms/raw/master/android-26/android.jar" dest="library/" usetimestamp="true" />
+		<get src="https://github.com/marianadangelo/android-platforms/raw/master/android-26/android.jar" dest="lib/" usetimestamp="true" />
 	</target>
 
 	<target name="deps" description="Get library dependencies">
-		<mkdir dir="library" />
 		<antcall target="processing-deps" />
 		<antcall target="android-deps" />
+		<!-- bundled dependencies go into library/, build-only dependencies into lib/ -->
 		<get src="https://github.com/philburk/jsyn/releases/download/v17.1.0/jsyn-17.1.0.jar" dest="library/" usetimestamp="true" />
 		<get src="https://github.com/kevinstadler/JavaMP3/releases/download/v1.0.4/javamp3-1.0.4.jar" dest="library/" usetimestamp="true" />
 	</target>
@@ -66,13 +67,13 @@
 		</javadoc>
 	</target>
 
-	<target name="build" depends="clean,compile" description="Build Sound library jar">
+	<target name="jar" depends="clean,compile" description="Build Sound library jar">
 		<jar destfile="library/sound.jar">
 			<fileset dir="bin" />
 		</jar>
 	</target>
 
-	<target name="dist" depends="build,javadoc">
+	<target name="dist" depends="jar,javadoc">
 		<zip destfile="../sound.zip">
 			<zipfileset dir="." prefix="sound">
 				<exclude name=".*" />

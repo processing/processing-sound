@@ -1,4 +1,4 @@
-# Contributing
+## Contributing
 
 Pull requests for bug fixes as well as new features and example sketches are always welcome! Check the open [issues](https://github.com/processing/processing-sound/issues) if you don't know where to start.
 
@@ -20,8 +20,8 @@ For faster developing, we recommend using the `ant quickinstall` target.
 
 In the `library.properties` file:
 
-- increase the `version` field by one
-- change the `prettyVersion` field to whatever you like/is meaningful
+- [ ] increase the `version` field by one
+- [ ] change the `prettyVersion` field to whatever you like/is meaningful
 
 Before pushing a new `v*` tag to Github, create and test a local library build with
 
@@ -32,7 +32,7 @@ ant dist
 ### Automatically creating a new version release with Github actions
 
 ```
-git tag v<number> [<commit>]
+git tag v<prettyVersion> [<commit>]
 git push --tags
 ```
 

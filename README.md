@@ -21,7 +21,7 @@ For detailed changelogs, have a look at the [Github releases page](https://githu
 
 ### Contributing
 
-Pull requests for bug fixes as well as new features and example sketches are always welcome! Check [[CONTRIBUTING.md]] for help on how to get started.
+Pull requests for bug fixes as well as new features and example sketches are always welcome! Check [CONTRIBUTING.md](CONTRIBUTING.md) for help on how to get started.
 
 Thanks to the following community members for their contributions:
 
