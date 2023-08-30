@@ -69,7 +69,7 @@ public class Sound {
 	}
 
 	public static String[] list(boolean quiet) {
-		AudioDeviceManager audioManager = Engine.getAudioManager();
+		AudioDeviceManager audioManager = Engine.getAudioDeviceManager();
 		int numDevices = audioManager.getDeviceCount();
 		String[] devices = new String[numDevices];
 		for (int i = 0; i < numDevices; i++) {
@@ -149,14 +149,12 @@ public class Sound {
 		return Engine.getEngine().selectOutputDevice(Engine.getDeviceIdByName(deviceName));
 	}
 
-	// TODO implement method that returns number of input/output channels of a (specific) device
+	public static int defaultOutputDevice() {
+		return Sound.outputDevice(Engine.getAudioDeviceManager().getDefaultOutputDeviceID());
+	}
 
-	/**
-	 * Select the output channel.
-	 * @webref Configuration:Sound
-	 */
-	public static int outputChannel(int channel) {
-		return Engine.getEngine().selectOutputChannel(channel);
+	public static int defaultInputDevice() {
+		return Sound.inputDevice(Engine.getAudioDeviceManager().getDefaultInputDeviceID());
 	}
 
 	/**

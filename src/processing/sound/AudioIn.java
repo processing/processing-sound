@@ -43,7 +43,7 @@ public class AudioIn extends SoundObject {
 		// TODO check if the current input device actually has 'in' input channels,
 		// otherwise an ugly exception is thrown
 
-		if (Engine.getAudioManager() instanceof JSynAndroidAudioDeviceManager) {
+		if (Engine.getAudioDeviceManager() instanceof JSynAndroidAudioDeviceManager) {
 			if (in != 0) {
 				Engine.printWarning("if you want to capture audio from somewhere other than the default\n" +
 					"device on Android, use: new Sound(this).inputDevice(deviceID)\n" +

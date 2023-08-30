@@ -29,13 +29,20 @@ public abstract class MultiChannel {
 	}
 
 	/**
-	 * Gets the number of output channels available on the current output device
+	 * Gets the number of output channels available on an output device
+	 * 
+	 * @param deviceId if none is given, gets information about the current device.
 	 * @return the number of output channels available on the current output device
 	 *
 	 * @webref I/O:MultiChannel
 	 * @see Sound#outputDevice()
 	 */
-	public static int availableChannels() {
-		return Engine.getAudioManager().getMaxOutputChannels(Engine.getEngine().outputDevice);
+	public static int availableChannels(int deviceId) {
+		return Engine.getAudioDeviceManager().getMaxOutputChannels(deviceId);
 	}
+
+	public static int availableChannels() {
+		return MultiChannel.availableChannels(Engine.getEngine().outputDevice);
+	}
+
 }
