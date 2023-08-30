@@ -7,13 +7,18 @@ void setup() {
   background(255);
   
   
+  boolean foundMultiChannel = false;
   for (int i = 0; i < Sound.list(true).length; i++) {
-    Sound.outputDevice(i);
-    if (MultiChannel.availableChannels() > 2) {
+    if (MultiChannel.availableChannels(i) > 2) {
       println("Found a multi-channel device: " + Sound.list(true)[i]);
+			Sound.outputDevice(i);
+			foundMultiChannel = true;
       break;
     }
   }
+	if (!foundMultiChannel) {
+	  println("Did not find any output devices with more than 2 channels!");
+	}
   
   println("Playing back different sine waves on the " + MultiChannel.availableChannels() + " different channels");
   float freq = 100;

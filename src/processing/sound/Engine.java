@@ -22,7 +22,7 @@ class Engine {
 	// a true system-wide singleton, there is no point having more than one of these
 	private static AudioDeviceManager audioManager;
 
-	static AudioDeviceManager getAudioManager() {
+	static AudioDeviceManager getAudioDeviceManager() {
 		if (Engine.audioManager == null) {
 			try {
 				Class.forName("javax.sound.sampled.AudioSystem");
@@ -91,30 +91,29 @@ class Engine {
 		logger.setLevel(Level.WARNING);
 
 		// create and start the synthesizer, and set this object as the singleton.
-		this.synth = JSyn.createSynthesizer(Engine.getAudioManager());
+		this.synth = JSyn.createSynthesizer(Engine.getAudioDeviceManager());
 
 		// select default devices
-		for (int i = 0; i < Engine.getAudioManager().getDeviceCount(); i++) {
+		for (int i = 0; i < Engine.getAudioDeviceManager().getDeviceCount(); i++) {
 			if (Engine.checkDeviceHasOutputs(i)) {
 				this.outputDevice = i;
 				break;
 			}
-			if (i == Engine.getAudioManager().getDeviceCount()) {
+			if (i == Engine.getAudioDeviceManager().getDeviceCount()) {
 				Engine.printError("library initalization failed: could not find any audio devices with a stereo output");
 				return;
 			}
 		}
-		for (int i = 0; i < Engine.getAudioManager().getDeviceCount(); i++) {
+		for (int i = 0; i < Engine.getAudioDeviceManager().getDeviceCount(); i++) {
 			if (Engine.checkDeviceHasInputs(i)) {
 				this.inputDevice = i;
 				break;
 			}
-			if (i == Engine.getAudioManager().getDeviceCount()) {
+			if (i == Engine.getAudioDeviceManager().getDeviceCount()) {
 				Engine.printWarning("could not find any sound devices with input channels, you won't be able to use the AudioIn class");
 			}
 		}
 		this.startSynth();
-		this.setVolume(1.0f);
 
 		Engine.singleton = this;
 	}
@@ -123,10 +122,16 @@ class Engine {
 		if (this.synth.isRunning()) {
 			this.synth.stop();
 			// TODO clean up old outputs/volumes/entire synth network (if any)?
+			for (ChannelOut c : this.output) {
+				this.synth.remove(c);
+			}
+			for (Multiply m : this.volume) {
+				this.synth.remove(m);
+			}
 		}
 
-		this.output = new ChannelOut[Engine.getAudioManager().getMaxOutputChannels(this.outputDevice)]; 
-		this.volume = new Multiply[Engine.getAudioManager().getMaxOutputChannels(this.outputDevice)]; 
+		this.output = new ChannelOut[Engine.getAudioDeviceManager().getMaxOutputChannels(this.outputDevice)];
+		this.volume = new Multiply[Engine.getAudioDeviceManager().getMaxOutputChannels(this.outputDevice)];
 		for (int i = 0; i < this.output.length; i++) {
 			this.output[i] = new ChannelOut();
 			this.output[i].setChannelIndex(i);
@@ -137,10 +142,11 @@ class Engine {
 			this.volume[i].output.connect(this.output[i].input);
 			this.synth.add(this.volume[i]);
 		}
+		this.setVolume(1.0f);
 
 		this.synth.start(this.sampleRate,
-				this.inputDevice, Engine.getAudioManager().getMaxInputChannels(this.inputDevice),
-				this.outputDevice, Engine.getAudioManager().getMaxOutputChannels(this.outputDevice));
+				this.inputDevice, Engine.getAudioDeviceManager().getMaxInputChannels(this.inputDevice),
+				this.outputDevice, Engine.getAudioDeviceManager().getMaxOutputChannels(this.outputDevice));
 	}
 
 
@@ -150,7 +156,7 @@ class Engine {
 	}
 
 	private static boolean isValidDeviceId(int deviceId) {
-		if (deviceId >= 0 && deviceId < Engine.getAudioManager().getDeviceCount()) {
+		if (deviceId >= 0 && deviceId < Engine.getAudioDeviceManager().getDeviceCount()) {
 			return true;
 		}
 		Engine.printError("not a valid device id: " + deviceId);
@@ -158,12 +164,12 @@ class Engine {
 	}
 
 	private static boolean checkDeviceHasInputs(int deviceId) {
-		return Engine.getAudioManager().getMaxInputChannels(deviceId) > 0;
+		return Engine.getAudioDeviceManager().getMaxInputChannels(deviceId) > 0;
 	}
 
 	private static boolean checkDeviceHasOutputs(int deviceId) {
 		// require stereo output
-		return Engine.getAudioManager().getMaxOutputChannels(deviceId) > 1;
+		return Engine.getAudioDeviceManager().getMaxOutputChannels(deviceId) > 1;
 	}
 
 	protected int selectInputDevice(int deviceId) {
@@ -195,8 +201,8 @@ class Engine {
 			// disable multi-channel mode
 			this.outputChannel = 0;
 			this.multiChannelMode = false;
-		} else if (channel < 0 || channel > Engine.getAudioManager().getMaxOutputChannels(this.outputDevice)) {
-			Engine.printError("Invalid channel #" + channel + ", current output device only has " + Engine.getAudioManager().getMaxOutputChannels(this.outputDevice) + " channels");
+		} else if (channel < 0 || channel > Engine.getAudioDeviceManager().getMaxOutputChannels(this.outputDevice)) {
+			Engine.printError("Invalid channel #" + channel + ", current output device only has " + Engine.getAudioDeviceManager().getMaxOutputChannels(this.outputDevice) + " channels");
 		} else {
 			this.outputChannel = channel;
 			this.multiChannelMode = true;
@@ -205,11 +211,11 @@ class Engine {
 	}
 
 	protected String getSelectedInputDeviceName() {
-		return Engine.getAudioManager().getDeviceName(this.inputDevice);
+		return Engine.getAudioDeviceManager().getDeviceName(this.inputDevice);
 	}
 
 	protected String getSelectedOutputDeviceName() {
-		return Engine.getAudioManager().getDeviceName(this.outputDevice);
+		return Engine.getAudioDeviceManager().getDeviceName(this.outputDevice);
 	}
 
 	protected void setVolume(double volume) {
@@ -241,7 +247,7 @@ class Engine {
 		// TODO check if unit is already connected
 		// source.getOutput().isConnected()
 		for (int i = 0; i < source.getOutput().getNumParts(); i++) {
-			source.getOutput().connect(i, this.volume[(this.outputChannel + i) % this.getAudioManager().getMaxOutputChannels(this.outputDevice)].inputA, 0);
+			source.getOutput().connect(i, this.volume[(this.outputChannel + i) % this.getAudioDeviceManager().getMaxOutputChannels(this.outputDevice)].inputA, 0);
 			if (this.multiChannelMode) {
 				// only add the first (left) channel
 				break;
@@ -294,8 +300,8 @@ class Engine {
 	// static helper methods that do stuff like checking argument values or printing library messages
 
 	protected static int getDeviceIdByName(String deviceName) {
-		for (int i = 0; i < Engine.getAudioManager().getDeviceCount(); i++) {
-			if (deviceName.equals(Engine.getAudioManager().getDeviceName(i))) {
+		for (int i = 0; i < Engine.getAudioDeviceManager().getDeviceCount(); i++) {
+			if (deviceName.equals(Engine.getAudioDeviceManager().getDeviceName(i))) {
 				return i;
 			}
 		}
