@@ -1,8 +1,9 @@
 package processing.sound;
 
+import com.jsyn.Synthesizer;
 import com.jsyn.data.FloatSample;
 import com.jsyn.devices.AudioDeviceManager;
-import com.jsyn.Synthesizer;
+import com.jsyn.engine.SynthesisEngine;
 
 import processing.core.PApplet;
 
@@ -18,15 +19,12 @@ import processing.core.PApplet;
  * 
  * @webref Configuration:Sound
  * @webBrief This class can be used for configuring the Processing Sound library.
+ * @see MultiChannel
  */
 public class Sound {
 
-	// could make this static as well, Engine class guarantees it's a singleton
-	// anyway
-	private Engine engine;
-
 	public Sound(PApplet parent) {
-		this.engine = Engine.getEngine(parent);
+		Engine.getEngine(parent);
 	}
 
 	/**
@@ -67,7 +65,11 @@ public class Sound {
 	 * @webBrief Print and return information on available audio devices and their number of input/output channels.
 	 */
 	public static String[] list() {
-		AudioDeviceManager audioManager = Engine.getAudioManager();
+		return Sound.list(false);
+	}
+
+	public static String[] list(boolean quiet) {
+		AudioDeviceManager audioManager = Engine.getAudioDeviceManager();
 		int numDevices = audioManager.getDeviceCount();
 		String[] devices = new String[numDevices];
 		for (int i = 0; i < numDevices; i++) {
@@ -77,15 +79,17 @@ public class Sound {
 			int maxOutputs = audioManager.getMaxOutputChannels(i);
 			boolean isDefaultInput = (i == audioManager.getDefaultInputDeviceID());
 			boolean isDefaultOutput = (i == audioManager.getDefaultOutputDeviceID());
-			System.out.println("device id " + i + ": " + deviceName);
-			System.out.println("  max inputs : " + maxInputs + (isDefaultInput ? "   (default)" : ""));
-			System.out.println("  max outputs: " + maxOutputs + (isDefaultOutput ? "   (default)" : ""));
+			if (!quiet) {
+				System.out.println("device id " + i + ": " + deviceName);
+				System.out.println("  input channels : " + maxInputs + (isDefaultInput ? "   (default)" : ""));
+				System.out.println("  output channels: " + maxOutputs + (isDefaultOutput ? "   (default)" : ""));
+			}
 		}
 		return devices;
 	}
 
-	public int sampleRate() {
-		return this.engine.getSampleRate();
+	public static int sampleRate() {
+		return Engine.getEngine().getSampleRate();
 	}
 
 	/**
@@ -97,9 +101,9 @@ public class Sound {
 	 * @webref Configuration:Sound
 	 * @webBrief Get or set the internal sample rate of the synthesis engine.
 	 */
-	public int sampleRate(int sampleRate) {
-		this.engine.setSampleRate(sampleRate);
-		return this.sampleRate();
+	public static int sampleRate(int sampleRate) {
+		Engine.getEngine().setSampleRate(sampleRate);
+		return Sound.sampleRate();
 	}
 
 	/**
@@ -111,12 +115,18 @@ public class Sound {
 	 * 
 	 * @param deviceId
 	 *            the device id obtained from Sound.list()
+	 * @param deviceName
+	 *            the device name obtained from Sound.list()
 	 * @see Sound#list()
 	 * @webref Configuration:Sound
 	 * @webBrief Choose the device (sound card) which should be used for grabbing audio input using AudioIn.
 	 */
-	public void inputDevice(int deviceId) {
-		this.engine.selectInputDevice(deviceId);
+	public static int inputDevice(int deviceId) {
+		return Engine.getEngine().selectInputDevice(deviceId);
+	}
+
+	public static int inputDevice(String deviceName) {
+		return Engine.getEngine().selectInputDevice(Engine.getDeviceIdByName(deviceName));
 	}
 
 	/**
@@ -124,13 +134,27 @@ public class Sound {
 	 * be sent to. The output device should support stereo output (2 channels).
 	 * 
 	 * @param deviceId
-	 *            the device id obtained from list()
+	 *            the device id obtained from Sound.list()
+	 * @param deviceName
+	 *            the device name obtained from Sound.list()
 	 * @see Sound#list()
 	 * @webref Configuration:Sound
 	 * @webBrief Choose the device (sound card) which the Sound library's audio output should be sent to.
 	 */
-	public void outputDevice(int deviceId) {
-		this.engine.selectOutputDevice(deviceId);
+	public static int outputDevice(int deviceId) {
+		return Engine.getEngine().selectOutputDevice(deviceId);
+	}
+
+	public static int outputDevice(String deviceName) {
+		return Engine.getEngine().selectOutputDevice(Engine.getDeviceIdByName(deviceName));
+	}
+
+	public static int defaultOutputDevice() {
+		return Sound.outputDevice(Engine.getAudioDeviceManager().getDefaultOutputDeviceID());
+	}
+
+	public static int defaultInputDevice() {
+		return Sound.inputDevice(Engine.getAudioDeviceManager().getDefaultInputDeviceID());
 	}
 
 	/**
@@ -140,33 +164,37 @@ public class Sound {
 	 *            the desired output volume, normally between 0.0 and 1.0 (default
 	 *            is 1.0)
 	 * @webref Configuration:Sound
-	 * @webBrief Set the overall output volume of the Processing sound library.
 	 */
-	public void volume(float volume) {
-		this.engine.setVolume(volume);
+	public static void volume(float volume) {
+		Engine.getEngine().setVolume(volume);
 	}
 
 	/**
 	 * Prints information about the sound library's current memory and CPU usage to the console.
 	 * @webref Configuration:Sound
 	 */
-	public void status() {
-		Engine.printMessage(String.format("%.2f", this.engine.synth.getCurrentTime()) + " seconds elapsed, generated " + this.engine.synth.getFrameCount() + " frames (framerate " + this.engine.synth.getFrameRate() + ")");
-		Engine.printMessage("  CPU usage: " + Math.round(100 * this.engine.synth.getUsage()) + "%");
-		Engine.printMessage("  elements in synthesizer network: " + this.engine.nCircuits);
-		Engine.printMessage("  sound sources currently playing: " + this.engine.nPlayingCircuits);
+	public static void status() {
+		Engine.printMessage(String.format("%.2f", Engine.getEngine().synth.getCurrentTime()) + " seconds elapsed, generated " + Engine.getEngine().synth.getFrameCount() + " frames (framerate " + Engine.getEngine().synth.getFrameRate() + ")");
+		Engine.printMessage("  CPU usage: " + Math.round(100 * Engine.getEngine().synth.getUsage()) + "%");
+		Engine.printMessage("  elements in synthesizer network: " + Engine.getEngine().nCircuits);
+		Engine.printMessage("  sound sources currently playing: " + Engine.getEngine().nPlayingCircuits);
 		long nSamples = 0;
 		for (FloatSample s : SoundFile.SAMPLECACHE.values()) {
 			nSamples += s.getNumFrames() * s.getChannelsPerFrame();
 		}
 		Engine.printMessage("  decoded audio samples held in cache: " + SoundFile.SAMPLECACHE.size() + " (" + nSamples + " frames total)");
 		// might return something useful later
+		Sound.printConnections();
+	}
+
+	public static void printConnections() {
+		((SynthesisEngine) Engine.getEngine().synth).printConnections();
 	}
 
 	/**
-	 * Use at your own risk.
+	 * Direct access to the underlying JSyn Synthesizer object. Use at your own risk.
 	 */
-	public Synthesizer getSynthesizer() {
-		return this.engine.synth;
+	public static Synthesizer getSynthesizer() {
+		return Engine.getEngine().synth;
 	}
 }

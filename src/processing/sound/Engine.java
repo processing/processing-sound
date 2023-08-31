@@ -7,7 +7,7 @@ import com.jsyn.JSyn;
 import com.jsyn.Synthesizer;
 import com.jsyn.devices.AudioDeviceFactory;
 import com.jsyn.devices.AudioDeviceManager;
-import com.jsyn.unitgen.LineOut;
+import com.jsyn.unitgen.ChannelOut;
 import com.jsyn.unitgen.Multiply;
 import com.jsyn.unitgen.UnitGenerator;
 import com.jsyn.unitgen.UnitSource;
@@ -19,107 +19,10 @@ import processing.core.PApplet;
  */
 class Engine {
 
+	// a true system-wide singleton, there is no point having more than one of these
 	private static AudioDeviceManager audioManager;
-	private static Engine singleton;
 
-	protected Synthesizer synth;
-	// the stereo lineout
-	private LineOut lineOut;
-	// two multipliers for controlling the global output volume
-	private Multiply leftOut;
-	private Multiply rightOut;
-
-	private int sampleRate = 44100;
-
-	// set in constructor
-	private int inputDevice;
-	private int outputDevice;
-
-	// keep track of the number of objects connected to the synthesizer circuit
-	protected int nCircuits = 0;
-	protected int nPlayingCircuits = 0;
-
-	protected static Engine getEngine(PApplet parent) {
-		if (Engine.singleton == null) {
-			Engine.singleton = new Engine(parent);
-		}
-		return Engine.singleton;
-	}
-
-	protected static Engine getEngine() {
-		return Engine.singleton;
-	}
-
-	private Engine(PApplet theParent) {
-		// only call initalisation steps if not already initialised
-		if (Engine.singleton != null) {
-			return;
-		}
-
-		// suppress JSyn's INFO log messages to stop them from showing
-		// up as redtext in the Processing console
-		Logger logger = Logger.getLogger(com.jsyn.engine.SynthesisEngine.class.getName());
-		logger.setLevel(Level.WARNING);
-
-		// create and start the synthesizer, and set this object as the singleton.
-		this.synth = JSyn.createSynthesizer(Engine.getAudioManager());
-
-		// select default devices
-		for (int i = 0; i < Engine.getAudioManager().getDeviceCount(); i++) {
-			if (Engine.checkDeviceHasOutputs(i)) {
-				this.outputDevice = i;
-				break;
-			}
-			if (i == Engine.getAudioManager().getDeviceCount()) {
-				Engine.printError("library initalization failed: could not find any audio devices with a stereo output");
-				return;
-			}
-		}
-		for (int i = 0; i < Engine.getAudioManager().getDeviceCount(); i++) {
-			if (Engine.checkDeviceHasInputs(i)) {
-				this.inputDevice = i;
-				break;
-			}
-			if (i == Engine.getAudioManager().getDeviceCount()) {
-				Engine.printWarning("could not find any sound devices with input channels, you won't be able to use the AudioIn class");
-			}
-		}
-
-		this.lineOut = new LineOut(); // stereo lineout by default
-		this.synth.add(lineOut);
-		this.lineOut.start();
-
-		this.leftOut = new Multiply();
-		this.rightOut = new Multiply();
-		this.setVolume(1.0f);
-		this.leftOut.output.connect(0, this.lineOut.input, 0);
-		this.rightOut.output.connect(0, this.lineOut.input, 1);
-		this.synth.add(this.leftOut);
-		this.synth.add(this.rightOut);
-
-		this.startSynth();
-		Engine.singleton = this;
-
-		// register Processing library callback methods
-		Object callback = new Callback();
-		theParent.registerMethod("dispose", callback);
-		// Android only
-		theParent.registerMethod("pause", callback);
-		theParent.registerMethod("resume", callback);
-	}
-
-	protected void startSynth() {
-		if (this.synth.isRunning()) {
-			this.synth.stop();
-		}
-
-		this.synth.start(this.sampleRate,
-				this.inputDevice, Engine.getAudioManager().getMaxInputChannels(this.inputDevice),
-				// TODO limit number of output channels to 2?
-				this.outputDevice, Engine.getAudioManager().getMaxOutputChannels(this.outputDevice));
-	}
-
-	protected static AudioDeviceManager getAudioManager() {
+	static AudioDeviceManager getAudioDeviceManager() {
 		if (Engine.audioManager == null) {
 			try {
 				Class.forName("javax.sound.sampled.AudioSystem");
@@ -131,50 +34,195 @@ class Engine {
 		return Engine.audioManager;
 	}
 
+	/**
+	 * Singleton instance that is created by the first method call to or creation of any Sound library class.
+	 * Any calls to configuration, start() or play() methods will be passed on to this engine.
+	 * In theory it's possible to have multiple instances of the library run on several different
+	 * sound devices simultaneously, by first setting this variable to null, forcing a (second)
+	 * singleton to be created, and then swapping them out manually at will.
+	 */
+	static Engine singleton;
+
+	static Engine getEngine(PApplet parent) {
+		if (Engine.singleton == null) {
+			Engine.singleton = new Engine();
+		}
+		if (parent != null) {
+			Engine.singleton.registerWithParent(parent);
+		}
+		return Engine.singleton;
+	}
+
+	static Engine getEngine() {
+		return Engine.getEngine(null);
+	}
+
+
+
+	protected Synthesizer synth;
+	// multi-channel lineouts
+	private ChannelOut[] output;
+	// multipliers for each output channel for controlling the global output volume
+	private Multiply[] volume;
+
+	private int sampleRate = 44100;
+
+	protected int inputDevice;
+	protected int outputDevice;
+	protected int outputChannel;
+	/**
+	 * when multi-channel mode is active, only the first (left) output of any unit
+	 * generators is added. the mode is activated by calling selectOutputChannel()
+	 */
+	protected boolean multiChannelMode = false;
+
+	// keep track of the number of objects connected to the synthesizer circuit
+	protected int nCircuits = 0;
+	protected int nPlayingCircuits = 0;
+
+	/**
+	 * Create a new synthesizer and connect it to the default sound devices.
+	 */
+	private Engine() {
+
+		// suppress JSyn's INFO log messages to stop them from showing
+		// up as redtext in the Processing console
+		Logger logger = Logger.getLogger(com.jsyn.engine.SynthesisEngine.class.getName());
+		logger.setLevel(Level.WARNING);
+
+		// create and start the synthesizer, and set this object as the singleton.
+		this.synth = JSyn.createSynthesizer(Engine.getAudioDeviceManager());
+
+		// select default devices
+		for (int i = 0; i < Engine.getAudioDeviceManager().getDeviceCount(); i++) {
+			if (Engine.checkDeviceHasOutputs(i)) {
+				this.outputDevice = i;
+				break;
+			}
+			if (i == Engine.getAudioDeviceManager().getDeviceCount()) {
+				Engine.printError("library initalization failed: could not find any audio devices with a stereo output");
+				return;
+			}
+		}
+		for (int i = 0; i < Engine.getAudioDeviceManager().getDeviceCount(); i++) {
+			if (Engine.checkDeviceHasInputs(i)) {
+				this.inputDevice = i;
+				break;
+			}
+			if (i == Engine.getAudioDeviceManager().getDeviceCount()) {
+				Engine.printWarning("could not find any sound devices with input channels, you won't be able to use the AudioIn class");
+			}
+		}
+		this.startSynth();
+
+		Engine.singleton = this;
+	}
+
+	protected void startSynth() {
+		if (this.synth.isRunning()) {
+			this.synth.stop();
+			// TODO clean up old outputs/volumes/entire synth network (if any)?
+			for (ChannelOut c : this.output) {
+				this.synth.remove(c);
+			}
+			for (Multiply m : this.volume) {
+				this.synth.remove(m);
+			}
+		}
+
+		this.output = new ChannelOut[Engine.getAudioDeviceManager().getMaxOutputChannels(this.outputDevice)];
+		this.volume = new Multiply[Engine.getAudioDeviceManager().getMaxOutputChannels(this.outputDevice)];
+		for (int i = 0; i < this.output.length; i++) {
+			this.output[i] = new ChannelOut();
+			this.output[i].setChannelIndex(i);
+			this.synth.add(output[i]);
+		  this.output[i].start();
+
+			this.volume[i] = new Multiply();
+			this.volume[i].output.connect(this.output[i].input);
+			this.synth.add(this.volume[i]);
+		}
+		this.setVolume(1.0f);
+
+		this.synth.start(this.sampleRate,
+				this.inputDevice, Engine.getAudioDeviceManager().getMaxInputChannels(this.inputDevice),
+				this.outputDevice, Engine.getAudioDeviceManager().getMaxOutputChannels(this.outputDevice));
+	}
+
+
 	protected void setSampleRate(int sampleRate) {
-		Engine.singleton.sampleRate = sampleRate;
-		Engine.singleton.startSynth();
+		this.sampleRate = sampleRate;
+		this.startSynth();
+	}
+
+	private static boolean isValidDeviceId(int deviceId) {
+		if (deviceId >= 0 && deviceId < Engine.getAudioDeviceManager().getDeviceCount()) {
+			return true;
+		}
+		Engine.printError("not a valid device id: " + deviceId);
+		return false;
 	}
 
 	private static boolean checkDeviceHasInputs(int deviceId) {
-		return Engine.getAudioManager().getMaxInputChannels(deviceId) > 0;
+		return Engine.getAudioDeviceManager().getMaxInputChannels(deviceId) > 0;
 	}
 
 	private static boolean checkDeviceHasOutputs(int deviceId) {
 		// require stereo output
-		return Engine.getAudioManager().getMaxOutputChannels(deviceId) > 1;
+		return Engine.getAudioDeviceManager().getMaxOutputChannels(deviceId) > 1;
 	}
 
-	protected void selectInputDevice(int deviceId) {
-		if (Engine.checkDeviceHasInputs(deviceId)) {
-			Engine.singleton.inputDevice = deviceId;
-			Engine.singleton.startSynth();
-		} else {
-			Engine.printError("audio device #" + deviceId + " has no input channels");
+	protected int selectInputDevice(int deviceId) {
+		if (Engine.isValidDeviceId(deviceId)) {
+			if (Engine.checkDeviceHasInputs(deviceId)) {
+				this.inputDevice = deviceId;
+				this.startSynth();
+			} else {
+				Engine.printError("audio device #" + deviceId + " has no input channels");
+			}
 		}
+		return this.inputDevice;
 	}
 
-	protected void selectOutputDevice(int deviceId) {
-		if (Engine.checkDeviceHasOutputs(deviceId)) {
-			Engine.singleton.outputDevice = deviceId;
-			Engine.singleton.startSynth();
-		} else {
-			Engine.printError("audio device #" + deviceId + " has no stereo output channel");
+	protected int selectOutputDevice(int deviceId) {
+		if (Engine.isValidDeviceId(deviceId)) {
+			if (Engine.checkDeviceHasOutputs(deviceId)) {
+				Engine.getEngine().outputDevice = deviceId;
+				Engine.getEngine().startSynth();
+			} else {
+				Engine.printError("audio device #" + deviceId + " has no stereo output channel");
+			}
 		}
+		return this.outputDevice;
 	}
 
-	protected static String getSelectedInputDeviceName() {
-		return Engine.getAudioManager().getDeviceName(Engine.singleton.inputDevice);
+	protected int selectOutputChannel(int channel) {
+		if (channel == -1) {
+			// disable multi-channel mode
+			this.outputChannel = 0;
+			this.multiChannelMode = false;
+		} else if (channel < 0 || channel > Engine.getAudioDeviceManager().getMaxOutputChannels(this.outputDevice)) {
+			Engine.printError("Invalid channel #" + channel + ", current output device only has " + Engine.getAudioDeviceManager().getMaxOutputChannels(this.outputDevice) + " channels");
+		} else {
+			this.outputChannel = channel;
+			this.multiChannelMode = true;
+		}
+		return this.outputChannel;
 	}
 
-	protected static String getSelectedOutputDeviceName() {
-		return Engine.getAudioManager().getDeviceName(Engine.singleton.outputDevice);
+	protected String getSelectedInputDeviceName() {
+		return Engine.getAudioDeviceManager().getDeviceName(this.inputDevice);
+	}
+
+	protected String getSelectedOutputDeviceName() {
+		return Engine.getAudioDeviceManager().getDeviceName(this.outputDevice);
 	}
 
 	protected void setVolume(double volume) {
 		if (Engine.checkRange(volume, "volume")) {
-			this.leftOut.inputB.set(volume);
-			this.rightOut.inputB.set(volume);
+			for (Multiply m : this.volume) {
+				m.inputB.set(volume);
+			}
 		}
 	}
 
@@ -197,15 +245,68 @@ class Engine {
 
 	protected void play(UnitSource source) {
 		// TODO check if unit is already connected
-		source.getOutput().connect(0, this.leftOut.inputA, 0);
-		source.getOutput().connect(1, this.rightOut.inputA, 0);
+		// source.getOutput().isConnected()
+		for (int i = 0; i < source.getOutput().getNumParts(); i++) {
+			source.getOutput().connect(i, this.volume[(this.outputChannel + i) % this.getAudioDeviceManager().getMaxOutputChannels(this.outputDevice)].inputA, 0);
+			if (this.multiChannelMode) {
+				// only add the first (left) channel
+				break;
+			}
+		}
 		this.nPlayingCircuits++;
 	}
 
 	protected void stop(UnitSource source) {
-		source.getOutput().disconnect(0, this.leftOut.inputA, 0);
-		source.getOutput().disconnect(1, this.rightOut.inputA, 0);
+		source.getOutput().disconnectAll();
 		this.nPlayingCircuits--;
+	}
+
+	/**
+	 * Internal helper class for Processing library callbacks
+	 */
+	public class Callback {
+		public void dispose() {
+			synth.stop();
+		}
+
+		public void pause() {
+			// TODO
+		}
+
+		public void resume() {
+			// TODO
+		}
+	}
+
+	private Callback registeredCallback;
+
+	/**
+	 * Register a callback with the sketch PApplet, so that the synth thread is stopped when the sketch is finished.
+	 */
+	private void registerWithParent(PApplet theParent) {
+		if (this.registeredCallback != null) {
+			return;
+		}
+		// register Processing library callback methods
+		this.registeredCallback = new Callback();
+		theParent.registerMethod("dispose", this.registeredCallback);
+		// Android only
+		theParent.registerMethod("pause", this.registeredCallback);
+		theParent.registerMethod("resume", this.registeredCallback);
+	}
+
+
+
+	// static helper methods that do stuff like checking argument values or printing library messages
+
+	protected static int getDeviceIdByName(String deviceName) {
+		for (int i = 0; i < Engine.getAudioDeviceManager().getDeviceCount(); i++) {
+			if (deviceName.equals(Engine.getAudioDeviceManager().getDeviceName(i))) {
+				return i;
+			}
+		}
+		Engine.printError("No device with name '" + deviceName + "' found.");
+		return -1;
 	}
 
 	protected static boolean checkAmp(float amp) {
@@ -246,21 +347,4 @@ class Engine {
 		PApplet.println("Sound library error: " + message);
 	}
 
-	/**
-	 * Internal helper class for Processing library callbacks
-	 */
-	public class Callback {
-		public void dispose() {
-			lineOut.stop();
-			synth.stop();
-		}
-
-		public void pause() {
-			// TODO
-		}
-
-		public void resume() {
-			// TODO
-		}
-	}
 }

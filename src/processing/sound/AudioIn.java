@@ -43,7 +43,7 @@ public class AudioIn extends SoundObject {
 		// TODO check if the current input device actually has 'in' input channels,
 		// otherwise an ugly exception is thrown
 
-		if (Engine.getAudioManager() instanceof JSynAndroidAudioDeviceManager) {
+		if (Engine.getAudioDeviceManager() instanceof JSynAndroidAudioDeviceManager) {
 			if (in != 0) {
 				Engine.printWarning("if you want to capture audio from somewhere other than the default\n" +
 					"device on Android, use: new Sound(this).inputDevice(deviceID)\n" +
@@ -54,7 +54,7 @@ public class AudioIn extends SoundObject {
 				Engine.printError(AudioIn.ANDROID_PERMISSION_WARNING_MESSAGE);
 				throw new AndroidPermissionException("RECORD_AUDIO permission not granted");
 			}
-			Engine.printMessage("capturing audio in from device " + Engine.getSelectedInputDeviceName());
+			Engine.printMessage("capturing audio in from device " + Engine.getEngine().getSelectedInputDeviceName());
 		}
 
 		this.input = new ChannelIn(in);
