@@ -1,4 +1,4 @@
-name: Build library and Javadoc
+name: "Commit > Build library jar and publish Javadoc"
 
 on:
   push:
