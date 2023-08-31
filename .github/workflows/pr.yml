@@ -8,11 +8,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK 11
-        uses: actions/setup-java@v3
-        with:
-          java-version: '11'
-          distribution: 'temurin'
+      - uses: ./.github/workflows/setup.yml
+      - name: Compile
+        run: ant compile
+      - name: Run tests
+        run: ant test
       - name: Build library zip
         run: ant dist
