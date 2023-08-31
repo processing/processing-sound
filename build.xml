@@ -43,12 +43,21 @@
 		<get src="https://github.com/marianadangelo/android-platforms/raw/master/android-26/android.jar" dest="lib/" usetimestamp="true" />
 	</target>
 
-	<target name="deps" description="Get library dependencies">
-		<antcall target="processing-deps" />
-		<antcall target="android-deps" />
+	<target name="check-bundled-deps">
+		<available file="library/jsyn-17.1.0.jar" property="hasjsyn" />
+		<available file="library/javamp3-1.0.4.jar" property="hasjavamp3" />
+	</target>
+
+	<target name="bundled-deps" depends="check-bundled-deps" unless="hasjsyn" description="Download JSyn and JavaMP3">
 		<!-- bundled dependencies go into library/, build-only dependencies into lib/ -->
 		<get src="https://github.com/philburk/jsyn/releases/download/v17.1.0/jsyn-17.1.0.jar" dest="library/" usetimestamp="true" />
 		<get src="https://github.com/kevinstadler/JavaMP3/releases/download/v1.0.4/javamp3-1.0.4.jar" dest="library/" usetimestamp="true" />
+	</target>
+
+	<target name="deps" description="Get library dependencies">
+		<antcall target="processing-deps" />
+		<antcall target="android-deps" />
+		<antcall target="bundled-deps" />
 	</target>
 
 	<target name="compile" depends="deps" description="Compile sources">
@@ -67,29 +76,31 @@
 		</javadoc>
 	</target>
 
-	<target name="jar" depends="clean,compile" description="Build Sound library jar">
+	<target name="jar" depends="compile" description="Build Sound library jar">
 		<jar destfile="library/sound.jar">
 			<fileset dir="bin" />
 		</jar>
 	</target>
 
-	<target name="dist" depends="jar,javadoc">
+	<target name="dist" depends="clean,jar,javadoc" description="Build clean Sound library zip">
 		<zip destfile="../sound.zip">
 			<zipfileset dir="." prefix="sound">
-				<exclude name=".*" />
-				<exclude name="build.xml" />
-				<exclude name="bin/**" />
-				<exclude name="docs/**" />
-				<exclude name="examples/**/application.*/**" />
-				<exclude name="library/android.jar" />
-				<exclude name="library/processing-core.zip" />
-				<exclude name="src/**" />
+				<include name="examples/**" />
+				<include name="library/" />
+				<include name="library.properties" />
+				<include name="CONTRIBUTING.md" />
+				<include name="LICENSE" />
+				<include name="README.md" />
 			</zipfileset>
 		</zip>
 		<copy file="library.properties" toFile="../sound.txt" />
 	</target>
 
-	<target name="install" depends="dist" description="Local installation for testing/developing">
+	<target name="install" depends="dist" description="Local installation of library zip for testing/developing">
 		<unzip src="../sound.zip" dest="../../Documents/Processing/libraries/" />
+	</target>
+
+	<target name="quickinstall" depends="jar" description="Build and copy sound.jar for testing/developing">
+		<copy file="library/sound.jar" toDir="../../Documents/Processing/libraries/sound/library/" />
 	</target>
 </project>
