@@ -1,0 +1,21 @@
+name: Set up build environment and dependencies
+
+on:
+  workflow_call:
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+      - uses: actions/cache@v3
+        with:
+          key: deps-1
+          path: build-deps/
+      - name: Get unit testing dependencies
+        run: mvn dependency:copy-dependencies -DoutputDirectory=build-deps

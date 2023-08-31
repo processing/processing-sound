@@ -1,14 +1,16 @@
 <?xml version="1.0"?>
 <project name="Processing Sound Library" default="jar">
 
+	<property file="build.properties"/>
+
 	<path id="classpath">
-		<fileset dir="library">
-			<include name="*.jar" />
-		</fileset>
-		<fileset dir="lib">
-			<include name="processing-core.zip" />
-			<include name="*.jar" />
-		</fileset>
+		<pathelement location="library/javamp3-1.0.4.jar" />
+		<pathelement location="library/jsyn-17.1.0.jar" />
+		<pathelement location="${lib}/processing-core.zip" />
+		<pathelement location="${lib}/junit-4.13.2.jar" />
+		<pathelement location="${lib}/hamcrest-core-1.3.jar" />
+		<!-- have to put android.jar last (after junit) https://stackoverflow.com/a/18256532 -->
+		<pathelement location="${lib}/android.jar" />
 	</path>
 
 	<target name="clean" description="Clean the build directories">
@@ -17,30 +19,30 @@
 	</target>
 
 	<target name="checkprocessingdeps">
-		<available file="lib/processing-core.zip" property="hasprocessingcore" />
-		<available file="lib/android.jar" property="hasandroid" />
+		<available file="${lib}/processing-core.zip" property="hasprocessingcore" />
+		<available file="${lib}/android.jar" property="hasandroid" />
 	</target>
 
 	<!-- as of version 2.2, the sound library is compiled against the -->
 	<!-- processing-core.zip provided by Processing for Android mode -->
 	<!-- we can automatically retrieve the latest version from GitHub -->
 	<target name="processing-deps" depends="checkprocessingdeps" unless="hasprocessingcore" description="Download Android mode's processing-core">
-		<get src="https://github.com/processing/processing-android/releases/download/latest/AndroidMode.zip" dest="library/" usetimestamp="true" />
-		<unzip src="library/AndroidMode.zip" dest="lib/">
+		<get src="https://github.com/processing/processing-android/releases/download/latest/AndroidMode.zip" dest="${lib}" usetimestamp="true" />
+		<unzip src="${lib}/AndroidMode.zip" dest="${lib}">
 			<patternset>
 				<include name="AndroidMode/processing-core.zip" />
 			</patternset>
 			<mapper type="flatten"/>
 		</unzip>
 		<!-- no real need to keep parent zip -->
-		<delete file="library/AndroidMode.zip" />
+		<delete file="${lib}/AndroidMode.zip" />
 	</target>
 
 	<target name="android-deps" depends="checkprocessingdeps" unless="hasandroid" description="Download an android.jar">
 		<!-- this part of the Android SDK is required to build JSynAndroidAudioDeviceManager -->
 		<!-- preferrably you should soft-link or copy the android.jar of your locally
 			installed SDK into this project's library/ directory -->
-		<get src="https://github.com/marianadangelo/android-platforms/raw/master/android-26/android.jar" dest="lib/" usetimestamp="true" />
+		<get src="https://github.com/marianadangelo/android-platforms/raw/master/android-26/android.jar" dest="${lib}" usetimestamp="true" />
 	</target>
 
 	<target name="check-bundled-deps">
@@ -65,6 +67,25 @@
 		<javac source="1.8" target="1.8" srcdir="src" destdir="bin" encoding="UTF-8" includeAntRuntime="false" nowarn="true">
 			<classpath refid="classpath" />
 		</javac>
+	</target>
+
+	<target name="compile-tests">
+		<javac source="1.8" target="1.8" srcdir="test" destdir="test" encoding="UTF-8" includeAntRuntime="false" nowarn="true">
+			<classpath refid="classpath" />
+		</javac>
+	</target>
+
+	<target name="test" depends="compile"><!--,compile-tests">-->
+		<junit>
+			<classpath>
+				<path refid="classpath" />
+				<pathelement location="test" />
+			</classpath>
+			<formatter type="brief" usefile="false" />
+			<batchtest>
+				<fileset dir="test/" includes="**/*Test.class" />
+			</batchtest>
+		</junit>
 	</target>
 
 	<target name="javadoc">
