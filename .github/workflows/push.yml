@@ -14,6 +14,10 @@ jobs:
         run: ant jar
       - name: Run tests
         run: ant test
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v3
+        with:
+          report_paths: 'TEST-*.xml'
       - uses: actions/upload-artifact@v3
         with:
           name: sound-jar-${{ github.sha }}

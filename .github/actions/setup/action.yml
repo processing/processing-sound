@@ -7,11 +7,12 @@ runs:
       with:
         java-version: '17'
         distribution: 'temurin'
-        cache: 'maven'
+        cache: maven
+        # cache: gradle
+
+    # cache any custom dependencies (e.g. processing-core.zip) in the library/
+    # folder so that they don't have to be downloaded every time
     - uses: actions/cache@v3
       with:
         key: deps-1
-        path: build-deps/
-    - name: Get unit testing dependencies
-      shell: bash
-      run: mvn dependency:copy-dependencies -DoutputDirectory=build-deps
+        path: library/
