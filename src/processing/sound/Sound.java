@@ -59,6 +59,9 @@ public class Sound {
 	 * can also use the device name array returned by the function to automate device 
 	 * selection by name in your own code.
 	 * 
+	 * @param listAll whether to include all devices in the output listing. By default,
+	 * sound devices without any inputs or outputs are omitted from the output listing
+	 * for clarity. Pass `true` here if you want a complete list of all devices (for debugging).
 	 * @return an array giving the names of all audio devices available on this
 	 *         computer
 	 * @webref Configuration:Sound
@@ -68,7 +71,11 @@ public class Sound {
 		return Sound.list(false);
 	}
 
-	public static String[] list(boolean quiet) {
+	public static AudioDeviceManager getAudioDeviceManager() {
+		return Engine.getAudioDeviceManager();
+	}
+
+	public static String[] list(boolean listAll) {
 		AudioDeviceManager audioManager = Engine.getAudioDeviceManager();
 		int numDevices = audioManager.getDeviceCount();
 		String[] devices = new String[numDevices];
@@ -79,10 +86,14 @@ public class Sound {
 			int maxOutputs = audioManager.getMaxOutputChannels(i);
 			boolean isDefaultInput = (i == audioManager.getDefaultInputDeviceID());
 			boolean isDefaultOutput = (i == audioManager.getDefaultOutputDeviceID());
-			if (!quiet) {
+			if (listAll || maxInputs > 0 || maxOutputs > 0) {
 				System.out.println("device id " + i + ": " + deviceName);
-				System.out.println("  input channels : " + maxInputs + (isDefaultInput ? "   (default)" : ""));
-				System.out.println("  output channels: " + maxOutputs + (isDefaultOutput ? "   (default)" : ""));
+				if (listAll || maxInputs > 0) {
+					System.out.println("  input channels : " + maxInputs + (isDefaultInput ? "   (default)" : ""));
+				}
+				if (listAll || maxOutputs > 0) {
+					System.out.println("  output channels: " + maxOutputs + (isDefaultOutput ? "   (default)" : ""));
+				}
 			}
 		}
 		return devices;
