@@ -1,0 +1,17 @@
+name: Set up build environment and dependencies
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: 'maven'
+    - uses: actions/cache@v3
+      with:
+        key: deps-1
+        path: build-deps/
+    - name: Get unit testing dependencies
+      shell: bash
+      run: mvn dependency:copy-dependencies -DoutputDirectory=build-deps
