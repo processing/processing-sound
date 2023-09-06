@@ -6,7 +6,8 @@ import com.jsyn.unitgen.UnitSource;
 import processing.core.PApplet;
 
 /**
- * For advanced users: common superclass of all noise generators
+ * Common superclass of all noise generators
+ * @webref Noise
  */
 public abstract class Noise<JSynNoise extends UnitGenerator> extends SoundObject {
 
@@ -23,6 +24,12 @@ public abstract class Noise<JSynNoise extends UnitGenerator> extends SoundObject
 		this.play();
 	}
 
+	/**
+	 * Starts the noise
+	 * @webref Noise:Noise
+	 * @param amp The amplitude of the noise as a value between 0.0 and 1.0.
+	 * @param pos The panoramic position of the noise as a float from -1.0 to 1.0.
+	 **/
 	public void play(float amp, float pos) {
 		this.pan(pos);
 		this.play(amp);
@@ -33,9 +40,32 @@ public abstract class Noise<JSynNoise extends UnitGenerator> extends SoundObject
 		this.play();
 	}
 
+	/**
+	 * Set the amplitude and panoramic position with one method.
+	 * @webref Noise:Noise
+	 * @param amp The amplitude of the noise as a value between 0.0 and 1.0.
+	 * @param pos The panoramic position of the noise as a float from -1.0 to 1.0.
+	 **/
+	public void set(float amp, float pos) {
+		this.amp(amp);
+		this.pan(pos);
+	}
+
+	/**
+	 * @deprecated
+	 */
 	public void set(float amp, float add, float pos) {
 		this.amp(amp);
 		this.add(add);
 		this.pan(pos);
 	}
+
+	/**
+	 * Stop the noise from playing back
+	 * @webref Noise:Noise
+	 */
+	public void stop() {
+		super.stop();
+	}
+
 }

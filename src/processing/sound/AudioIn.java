@@ -88,8 +88,6 @@ public class AudioIn extends SoundObject {
 	 * @param amp
 	 *            the volume to grab the input at as a value from 0.0 (complete
 	 *            silence) to 1.0 (full volume)
-	 * @param add
-	 *            offset the audio input by the given value
 	 * @param pos
 	 *            pan the audio input in a stereo panorama. Allowed values are
 	 *            between -1.0 (left) and 1.0 (right)
@@ -136,22 +134,34 @@ public class AudioIn extends SoundObject {
 	}
 
 	/**
-	 * Sets amplitude, add and pan position with one method.
+	 * Set amplitude and pan position with one method.
 	 * 
 	 * @webref I/O:AudioIn
-	 * @webBrief Sets amplitude, add and pan position with one method.
 	 * @param amp
 	 *            the volume to grab the input at as a value from 0.0 (complete
 	 *            silence) to 1.0 (full volume)
-	 * @param add
-	 *            offset the audio input by the given value
 	 * @param pos
 	 *            pan the audio input in a stereo panorama. Allowed values are
 	 *            between -1.0 (left) and 1.0 (right)
 	 **/
+	public void set(float amp, float pos) {
+		this.amp(amp);
+		this.pan(pos);
+	}
+
 	public void set(float amp, float add, float pos) {
 		this.amp(amp);
 		this.add(add);
 		this.pan(pos);
 	}
+
+	/**
+	 * Stop capturing sound from this audio input.
+	 *
+	 * @webref I/O:AudioIn
+	 **/
+	public void stop() {
+		super.stop();
+	}
+
 }

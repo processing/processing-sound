@@ -11,6 +11,7 @@ import processing.core.PApplet;
 
 /**
  * For advanced users: common superclass of all effect types
+ * @webref Effects
  */
 // helper class for applying the same effect (with the same parameters) on two channels.
 // a basic design question is what to do if the same effect is applied to several different
@@ -53,7 +54,7 @@ public abstract class Effect<EffectType extends UnitFilter> {
 	/**
 	 * Start the effect.
 	 * @param input Input sound source
-	 * @webref Effects
+	 * @webref Effects:Effect
 	 */
 	public void process(SoundObject input) {
 		if (this.inputs.add(input)) {
@@ -66,7 +67,7 @@ public abstract class Effect<EffectType extends UnitFilter> {
 
 	/**
 	 * Stop the effect.
-	 * @webref Effects
+	 * @webref Effects:Effect
 	 */
 	public void stop() {
 		if (this.inputs.isEmpty()) {

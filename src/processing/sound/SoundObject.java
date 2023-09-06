@@ -8,6 +8,7 @@ import processing.core.PApplet;
 /**
  * For advanced users: common superclass of all sound sources (oscillators,
  * noise, audio samples and even AudioIn).
+ * @webref SoundObject
  */
 // Subclasses need to assign the 'amplitude' port, and also initiate a
 // JSynCircuit (which effects can be plugged into) with an appropriate
@@ -53,6 +54,7 @@ public abstract class SoundObject {
 	 * @param amp
 	 *            A float value between 0.0 (complete silence) and 1.0 (full volume)
 	 *            controlling the amplitude/volume of this sound.
+	 * @webref SoundObject:SoundObject
 	 **/
 	public void amp(float amp) {
 		if (Engine.checkAmp(amp)) {
@@ -79,6 +81,7 @@ public abstract class SoundObject {
 	 * @param pos
 	 *            The panoramic position of this sound unit as a float from -1.0
 	 *            (left) to 1.0 (right).
+	 * @webref SoundObject:SoundObject
 	 **/
 	public void pan(float pos) {
 		if (this.circuit.processor == null) {
@@ -89,8 +92,7 @@ public abstract class SoundObject {
 	}
 
 	/**
-	 * Start the generator
-	 *
+	 * Starts the generator
 	 **/
 	public void play() {
 		// TODO print info message if it's already playing?
@@ -104,7 +106,9 @@ public abstract class SoundObject {
 	}
 
 	/**
-	 * Stop the generator
+	 * Stops this sound from playing back.
+	 *
+	 * @webref SoundObject:SoundObject
 	 **/
 	public void stop() {
 		this.isPlaying = false;

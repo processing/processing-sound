@@ -20,7 +20,7 @@ public class Env {
 
 	/**
 	* Triggers the envelope.
-	* @webref Envelopes:Env
+	* @webref Envelopes
 	* @webBrief Triggers the envelope.
 	* @param input Input sound source
 	* @param attackTime Attack time value as a float.
