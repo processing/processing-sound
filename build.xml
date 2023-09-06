@@ -80,7 +80,9 @@
 	</target>
 
 	<target name="javadoc">
-		<javadoc bottom="Processing Sound" destdir="docs" verbose="false" doctitle="Javadocs: Processing Sound" public="true" windowtitle="Javadocs: Processing Sound" additionalparam="-notimestamp" link="https://www.softsynth.com/jsyn/docs/javadocs/">
+		<javadoc bottom="Processing Sound" destdir="reference" verbose="false" doctitle="Javadocs: Processing Sound" public="true" windowtitle="Javadocs: Processing Sound" additionalparam="-notimestamp">
+			<link href="https://processing.github.io/processing-javadocs/core/" />
+			<link href="https://www.softsynth.com/jsyn/docs/javadocs/" />
 			<fileset dir="src" defaultexcludes="yes">
 				<include name="**/*" />
 			</fileset>
@@ -88,20 +90,34 @@
 		</javadoc>
 	</target>
 
+	<patternset id="dist.files">
+		<include name="CONTRIBUTING.md" />
+		<include name="LICENSE" />
+		<include name="README.md" />
+		<include name="examples/**" />
+		<include name="library/sound.jar" />
+		<include name="library/jsyn-17.1.0.jar" />
+		<include name="library/javamp3-1.0.4.jar" />
+		<include name="library.properties" />
+	</patternset>
+
 	<target name="dist" depends="clean,jar,javadoc" description="Build clean Sound library zip">
 		<zip destfile="../sound.zip">
 			<zipfileset dir="." prefix="sound">
-				<include name="examples/**" />
-				<include name="library/sound.jar" />
-				<include name="library/jsyn-17.1.0.jar" />
-				<include name="library/javamp3-1.0.4.jar" />
-				<include name="library.properties" />
-				<include name="CONTRIBUTING.md" />
-				<include name="LICENSE" />
-				<include name="README.md" />
+				<patternset refid="dist.files" />
+				<include name="reference/**" />
 			</zipfileset>
 		</zip>
 		<copy file="library.properties" toFile="../sound.txt" />
+	</target>
+
+	<target name="dist-slim" depends="clean,jar" description="Build a reduced size Sound library zip (omitting javadoc documentation and examples with audio files)">
+		<zip destfile="../sound-slim.zip">
+			<zipfileset dir="." prefix="sound">
+				<patternset refid="dist.files" />
+				<exclude name="examples/**/data/*" />
+			</zipfileset>
+		</zip>
 	</target>
 
 	<!-- local development targets -->

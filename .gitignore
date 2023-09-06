@@ -3,4 +3,5 @@
 *.jar
 *.class
 .DS_Store
+TEST-*
 tags
