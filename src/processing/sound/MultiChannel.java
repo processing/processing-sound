@@ -17,7 +17,7 @@ public abstract class MultiChannel {
 	 * @return the channel number that sounds will be sent to
 	 *
 	 * @webref I/O:MultiChannel
-	 * @see MultiChannel#numOutputChannels()
+	 * @see MultiChannel#availableChannels()
 	 */
 	public static int activeChannel(int channel) {
 		Engine.getEngine().selectOutputChannel(channel);
@@ -35,7 +35,7 @@ public abstract class MultiChannel {
 	 * @return the number of output channels available on the current output device
 	 *
 	 * @webref I/O:MultiChannel
-	 * @see Sound#outputDevice()
+	 * @see Sound#outputDevice(int)
 	 */
 	public static int availableChannels(int deviceId) {
 		return Engine.getAudioDeviceManager().getMaxOutputChannels(deviceId);

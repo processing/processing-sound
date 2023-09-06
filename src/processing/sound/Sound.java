@@ -49,6 +49,14 @@ public class Sound {
 		this.volume(volume);
 	}
 
+	public static String[] list() {
+		return Sound.list(false);
+	}
+
+	public static AudioDeviceManager getAudioDeviceManager() {
+		return Engine.getAudioDeviceManager();
+	}
+
 	/**
 	 * Print and return information on available audio devices and their number of
 	 * input/output channels.
@@ -67,14 +75,6 @@ public class Sound {
 	 * @webref Configuration:Sound
 	 * @webBrief Print and return information on available audio devices and their number of input/output channels.
 	 */
-	public static String[] list() {
-		return Sound.list(false);
-	}
-
-	public static AudioDeviceManager getAudioDeviceManager() {
-		return Engine.getAudioDeviceManager();
-	}
-
 	public static String[] list(boolean listAll) {
 		AudioDeviceManager audioManager = Engine.getAudioDeviceManager();
 		int numDevices = audioManager.getDeviceCount();

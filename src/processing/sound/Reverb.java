@@ -7,11 +7,13 @@ import processing.core.PApplet;
  * 
  * @webref Effects:Reverb
  * @webBrief This is a simple reverb effect.
- * @param parent
- *            PApplet: typically use "this"
  **/
 public class Reverb extends Effect<JSynReverb> {
 
+/**
+ * @param parent
+ *            PApplet: typically use "this"
+ */
 	public Reverb(PApplet parent) {
 		super(parent);
 	}

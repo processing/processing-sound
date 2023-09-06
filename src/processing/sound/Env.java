@@ -25,7 +25,7 @@ public class Env {
 	* @param input Input sound source
 	* @param attackTime Attack time value as a float.
 	* @param sustainTime Sustain time value as a float. 
-	* @param sustain Sustain level value as a float. (as fraction of the input amplitude)
+	* @param sustainLevel Sustain level value as a float. (as fraction of the input amplitude)
 	* @param releaseTime Release time value as a float.
 	**/
 	public void play(SoundObject input, float attackTime, float sustainTime, float sustainLevel, float releaseTime) {

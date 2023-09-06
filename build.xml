@@ -80,7 +80,7 @@
 	</target>
 
 	<target name="javadoc">
-		<javadoc bottom="Processing Sound" destdir="reference" verbose="false" doctitle="Javadocs: Processing Sound" public="true" windowtitle="Javadocs: Processing Sound" additionalparam="-notimestamp">
+		<javadoc bottom="Processing Sound" destdir="reference" verbose="false" doctitle="Javadocs: Processing Sound" public="true" windowtitle="Javadocs: Processing Sound" additionalparam="-notimestamp -Xdoclint:all,-missing,-syntax -quiet">
 			<link href="https://processing.github.io/processing-javadocs/core/" />
 			<link href="https://www.softsynth.com/jsyn/docs/javadocs/" />
 			<fileset dir="src" defaultexcludes="yes">
