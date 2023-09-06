@@ -1,4 +1,4 @@
-name: "Commit > Build library jar, run tests and publish Javadoc"
+name: "push > build library jar (publish Javadoc if on main)"
 
 on:
   push:

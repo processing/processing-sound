@@ -80,7 +80,7 @@
 	</target>
 
 	<target name="javadoc">
-		<javadoc bottom="Processing Sound" destdir="docs" verbose="false" doctitle="Javadocs: Processing Sound" public="true" windowtitle="Javadocs: Processing Sound" additionalparam="-notimestamp">
+		<javadoc bottom="Processing Sound" destdir="docs" verbose="false" doctitle="Javadocs: Processing Sound" public="true" windowtitle="Javadocs: Processing Sound" additionalparam="-notimestamp" link="https://www.softsynth.com/jsyn/docs/javadocs/">
 			<fileset dir="src" defaultexcludes="yes">
 				<include name="**/*" />
 			</fileset>

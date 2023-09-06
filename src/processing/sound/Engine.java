@@ -67,9 +67,10 @@ class Engine {
 
 	private int sampleRate = 44100;
 
-	protected int inputDevice;
-	protected int outputDevice;
+	protected int inputDevice = -1;
+	protected int outputDevice = -1;
 	protected int outputChannel;
+
 	/**
 	 * when multi-channel mode is active, only the first (left) output of any unit
 	 * generators is added. the mode is activated by calling selectOutputChannel()
@@ -94,24 +95,25 @@ class Engine {
 		this.synth = JSyn.createSynthesizer(Engine.getAudioDeviceManager());
 
 		// select default devices
+		// TODO should use audioManager.getDefaultInputDeviceID() ??
 		for (int i = 0; i < Engine.getAudioDeviceManager().getDeviceCount(); i++) {
 			if (Engine.checkDeviceHasOutputs(i)) {
 				this.outputDevice = i;
 				break;
 			}
-			if (i == Engine.getAudioDeviceManager().getDeviceCount()) {
-				Engine.printError("library initalization failed: could not find any audio devices with a stereo output");
-				return;
-			}
+		}
+		if (outputDevice == -1) {
+			Engine.printError("could not find any audio devices with a stereo output");
+			return;
 		}
 		for (int i = 0; i < Engine.getAudioDeviceManager().getDeviceCount(); i++) {
 			if (Engine.checkDeviceHasInputs(i)) {
 				this.inputDevice = i;
 				break;
 			}
-			if (i == Engine.getAudioDeviceManager().getDeviceCount()) {
-				Engine.printWarning("could not find any sound devices with input channels, you won't be able to use the AudioIn class");
-			}
+		}
+		if (inputDevice == -1) {
+			Engine.printWarning("could not find any sound devices with input channels, you won't be able to use the AudioIn class");
 		}
 		this.startSynth();
 
