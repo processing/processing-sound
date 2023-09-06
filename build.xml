@@ -1,14 +1,21 @@
 <?xml version="1.0"?>
 <project name="Processing Sound Library" default="jar">
 
+	<property file="build.properties"/>
+
 	<path id="classpath">
-		<fileset dir="library">
-			<include name="*.jar" />
-		</fileset>
-		<fileset dir="lib">
-			<include name="processing-core.zip" />
-			<include name="*.jar" />
-		</fileset>
+		<pathelement location="library/javamp3-1.0.4.jar" />
+		<pathelement location="library/jsyn-17.1.0.jar" />
+		<pathelement location="${lib}/processing-core.zip" />
+		<pathelement location="${lib}/android.jar" />
+	</path>
+
+	<path id="classpath.testing">
+		<pathelement location="${lib}/junit-4.13.2.jar" />
+		<pathelement location="${lib}/hamcrest-core-1.3.jar" />
+		<!-- junit needs to come before android.jar: https://stackoverflow.com/a/18256532 -->
+		<pathelement location="${lib}/sound.jar" />
+		<path refid="classpath" />
 	</path>
 
 	<target name="clean" description="Clean the build directories">
@@ -17,30 +24,30 @@
 	</target>
 
 	<target name="checkprocessingdeps">
-		<available file="lib/processing-core.zip" property="hasprocessingcore" />
-		<available file="lib/android.jar" property="hasandroid" />
+		<available file="${lib}/processing-core.zip" property="hasprocessingcore" />
+		<available file="${lib}/android.jar" property="hasandroid" />
 	</target>
 
 	<!-- as of version 2.2, the sound library is compiled against the -->
 	<!-- processing-core.zip provided by Processing for Android mode -->
 	<!-- we can automatically retrieve the latest version from GitHub -->
 	<target name="processing-deps" depends="checkprocessingdeps" unless="hasprocessingcore" description="Download Android mode's processing-core">
-		<get src="https://github.com/processing/processing-android/releases/download/latest/AndroidMode.zip" dest="library/" usetimestamp="true" />
-		<unzip src="library/AndroidMode.zip" dest="lib/">
+		<get src="https://github.com/processing/processing-android/releases/download/latest/AndroidMode.zip" dest="${lib}" usetimestamp="true" />
+		<unzip src="${lib}/AndroidMode.zip" dest="${lib}">
 			<patternset>
 				<include name="AndroidMode/processing-core.zip" />
 			</patternset>
 			<mapper type="flatten"/>
 		</unzip>
 		<!-- no real need to keep parent zip -->
-		<delete file="library/AndroidMode.zip" />
+		<delete file="${lib}/AndroidMode.zip" />
 	</target>
 
 	<target name="android-deps" depends="checkprocessingdeps" unless="hasandroid" description="Download an android.jar">
 		<!-- this part of the Android SDK is required to build JSynAndroidAudioDeviceManager -->
 		<!-- preferrably you should soft-link or copy the android.jar of your locally
 			installed SDK into this project's library/ directory -->
-		<get src="https://github.com/marianadangelo/android-platforms/raw/master/android-26/android.jar" dest="lib/" usetimestamp="true" />
+		<get src="https://github.com/marianadangelo/android-platforms/raw/master/android-26/android.jar" dest="${lib}" usetimestamp="true" />
 	</target>
 
 	<target name="check-bundled-deps">
@@ -49,7 +56,6 @@
 	</target>
 
 	<target name="bundled-deps" depends="check-bundled-deps" unless="hasjsyn" description="Download JSyn and JavaMP3">
-		<!-- bundled dependencies go into library/, build-only dependencies into lib/ -->
 		<get src="https://github.com/philburk/jsyn/releases/download/v17.1.0/jsyn-17.1.0.jar" dest="library/" usetimestamp="true" />
 		<get src="https://github.com/kevinstadler/JavaMP3/releases/download/v1.0.4/javamp3-1.0.4.jar" dest="library/" usetimestamp="true" />
 	</target>
@@ -67,8 +73,14 @@
 		</javac>
 	</target>
 
+	<target name="jar" depends="compile" description="Build Sound library jar">
+		<jar destfile="library/sound.jar">
+			<fileset dir="bin" />
+		</jar>
+	</target>
+
 	<target name="javadoc">
-		<javadoc bottom="Processing Sound" destdir="docs" verbose="false" doctitle="Javadocs: Processing Sound" public="true" windowtitle="Javadocs: Processing Sound" additionalparam="-notimestamp">
+		<javadoc bottom="Processing Sound" destdir="docs" verbose="false" doctitle="Javadocs: Processing Sound" public="true" windowtitle="Javadocs: Processing Sound" additionalparam="-notimestamp" link="https://www.softsynth.com/jsyn/docs/javadocs/">
 			<fileset dir="src" defaultexcludes="yes">
 				<include name="**/*" />
 			</fileset>
@@ -76,17 +88,13 @@
 		</javadoc>
 	</target>
 
-	<target name="jar" depends="compile" description="Build Sound library jar">
-		<jar destfile="library/sound.jar">
-			<fileset dir="bin" />
-		</jar>
-	</target>
-
 	<target name="dist" depends="clean,jar,javadoc" description="Build clean Sound library zip">
 		<zip destfile="../sound.zip">
 			<zipfileset dir="." prefix="sound">
 				<include name="examples/**" />
-				<include name="library/" />
+				<include name="library/sound.jar" />
+				<include name="library/jsyn-17.1.0.jar" />
+				<include name="library/javamp3-1.0.4.jar" />
 				<include name="library.properties" />
 				<include name="CONTRIBUTING.md" />
 				<include name="LICENSE" />
@@ -96,6 +104,8 @@
 		<copy file="library.properties" toFile="../sound.txt" />
 	</target>
 
+	<!-- local development targets -->
+
 	<target name="install" depends="dist" description="Local installation of library zip for testing/developing">
 		<unzip src="../sound.zip" dest="../../Documents/Processing/libraries/" />
 	</target>
@@ -103,4 +113,33 @@
 	<target name="quickinstall" depends="jar" description="Build and copy sound.jar for testing/developing">
 		<copy file="library/sound.jar" toDir="../../Documents/Processing/libraries/sound/library/" />
 	</target>
+
+
+	<!-- test targets -->
+
+	<target name="test-deps">
+		<exec executable="mvn" discardOutput="true">
+			<arg line="dependency:copy-dependencies -DoutputDirectory=${lib}" />
+		</exec>
+	</target>
+
+	<target name="compile-tests" depends="compile,test-deps">
+		<javac source="1.8" target="1.8" srcdir="test" destdir="test" encoding="UTF-8" includeAntRuntime="false" nowarn="true">
+			<classpath refid="classpath.testing" />
+		</javac>
+	</target>
+
+	<target name="test" depends="compile-tests">
+		<junit>
+			<classpath>
+				<path refid="classpath.testing" />
+				<pathelement location="test" />
+			</classpath>
+			<formatter type="xml" />
+			<batchtest>
+				<fileset dir="test/" includes="**/*Test.class" />
+			</batchtest>
+		</junit>
+	</target>
+
 </project>

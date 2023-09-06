@@ -1,26 +1,30 @@
-name: "Commit > Build library jar and publish Javadoc"
+name: "push > build library jar (publish Javadoc if on main)"
 
 on:
   push:
-    branches: [ 'main' ]
 
 jobs:
-
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
+      - name: Setup
+        uses: ./.github/actions/setup
       - name: Build library with Ant
-        run: ant
+        run: ant jar
+      - name: Run tests
+        run: ant test
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v3
+        with:
+          report_paths: 'TEST-*.xml'
       - uses: actions/upload-artifact@v3
         with:
           name: sound-jar-${{ github.sha }}
           path: library/sound.jar
-      - name: Build Javadoc
+
+      # generate + upload javadoc artifact
+      - name: Generate Javadoc
         run: ant javadoc
       - name: Upload GitHub Pages Artifact
         uses: actions/upload-pages-artifact@v1
@@ -28,7 +32,9 @@ jobs:
           path: docs/
 
 
-  deploy-javadoc:
+  publish-javadoc:
+    # only publish javadocs from main branch
+    if: github.ref == 'refs/heads/main'
     needs: build
 
     # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
