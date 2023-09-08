@@ -6,8 +6,9 @@
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="lib" path="library/javamp3-1.0.4.jar"/>
 	<classpathentry kind="lib" path="library/jsyn-17.1.0.jar"/>
-	<classpathentry kind="lib" path="lib/junit-4.12.jar"/>
-	<classpathentry kind="lib" path="lib/android.jar"/>
+	<classpathentry kind="lib" path="library/junit-4.12.jar"/>
+	<classpathentry kind="lib" path="library/android.jar"/>
+	<classpathentry kind="lib" path="library/jportaudio.jar"/>
 	<classpathentry kind="lib" path="test/**/*.class"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

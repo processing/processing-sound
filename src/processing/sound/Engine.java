@@ -3,10 +3,14 @@ package processing.sound;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.sound.sampled.LineUnavailableException;
+
 import com.jsyn.JSyn;
 import com.jsyn.Synthesizer;
 import com.jsyn.devices.AudioDeviceFactory;
 import com.jsyn.devices.AudioDeviceManager;
+import com.jsyn.devices.AudioDeviceOutputStream;
+import com.jsyn.devices.jportaudio.JPortAudioDevice;
 import com.jsyn.unitgen.ChannelOut;
 import com.jsyn.unitgen.Multiply;
 import com.jsyn.unitgen.UnitGenerator;
@@ -91,6 +95,40 @@ class Engine {
 		Logger logger = Logger.getLogger(com.jsyn.engine.SynthesisEngine.class.getName());
 		logger.setLevel(Level.WARNING);
 
+		this.createSynthesizer();
+
+		Engine.singleton = this;
+	}
+	
+	private boolean triedPortAudio = false;
+
+	protected boolean usePortAudio() {
+		// TODO check if we're actually on Windows?
+		if (!this.triedPortAudio) {
+			Engine.printMessage("Loading PortAudio");
+			this.triedPortAudio = true;
+			System.loadLibrary("portaudio_x64");
+			AudioDeviceManager newManager = AudioDeviceFactory.createAudioDeviceManager();
+			if (newManager instanceof JPortAudioDevice) {
+				Engine.printMessage("Using PortAudio");
+				Engine.audioManager = newManager;
+				this.createSynthesizer();
+				// TODO might need to reconnect old entities if possible?
+			}
+		}
+		return Engine.audioManager instanceof JPortAudioDevice;
+	}
+
+	private void createSynthesizer() {
+		// try {
+			AudioDeviceOutputStream o = Engine.audioManager.createOutputStream(AudioDeviceManager.USE_DEFAULT_DEVICE, this.sampleRate, 2);
+			o.start();
+			o.stop();
+		// } catch (LineUnavailableException e) {
+			// System.out.println(e);
+			// this.usePortAudio();
+			// return;
+		// }
 		// create and start the synthesizer, and set this object as the singleton.
 		this.synth = JSyn.createSynthesizer(Engine.getAudioDeviceManager());
 
@@ -116,8 +154,6 @@ class Engine {
 			Engine.printWarning("could not find any sound devices with input channels, you won't be able to use the AudioIn class");
 		}
 		this.startSynth();
-
-		Engine.singleton = this;
 	}
 
 	protected void startSynth() {
