@@ -137,7 +137,7 @@ public class Sound {
 	}
 
 	public static int inputDevice(String deviceName) {
-		return Engine.getEngine().selectInputDevice(Engine.getDeviceIdByName(deviceName));
+		return Engine.getEngine().selectInputDevice(Engine.getEngine().getDeviceIdByName(deviceName));
 	}
 
 	/**
@@ -157,7 +157,7 @@ public class Sound {
 	}
 
 	public static int outputDevice(String deviceName) {
-		return Engine.getEngine().selectOutputDevice(Engine.getDeviceIdByName(deviceName));
+		return Engine.getEngine().selectOutputDevice(Engine.getEngine().getDeviceIdByName(deviceName));
 	}
 
 	public static int defaultOutputDevice() {
