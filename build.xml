@@ -47,7 +47,7 @@
 		<!-- this part of the Android SDK is required to build JSynAndroidAudioDeviceManager -->
 		<!-- preferrably you should soft-link or copy the android.jar of your locally
 			installed SDK into this project's library/ directory -->
-		<get src="https://github.com/marianadangelo/android-platforms/raw/master/android-26/android.jar" dest="${lib}" usetimestamp="true" />
+		<get src="https://raw.githubusercontent.com/mardangelo/android-platforms/master/android-26/android.jar" dest="${lib}" usetimestamp="true" />
 	</target>
 
 	<target name="check-bundled-deps">

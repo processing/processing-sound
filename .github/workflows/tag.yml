@@ -22,10 +22,8 @@ jobs:
           branch=${raw##*/}
           echo "branch=$branch" >> $GITHUB_OUTPUT
 
-      - uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
+      - name: Set up build environment and dependencies
+        uses: ./.github/actions/setup
       - name: Build and package library with Ant
         run: ant dist
 
@@ -54,6 +52,7 @@ jobs:
         with:
           name: ${{ github.ref_name }} dev build
           prerelease: true
-          body: Test build of commit ${{ github.sha }} from the ${{ steps.branch-name.outputs.branch }} [${{ steps.branch-name.outputs.branch }}](https://github.com/${{ github.repository }}/tree/${{ steps.branch-name.outputs.branch }}) branch
+          body: Dev build of commit ${{ github.sha }} by ${{ github.actor }} from the [${{ steps.branch-name.outputs.branch }}](https://github.com/${{ github.repository }}/tree/${{ steps.branch-name.outputs.branch }}) branch
+          generate_release_notes: true
           files: ../sound.zip
 

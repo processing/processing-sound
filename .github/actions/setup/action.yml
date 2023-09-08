@@ -14,5 +14,5 @@ runs:
     # folder so that they don't have to be downloaded every time
     - uses: actions/cache@v3
       with:
-        key: deps-1
+        key: build-deps
         path: library/

@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Setup
+      - name: Set up build environment and dependencies
         uses: ./.github/actions/setup
       - name: Build library with Ant
         run: ant jar
