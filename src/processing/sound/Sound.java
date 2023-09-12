@@ -67,36 +67,59 @@ public class Sound {
 	 * can also use the device name array returned by the function to automate device 
 	 * selection by name in your own code.
 	 * 
-	 * @param listAll whether to include all devices in the output listing. By default,
-	 * sound devices without any inputs or outputs are omitted from the output listing
-	 * for clarity. Pass `true` here if you want a complete list of all devices (for debugging).
+	 * @param printAll whether to include all devices in the output listing. By 
+	 * default, sound devices without any inputs or outputs are omitted from the 
+	 * output listing for clarity. Pass `true` here if you want a complete list of 
+	 * all devices (for debugging).
 	 * @return an array giving the names of all audio devices available on this
 	 *         computer
 	 * @webref Configuration:Sound
-	 * @webBrief Print and return information on available audio devices and their number of input/output channels.
+	 * @webBrief Print and return information on available audio devices and their 
+	 * number of input/output channels.
 	 */
-	public static String[] list(boolean listAll) {
+	public static String[] list(boolean printAll) {
 		AudioDeviceManager audioManager = Engine.getAudioDeviceManager();
 		int numDevices = audioManager.getDeviceCount();
-		String[] devices = new String[numDevices];
+		int longestLength = "Output device name".length();
+		String[] deviceNames = new String[numDevices];
 		for (int i = 0; i < numDevices; i++) {
-			String deviceName = audioManager.getDeviceName(i);
-			devices[i] = audioManager.getDeviceName(i);
-			int maxInputs = audioManager.getMaxInputChannels(i);
-			int maxOutputs = audioManager.getMaxOutputChannels(i);
-			boolean isDefaultInput = (i == audioManager.getDefaultInputDeviceID());
-			boolean isDefaultOutput = (i == audioManager.getDefaultOutputDeviceID());
-			if (listAll || maxInputs > 0 || maxOutputs > 0) {
-				System.out.println("device id " + i + ": " + deviceName);
-				if (listAll || maxInputs > 0) {
-					System.out.println("  input channels : " + maxInputs + (isDefaultInput ? "   (default)" : ""));
+			deviceNames[i] = audioManager.getDeviceName(i);
+			longestLength = Math.max(longestLength, deviceNames[i].length());
+		}
+		if (printAll) {
+			String lineFormat = "%1s %1s %3s | %-" + longestLength + "s | %6s | %4s%n";
+
+			System.out.format(lineFormat, "", "",  "id", "Device name", "inputs", "outputs");
+			System.out.println("    ----+" + "-".repeat(longestLength+2) + "+--------".repeat(2));
+			for (int i = 0; i < numDevices; i++) {
+				System.out.format(lineFormat, Engine.getEngine().inputDevice == i ? "I" : " ",
+						Engine.getEngine().outputDevice == i ? "O" : " ", i, deviceNames[i],
+						audioManager.getMaxInputChannels(i),
+						audioManager.getMaxOutputChannels(i));
+			}
+
+		} else {
+			String lineFormat = "%1s %3s | %-" + longestLength + "s | %4s%n";
+
+			System.out.format(lineFormat, " ",  "id", "Input device name", "inputs");
+			System.out.println("  ----+" + "-".repeat(longestLength+2) + "+--------");
+			for (int i = 0; i < numDevices; i++) {
+				if (audioManager.getMaxInputChannels(i) > 0) {
+					System.out.format(lineFormat, Engine.getEngine().inputDevice == i ? "I" : " ", i, deviceNames[i], audioManager.getMaxInputChannels(i));
 				}
-				if (listAll || maxOutputs > 0) {
-					System.out.println("  output channels: " + maxOutputs + (isDefaultOutput ? "   (default)" : ""));
+			}
+			System.out.println();
+			System.out.format(lineFormat, " ",  "id", "Output device name", "outputs");
+			System.out.println("  ----+" + "-".repeat(longestLength+2) + "+--------");
+			for (int i = 0; i < numDevices; i++) {
+				if (audioManager.getMaxOutputChannels(i) > 0) {
+					System.out.format(lineFormat, Engine.getEngine().outputDevice == i ? "O" : " ",  i, deviceNames[i], audioManager.getMaxOutputChannels(i));
 				}
 			}
 		}
-		return devices;
+		System.out.println();
+
+		return deviceNames;
 	}
 
 	public static int sampleRate() {
@@ -137,7 +160,7 @@ public class Sound {
 	}
 
 	public static int inputDevice(String deviceName) {
-		return Engine.getEngine().selectInputDevice(Engine.getDeviceIdByName(deviceName));
+		return Engine.getEngine().selectInputDevice(Engine.getDeviceIdByName(deviceName.trim()));
 	}
 
 	/**
@@ -157,7 +180,7 @@ public class Sound {
 	}
 
 	public static int outputDevice(String deviceName) {
-		return Engine.getEngine().selectOutputDevice(Engine.getDeviceIdByName(deviceName));
+		return Engine.getEngine().selectOutputDevice(Engine.getDeviceIdByName(deviceName.trim()));
 	}
 
 	public static int defaultOutputDevice() {
