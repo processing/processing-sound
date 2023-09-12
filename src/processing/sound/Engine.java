@@ -254,7 +254,7 @@ class Engine {
 			} catch (LineUnavailableException e) {
 				// if this fails then we need to get the name of the old output device 
 				// and re-select it on the new device
-				String targetDeviceName = this.synth.getAudioDeviceManager().getDeviceName(deviceId);
+				String targetDeviceName = this.getDeviceName(deviceId);
 				// this might replace this.synth
 				if (!this.usePortAudio(true)) {
 					// hopeless
@@ -279,9 +279,13 @@ class Engine {
 		return this.outputDevice;
 	}
 
+	protected String getDeviceName(int deviceId) {
+		return this.synth.getAudioDeviceManager().getDeviceName(deviceId).trim();
+	}
+
 	protected int getDeviceIdByName(String deviceName) {
 		for (int i = 0; i < this.synth.getAudioDeviceManager().getDeviceCount(); i++) {
-			if (deviceName.equalsIgnoreCase(this.synth.getAudioDeviceManager().getDeviceName(i))) {
+			if (deviceName.equalsIgnoreCase(this.getDeviceName(i))) {
 				return i;
 			}
 		}
@@ -294,7 +298,7 @@ class Engine {
 		} catch (RuntimeException e) {
 			if (fuzzy) {
 				for (int i = 0; i < this.synth.getAudioDeviceManager().getDeviceCount(); i++) {
-					if (this.synth.getAudioDeviceManager().getDeviceName(i).startsWith(deviceName)) {
+					if (this.getDeviceName(i).startsWith(deviceName)) {
 						return i;
 					}
 				}
@@ -318,11 +322,11 @@ class Engine {
 	}
 
 	protected String getSelectedInputDeviceName() {
-		return this.synth.getAudioDeviceManager().getDeviceName(this.inputDevice);
+		return this.getDeviceName(this.inputDevice);
 	}
 
 	protected String getSelectedOutputDeviceName() {
-		return this.synth.getAudioDeviceManager().getDeviceName(this.outputDevice);
+		return this.getDeviceName(this.outputDevice);
 	}
 
 	protected void setVolume(double volume) {
