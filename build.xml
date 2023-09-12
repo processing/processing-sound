@@ -112,7 +112,8 @@
 		<include name="examples/**" />
 		<include name="library.properties" />
 		<include name="library/*.jar" />
-		<include name="library/**/*.dll" />
+		<!-- all files inside per-architecture directories - real dlls and dummy files -->
+		<include name="library/*-*/*" />
 
 		<exclude name="library/android.jar" />
 		<exclude name="library/junit-*" />
@@ -120,6 +121,10 @@
 	</patternset>
 
 	<target name="dist" depends="clean,jar,javadoc" description="Build clean Sound library zip">
+		<touch mkdirs="true" file="${lib}/linux-aarch64/dummy" />
+		<touch mkdirs="true" file="${lib}/linux-amd64/dummy" />
+		<touch mkdirs="true" file="${lib}/linux-arm/dummy" />
+		<touch mkdirs="true" file="${lib}/macos-x86_64/dummy" />
 		<zip destfile="../sound.zip">
 			<zipfileset dir="." prefix="sound">
 				<patternset refid="dist.files" />
