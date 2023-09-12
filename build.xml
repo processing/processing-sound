@@ -123,11 +123,11 @@
 	<!-- local development targets -->
 
 	<target name="install" depends="dist" description="Local installation of library zip for testing/developing">
-		<unzip src="../sound.zip" dest="../../Documents/Processing/libraries/" />
+		<unzip src="../sound.zip" dest="${local-processing-libraries}" />
 	</target>
 
 	<target name="quickinstall" depends="jar" description="Build and copy sound.jar for testing/developing">
-		<copy file="library/sound.jar" toDir="../../Documents/Processing/libraries/sound/library/" />
+		<copy file="${lib}/sound.jar" toDir="${local-processing-libraries}/sound/library/" />
 	</target>
 
 
