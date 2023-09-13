@@ -4,8 +4,7 @@
 	<property file="build.properties"/>
 
 	<path id="classpath">
-		<pathelement location="library/javamp3-1.0.4.jar" />
-		<pathelement location="library/jsyn-17.1.0.jar" />
+		<pathelement location="${lib}/jsyn-17.1.0.jar" />
 		<pathelement location="${lib}/processing-core.zip" />
 		<pathelement location="${lib}/android.jar" />
 	</path>
@@ -52,13 +51,10 @@
 
 	<target name="check-bundled-deps">
 		<available file="library/jsyn-17.1.0.jar" property="hasjsyn" />
-		<available file="library/javamp3-1.0.4.jar" property="hasjavamp3" />
 	</target>
 
-	<target name="bundled-deps" depends="check-bundled-deps" unless="hasjsyn" description="Download JSyn, JavaMP3 and (J)PortAudio">
+	<target name="bundled-deps" depends="check-bundled-deps" unless="hasjsyn" description="Download JSyn and (J)PortAudio">
 		<get src="https://github.com/philburk/jsyn/releases/download/v17.1.0/jsyn-17.1.0.jar" dest="library/" usetimestamp="true" />
-		<get src="https://github.com/kevinstadler/JavaMP3/releases/download/v1.0.4/javamp3-1.0.4.jar" dest="library/" usetimestamp="true" />
-
 		<get src="https://www.softsynth.com/jsyn/developers/archives/jportaudio_pc_20120904.zip" dest="library/" usetimestamp="true" />
 		<unzip src="${lib}/jportaudio_pc_20120904.zip" dest="${lib}">
 			<patternset>
@@ -120,7 +116,7 @@
 		<exclude name="library/hamcrest-*" />
 	</patternset>
 
-	<target name="dist" depends="clean,jar,javadoc" description="Build clean Sound library zip">
+	<target name="dist" depends="clean,maven-deps,javadoc" description="Build clean Sound library zip">
 		<touch mkdirs="true" file="${lib}/linux-aarch64/dummy" />
 		<touch mkdirs="true" file="${lib}/linux-amd64/dummy" />
 		<touch mkdirs="true" file="${lib}/linux-arm/dummy" />
@@ -156,13 +152,13 @@
 
 	<!-- test targets -->
 
-	<target name="test-deps">
+	<target name="maven-deps">
 		<exec executable="mvn" discardOutput="true">
 			<arg line="dependency:copy-dependencies -DoutputDirectory=${lib}" />
 		</exec>
 	</target>
 
-	<target name="compile-tests" depends="compile,test-deps">
+	<target name="compile-tests" depends="compile,maven-deps">
 		<javac source="1.8" target="1.8" srcdir="test" destdir="test" encoding="UTF-8" includeAntRuntime="false" nowarn="true">
 			<classpath refid="classpath.testing" />
 		</javac>

@@ -6,10 +6,14 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
+
 import com.jsyn.data.FloatSample;
 import com.jsyn.util.SampleLoader;
 
-import fr.delthas.javamp3.Sound;
 import processing.core.PApplet;
 
 // calls to amp(), pan() etc affect both the LAST initiated and still running sample, AND all subsequently started ones
@@ -63,40 +67,41 @@ public class SoundFile extends AudioSample {
 			try {
 				// load WAV or AIF using JSyn
 				this.sample = SampleLoader.loadFloatSample(fin);
-
-				// switching to JavaSound decoders is supposed to support 8bit
-				// unsigned WAV files as well, but doesn't actually seem to be
-				// the case
-				//SampleLoader.setJavaSoundPreferred(true);
-
 			} catch (IOException e) {
-				// try parsing as mp3
+				// not wav/aiff -- try converting via JavaSound...
 				try {
-					// stream as to be re-created, since it was modified in SampleLoader.loadFloatSample()
-					fin = parent.createInput(path);
-					Sound mp3 = new Sound(fin);
-					try {
-						ByteArrayOutputStream os = new ByteArrayOutputStream();
-						// TODO make decoding asynchronous with a FutureTask<FloatSample>
-						// this call is expensive
-						mp3.decodeFullyInto(os);
-						float data[] = new float[os.size() / 2];
-						SampleLoader.decodeLittleI16ToF32(os.toByteArray(), 0, os.size(), data, 0);
-						this.sample = new FloatSample(data, mp3.isStereo() ? 2 : 1);
-						this.sample.setFrameRate(mp3.getSamplingFrequency());
-					} catch (IOException ee) {
-						throw ee;
-					} catch (NullPointerException ee) {
-						throw new IOException();
-					} catch (ArrayIndexOutOfBoundsException ee) {
-						throw new IOException();
-					} finally {
-						mp3.close();
+					// stream was modified by first read attempt, so re-create it
+					AudioInputStream in = AudioSystem.getAudioInputStream(parent.createInput(path));
+					// https://docs.oracle.com/javase%2Ftutorial%2F/sound/converters.html
+					// https://stackoverflow.com/questions/41784397/convert-mp3-to-wav-in-java
+					AudioFormat targetFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED,
+							in.getFormat().getSampleRate(), 16, // in.getFormat().getSampleSizeInBits(),
+							in.getFormat().getChannels(), in.getFormat().getChannels() * 2,
+							in.getFormat().getSampleRate(), false);
+					// if AudioSystem.isConversionSupported(targetFormat, in.getFormat()) 
+					// returns false, then this will raise an Exception:
+					AudioInputStream converted = AudioSystem.getAudioInputStream(targetFormat, in);
+					// decoded mpeg streams don't know their exact output framelength, so 
+					// no other way than to just decode the whole thing, then allocate the 
+					// array for it...
+					ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+					int nRead;
+					byte[] buf = new byte[65536];
+					while ((nRead = converted.read(buf, 0, buf.length)) != -1) {
+						buffer.write(buf, 0, nRead);
 					}
+					buffer.flush();
+					float data[] = new float[buffer.size() / 2];
+					SampleLoader.decodeLittleI16ToF32(buffer.toByteArray(), 0, buffer.size(), data, 0);
+					this.sample = new FloatSample(data, converted.getFormat().getChannels());
+					this.sample.setFrameRate(converted.getFormat().getSampleRate());
+					fin.close();
 				} catch (IOException ee) {
 					Engine.printError("unable to decode sound file " + path);
 					// return dysfunctional SoundFile object
 					return;
+				} catch (UnsupportedAudioFileException ee) {
+					throw new RuntimeException(ee);
 				}
 			}
 			if (cache) {

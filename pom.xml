@@ -4,7 +4,7 @@
  
   <!-- this is a dummy pom.xml that is only used for automatically downloading
 			 unit testing dependencies using the following command:
-       mvn dependency:copy-dependencies -DoutputDirectory=build-deps -->
+       mvn dependency:copy-dependencies -DoutputDirectory=library -->
 
   <groupId>processing</groupId>
   <artifactId>sound</artifactId>
@@ -16,6 +16,25 @@
       <artifactId>junit</artifactId>
       <version>4.13.2</version>
       <scope>test</scope>
+    </dependency>
+    <dependency><!-- depends on tritonus-share-0.3.7.4 and jlayer-1.0.1.4 -->
+      <groupId>com.googlecode.soundlibs</groupId>
+      <artifactId>mp3spi</artifactId>
+      <version>1.9.5.4</version>
+    </dependency>
+    <!-- TODO switch to this github package repository, which requires auth setup
+	it would up tritonus to 0.3.11, jlayer to 1.0.2, plus add two extra dependencies.
+	https://github.com/umjammer/mp3spi/packages/1067666
+    <dependency>
+      <groupId>net.javazoom</groupId>
+      <artifactId>mp3spi</artifactId>
+      <version>1.9.13</version>
+    </dependency>
+    -->
+    <dependency>
+      <groupId>com.googlecode.soundlibs</groupId>
+      <artifactId>vorbisspi</artifactId>
+      <version>1.0.3.3</version>
     </dependency>
   </dependencies>
 </project>
