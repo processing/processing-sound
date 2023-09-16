@@ -54,8 +54,9 @@
 	</target>
 
 	<target name="bundled-deps" depends="check-bundled-deps" unless="hasjsyn" description="Download JSyn and (J)PortAudio">
-		<get src="https://github.com/philburk/jsyn/releases/download/v17.1.0/jsyn-17.1.0.jar" dest="library/" usetimestamp="true" />
-		<get src="https://www.softsynth.com/jsyn/developers/archives/jportaudio_pc_20120904.zip" dest="library/" usetimestamp="true" />
+		<get src="https://github.com/philburk/jsyn/releases/download/v17.1.0/jsyn-17.1.0.jar" dest="${lib}" usetimestamp="true" />
+		<get src="https://www.softsynth.com/jsyn/developers/archives/jportaudio_pc_20120904.zip" dest="${lib}" usetimestamp="true" />
+		<!--get src="https://www.softsynth.com/jsyn/developers/archives/jportaudio_mac_20120904.zip" dest="${lib}" usetimestamp="true" /-->
 		<unzip src="${lib}/jportaudio_pc_20120904.zip" dest="${lib}">
 			<patternset>
 				<include name="**/*.jar" />
@@ -68,7 +69,12 @@
 			</patternset>
 			<mapper type="flatten"/>
 		</unzip>
-		<delete file="${lib}/jportaudio_pc_20120904.zip" />
+		<!--unzip src="${lib}/jportaudio_mac_20120904.zip" dest="${lib}/mac-x86_64/">
+			<patternset>
+				<include name="**/*.jnilib" />
+			</patternset>
+			<mapper type="flatten"/>
+		</unzip-->
 	</target>
 
 	<target name="deps" description="Get library dependencies">
@@ -101,41 +107,48 @@
 		</javadoc>
 	</target>
 
+	<!-- see bottom of https://github.com/processing/processing4/wiki/Supported-Platforms#native-libraries -->
+	<target name="prepare-dist" depends="clean,maven-deps,jar">
+		<apply executable="mkdir" ignoremissing="false">
+			<filelist dir="${lib}" files="${native-lib-dirs}" />
+		</apply>
+	</target>
+
 	<patternset id="dist.files">
 		<include name="CONTRIBUTING.md" />
 		<include name="LICENSE" />
 		<include name="README.md" />
 		<include name="examples/**" />
-		<include name="library.properties" />
-		<include name="library/*.jar" />
-		<!-- all files inside per-architecture directories - real dlls and dummy files -->
-		<include name="library/*-*/*" />
+		<include name="${lib}/.properties" />
+		<include name="${lib}/*.jar" />
+		<!-- all files inside per-architecture native library directories -->
+		<include name="${lib}/*-*/*" />
 
 		<exclude name="library/android.jar" />
-		<exclude name="library/junit-*" />
-		<exclude name="library/hamcrest-*" />
+		<exclude name="${lib}/junit-*" />
+		<exclude name="${lib}/hamcrest-*" />
 	</patternset>
 
-	<target name="dist" depends="clean,maven-deps,javadoc" description="Build clean Sound library zip">
-		<touch mkdirs="true" file="${lib}/linux-aarch64/dummy" />
-		<touch mkdirs="true" file="${lib}/linux-amd64/dummy" />
-		<touch mkdirs="true" file="${lib}/linux-arm/dummy" />
-		<touch mkdirs="true" file="${lib}/macos-x86_64/dummy" />
+	<target name="dist" depends="prepare-dist,javadoc" description="Build clean Sound library zip">
 		<zip destfile="../sound.zip">
 			<zipfileset dir="." prefix="sound">
 				<patternset refid="dist.files" />
 				<include name="reference/**" />
 			</zipfileset>
+			<!-- explicitly add empty native directories -->
+			<zipfileset dir="${lib}" prefix="sound/${lib}" includes="${native-lib-dirs}" />
 		</zip>
 		<copy file="library.properties" toFile="../sound.txt" />
 	</target>
 
-	<target name="dist-slim" depends="clean,jar" description="Build a reduced size Sound library zip (omitting javadoc documentation and examples with audio files)">
+	<target name="dist-slim" depends="prepare-dist" description="Build a reduced size Sound library zip (omitting javadoc documentation and examples with audio files)">
 		<zip destfile="../sound-slim.zip">
 			<zipfileset dir="." prefix="sound">
 				<patternset refid="dist.files" />
 				<exclude name="examples/**/data/*" />
 			</zipfileset>
+			<!-- explicitly add empty native directories -->
+			<zipfileset dir="${lib}" prefix="sound/${lib}" includes="${native-lib-dirs}" />
 		</zip>
 	</target>
 
