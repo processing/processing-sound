@@ -12,12 +12,13 @@ If you have questions or problems using the library, the best place for help is 
 
 For detailed changelogs, have a look at the [Github releases page](https://github.com/processing/processing-sound/releases).
 
-### Known issues
+### Playing back sound files
 
-[`SoundFile`](https://processing.org/reference/libraries/sound/SoundFile.html) class for loading audio data from disk:
-* Currently no support for decoding WAV files that are in compressed formats such as 8bit unsigned (see [#15](/../../issues/15))
-* MP3 decoding is extremely slow on ARM processors (Android and Raspberry Pi). Since all audio samples loaded by the library end up being stored as raw uncompressed data in RAM anyway, we generally recommend using WAV files for loading audio samples from disk
-* Some MP3 files with meta-information (especially where large amounts of data such as the album cover image is stored in the ID3 header) fail to load (see [#32](/../../issues/32))
+Audio files loaded with the [`SoundFile`](https://processing.org/reference/libraries/sound/SoundFile.html) class are fully loaded into raw memory. That means your sketch will require ~20MB of RAM per minute of stereo audio.
+
+- if you get `OutOfMemoryError: Java heap space` errors on resource-lean platforms (e.g. Raspberry Pi), make sure to increase the heap size in Processing's `File > Preferences > Running` menu. As a rough rule, your heap size should be at least twice as much as the largest audio sample used in your sketch.
+- depending on the format and length of the audio files, loading them for the first time with `new SoundFile("<yourfilename.ext>")` might block the sketch for several seconds, while calls to `sf.play()` execute instantly
+- decoding of compressed formats (mp3, ogg, etc) can be quite slow on Raspberry Pi (20 seconds for a 3 minute mp3, 14 seconds for ogg on a Raspberry Pi 3B 32bit). Since all audio samples loaded by the library end up being stored as raw uncompressed data in RAM anyway, we generally recommend using WAV format for loading audio files
 
 ### Contributing
 
@@ -36,4 +37,4 @@ Thanks to the following community members for their contributions:
 
 ### License
 
-LGPL v2.1
+[LGPL v2.1](LICENSE)
