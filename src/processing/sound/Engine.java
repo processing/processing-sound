@@ -2,6 +2,8 @@ package processing.sound;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -84,6 +86,8 @@ class Engine {
 	}
 
 	protected Synthesizer synth;
+	protected final Set<UnitGenerator> addedUnits = new HashSet<UnitGenerator>();
+
 	// multi-channel lineouts
 	private ChannelOut[] output;
 	// multipliers for each output channel for controlling the global output volume
@@ -100,10 +104,6 @@ class Engine {
 	 * generators is added. the mode is activated by calling selectOutputChannel()
 	 */
 	protected boolean multiChannelMode = false;
-
-	// keep track of the number of objects connected to the synthesizer circuit
-	protected int nCircuits = 0;
-	protected int nPlayingCircuits = 0;
 
 	/**
 	 * Create a new synthesizer and connect it to the default sound devices.
@@ -342,16 +342,17 @@ class Engine {
 	}
 
 	protected void add(UnitGenerator generator) {
-		if (generator.getSynthesisEngine() == null) {
+		if (!this.addedUnits.contains(generator)) {
 			this.synth.add(generator);
-			this.nCircuits++;
+			this.addedUnits.add(generator);
 		}
 	}
 
 	protected void remove(UnitGenerator generator) {
-		// TODO check generator.getSynthesisEngine
-		this.synth.remove(generator);
-		this.nCircuits--;
+		if (this.addedUnits.contains(generator)) {
+			this.synth.remove(generator);
+			this.addedUnits.remove(generator);
+		}
 	}
 
 	protected void connectToOutput(int channel, UnitSource source) {
@@ -377,12 +378,13 @@ class Engine {
 				break;
 			}
 		}
-		this.nPlayingCircuits++;
 	}
 
 	protected void stop(UnitSource source) {
-		source.getOutput().disconnectAll();
-		this.nPlayingCircuits--;
+		if (this.addedUnits.contains(source.getUnitGenerator())) {
+			source.getOutput().disconnectAll();
+			this.remove(source.getUnitGenerator());
+		}
 	}
 
 	/**

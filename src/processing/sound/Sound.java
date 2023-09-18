@@ -80,6 +80,7 @@ public class Sound {
 	public static String[] list(boolean printAll) {
 		Engine e = Engine.getEngine();
 		AudioDeviceManager audioManager = e.getAudioDeviceManager();
+		Engine.printMessage("audio device listing by " + audioManager + ":\n");
 		int numDevices = audioManager.getDeviceCount();
 		int longestLength = "Output device name".length();
 		String[] deviceNames = new String[numDevices];
@@ -88,10 +89,10 @@ public class Sound {
 			longestLength = Math.max(longestLength, deviceNames[i].length());
 		}
 		if (printAll) {
-			String lineFormat = "%-3s %3s | %-" + longestLength + "s | %6s | %4s%n";
+			String lineFormat = " %-3s %3s | %-" + longestLength + "s | %6s | %4s%n";
 
 			System.out.format(lineFormat, "", "id", "Device name", "inputs", "outputs");
-			System.out.println("    ----+" + "-".repeat(longestLength+2) + "+--------".repeat(2));
+			System.out.println("     ----+" + "-".repeat(longestLength+2) + "+--------".repeat(2));
 			for (int i = 0; i < numDevices; i++) {
 				System.out.format(lineFormat,
 						Engine.getEngine().inputDevice == i ? (Engine.getEngine().outputDevice == i ? "I,O" : "I") :
@@ -101,10 +102,10 @@ public class Sound {
 			}
 
 		} else {
-			String lineFormat = "%1s %3s | %-" + longestLength + "s | %4s%n";
+			String lineFormat = " %1s %3s | %-" + longestLength + "s | %4s%n";
 
 			System.out.format(lineFormat, " ", "id", "Input device name", "inputs");
-			System.out.println("  ----+" + "-".repeat(longestLength+2) + "+--------");
+			System.out.println("   ----+" + "-".repeat(longestLength+2) + "+--------");
 			for (int i = 0; i < numDevices; i++) {
 				if (audioManager.getMaxInputChannels(i) > 0) {
 					System.out.format(lineFormat, Engine.getEngine().inputDevice == i ? "I" : " ", i, deviceNames[i], audioManager.getMaxInputChannels(i));
@@ -112,7 +113,7 @@ public class Sound {
 			}
 			System.out.println();
 			System.out.format(lineFormat, " ", "id", "Output device name", "outputs");
-			System.out.println("  ----+" + "-".repeat(longestLength+2) + "+--------");
+			System.out.println("   ----+" + "-".repeat(longestLength+2) + "+--------");
 			for (int i = 0; i < numDevices; i++) {
 				if (audioManager.getMaxOutputChannels(i) > 0) {
 					System.out.format(lineFormat, Engine.getEngine().outputDevice == i ? "O" : " ",  i, deviceNames[i], audioManager.getMaxOutputChannels(i));
@@ -212,15 +213,14 @@ public class Sound {
 	public static void status() {
 		Engine.printMessage(String.format("%.2f", Engine.getEngine().synth.getCurrentTime()) + " seconds elapsed, generated " + Engine.getEngine().synth.getFrameCount() + " frames (framerate " + Engine.getEngine().synth.getFrameRate() + ")");
 		Engine.printMessage("  CPU usage: " + Math.round(100 * Engine.getEngine().synth.getUsage()) + "%");
-		Engine.printMessage("  elements in synthesizer network: " + Engine.getEngine().nCircuits);
-		Engine.printMessage("  sound sources currently playing: " + Engine.getEngine().nPlayingCircuits);
+		Engine.printMessage("  elements in synthesizer network: " + Engine.getEngine().addedUnits.size());
 		long nSamples = 0;
 		for (FloatSample s : SoundFile.SAMPLECACHE.values()) {
 			nSamples += s.getNumFrames() * s.getChannelsPerFrame();
 		}
 		Engine.printMessage("  decoded audio samples held in cache: " + SoundFile.SAMPLECACHE.size() + " (" + nSamples + " frames total)");
 		// might return something useful later
-		Sound.printConnections();
+		// Sound.printConnections();
 	}
 
 	public static void printConnections() {
