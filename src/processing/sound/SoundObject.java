@@ -116,8 +116,8 @@ public abstract class SoundObject {
 		if (this.circuit.effect != null) {
 			this.removeEffect(this.circuit.effect);
 		}
+		// also removes the unit implicitly
 		Engine.getEngine().stop(this.circuit);
-		Engine.getEngine().remove(this.circuit);
 	}
 
 

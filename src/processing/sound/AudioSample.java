@@ -1,6 +1,9 @@
 package processing.sound;
 
 import com.jsyn.data.FloatSample;
+import com.jsyn.ports.QueueDataCommand;
+import com.jsyn.ports.QueueDataEvent;
+import com.jsyn.ports.UnitDataQueueCallback;
 import com.jsyn.unitgen.VariableRateDataReader;
 import com.jsyn.unitgen.VariableRateMonoReader;
 import com.jsyn.unitgen.VariableRateStereoReader;
@@ -124,13 +127,8 @@ public class AudioSample extends SoundObject {
 		this.circuit = new JSynCircuit(this.player.output);
 		this.amplitude = this.player.amplitude;
 
-		// unlike the Oscillator and Noise classes, the sample player units can
-		// always stay connected to the JSyn synths, since they make no noise
-		// as long as their dataQueue is empty
-		super.play(); // doesn't actually start playback, just adds the (silent) units
-
-		// as a consequence, the AudioSample class manages its isPlaying status
-		// explicitly (see the overridden public boolean isPlaying() method below)
+		// the AudioSample class manages its isPlaying status explicitly (see the 
+		// overridden public boolean isPlaying() method below)
 		this.isPlaying = false;
 	}
 
@@ -331,11 +329,19 @@ public class AudioSample extends SoundObject {
 		this.stop();
 		this.setStartFrameCountOffset();
 		this.startFrame = startFrame;
+		QueueDataCommand cmd = this.player.dataQueue.createQueueDataCommand(this.sample, startFrame, numFrames);
+		// TODO setAutoStop(true) ?
+		// TODO setImmadiate(true) ?
+		cmd.setCallback(new PlaybackFinishedCallback());
+		// TODO how to loop indefinitely??
 		if (numLoops > 1) {
-			this.player.dataQueue.queueLoop(this.sample, startFrame, numFrames, numLoops);
+			// how many times it's *repeated* after the first time
+			cmd.setNumLoops(numLoops - 1);
 		} else {
-			this.player.dataQueue.queueLoop(this.sample, startFrame, numFrames);
+			// TODO this.player.dataQueue.queueLoop(this.sample, startFrame, 
+			// numFrames);
 		}
+		this.player.getSynthesizer().queueCommand(cmd);
 		this.isPlayingAtLeastUntil = System.currentTimeMillis() + 50;
 		this.isPlaying = true;
 	}
@@ -344,6 +350,16 @@ public class AudioSample extends SoundObject {
 		this.loopInternal(startFrame, numFrames, 0);
 	}
 
+	/*
+	public void loop(int numLoops) {
+		this.loopInternal(0, this.frames(), numLoops);
+	}
+
+	public void loop(int numLoops, float rate) {
+		this.rate(rate);
+		this.loop(numLoops);
+	}
+	*/
 
 	public void loop() {
 		this.loopInternal(0, this.frames());
@@ -360,11 +376,6 @@ public class AudioSample extends SoundObject {
 		this.loop();
 	}
 
-	public void loop(float rate, float pos, float amp) {
-		this.pan(pos);
-		this.loop(rate, amp);
-	}
-
 	/**
 	 * Starts the playback of the audiosample. Only plays to the end of the audiosample 
 	 * once. If <b>cue()</b> or <b>pause()</b> were called previously, playback will resume from the cued position.
@@ -379,11 +390,18 @@ public class AudioSample extends SoundObject {
 	 * @param amp
 	 *            the desired playback amplitude of the audiosample as a value from
 	 *            0.0 (complete silence) to 1.0 (full volume)
-	 * @param add
-	 *            offset the output of the generator by the given value
 	 * @webref Sampling:AudioSample
 	 * @webBrief Starts the playback of the audiosample.
 	 **/
+	public void loop(float rate, float pos, float amp) {
+		this.pan(pos);
+		this.loop(rate, amp);
+	}
+
+	/**
+	 * @deprecated
+	 * @nowebref
+	 */
 	public void loop(float rate, float pos, float amp, float add) {
 		this.add(add);
 		this.loop(rate, pos, amp);
@@ -417,14 +435,28 @@ public class AudioSample extends SoundObject {
 	 * cue) { this.cue(cue); this.loop(rate, pos, amp, add); }
 	 */
 
+	private class PlaybackFinishedCallback implements UnitDataQueueCallback {
+		public void finished(QueueDataEvent event) {
+			stop();
+		}
+		public void looped(QueueDataEvent event) {
+			System.out.println("loop");
+		}
+		public void started(QueueDataEvent event) {
+		}
+	}
+
 	private void playInternal() {
 		this.playInternal(this.startFrame, this.frames() - this.startFrame);
 	}
 
 	private void playInternal(int startFrame, int numFrames) {
+		super.play(); // adds the player
 		this.setStartFrameCountOffset();
 		// only queueImmediate() guarantees that a directly subsequent call to .hasMore() returns true
-		this.player.dataQueue.queue(this.sample, startFrame, numFrames);
+		QueueDataCommand cmd = this.player.dataQueue.createQueueDataCommand(this.sample, startFrame, numFrames);
+		cmd.setCallback(new PlaybackFinishedCallback());
+		this.player.getSynthesizer().queueCommand(cmd);
 		this.isPlayingAtLeastUntil = System.currentTimeMillis() + 50;
 		this.isPlaying = true;
 	}
@@ -456,10 +488,14 @@ public class AudioSample extends SoundObject {
 		this.play(rate, amp);
 	}
 
+	/**
+	 * @deprecated
+	 * @nowebref
 	public void play(float rate, float pos, float amp, float add) {
 		this.add(add);
 		this.play(rate, pos, amp);
 	}
+	 */
 
 	/**
 	 * Starts the playback of the audiosample. Only plays to the end of the audiosample 
@@ -478,11 +514,18 @@ public class AudioSample extends SoundObject {
 	 * @param cue
 	 *            position in the audiosample that playback should start from, in
 	 *            seconds.
-	 * @param add
-	 *            offset the output of the generator by the given value
 	 * @webref Sampling:AudioSample
 	 * @webBrief Starts the playback of the audiosample.
 	 **/
+	public void play(float rate, float pos, float amp, float cue) {
+		this.cue(cue);
+		this.play(rate, pos, amp);
+	}
+
+	/**
+	 * @deprecated
+	 * @nowebref
+	 */
 	public void play(float rate, float pos, float amp, float add, float cue) {
 		this.cue(cue);
 		this.play(rate, pos, amp, add);
@@ -597,13 +640,19 @@ public class AudioSample extends SoundObject {
 	 * @param amp
 	 *            the desired playback amplitude of the audiosample as a value from
 	 *            0.0 (complete silence) to 1.0 (full volume)
-	 * @param add
-	 *            offset the output of the generator by the given value
 	 **/
-	public void set(float rate, float pos, float amp, float add) {
+	public void set(float rate, float pos, float amp) {
 		this.rate(rate);
 		this.pan(pos);
 		this.amp(amp);
+	}
+
+	/**
+	 * @deprecated
+	 * @nowebref
+	 */
+	public void set(float rate, float pos, float amp, float add) {
+		this.set(rate, pos, amp);
 		this.add(add);
 	}
 
@@ -614,6 +663,7 @@ public class AudioSample extends SoundObject {
 	 * @webBrief Stops the playback.
 	 **/
 	public void stop() {
+		super.stop();
 		this.player.dataQueue.clear();
 		this.isPlaying = false;
 	}
