@@ -5,12 +5,18 @@ SinOsc sines[];
 void setup() {
   size(640, 360);
   background(255);
-  
-  
+
+  // some multi-channel USB audio interfaces don't show the correct number of 
+  // output channels on Windows. If this is the case, try loading PortAudio 
+  // support at the very top of your sketch with the following command (see the 
+  // LowLevelEngine example for details):
+  //MultiChannel.usePortAudio();
+
   boolean foundMultiChannel = false;
-  for (int i = 0; i < Sound.list(true).length; i++) {
+  String[] deviceNames = Sound.list();
+  for (int i = 0; i < deviceNames.length; i++) {
     if (MultiChannel.availableChannels(i) > 2) {
-      println("Found a multi-channel device: " + Sound.list(true)[i]);
+      println("Found a multi-channel device: " + deviceNames[i]);
       Sound.outputDevice(i);
       foundMultiChannel = true;
       break;
@@ -21,16 +27,22 @@ void setup() {
   }
   
   println("Playing back different sine waves on the " + MultiChannel.availableChannels() + " different channels");
-  float freq = 100;
   
   sines = new SinOsc[MultiChannel.availableChannels()];
   
   // loop through all channels and start one sine wave on each
+  float frequency = 100;
   for (int i = 0; i < sines.length; i++) {
     MultiChannel.activeChannel(i);
     // create and start the sine oscillator.
     sines[i] = new SinOsc(this);
+    sinces[i].freq(frequency);
     sines[i].play();
+    // add a nice theatrical break
+    delay(500);
+
+    // increase frequency on the next channel by one semitone
+    frequency = frequency * 1.05946;
   }
 }
 

@@ -115,7 +115,7 @@
 		<include name="LICENSE" />
 		<include name="README.md" />
 		<include name="examples/**" />
-		<include name="${lib}/.properties" />
+		<include name="library.properties" />
 		<include name="${lib}/*.jar" />
 		<!-- all files inside per-architecture native library directories -->
 		<include name="${lib}/*-*/*" />
