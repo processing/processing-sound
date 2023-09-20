@@ -46,7 +46,7 @@ class Engine {
 		System.setOut(originalStream);
 	}
 
-	protected static AudioDeviceManager getDefaultAudioDeviceManager() {
+	private static AudioDeviceManager getDefaultAudioDeviceManager() {
 		try {
 			Class.forName("javax.sound.sampled.AudioSystem");
 			// create a JavaSound device first
@@ -146,7 +146,7 @@ class Engine {
 	// called in three different cases:
 	// 1. explicitly by the user
 	// 2. automatically by selectOutputDevice when it fails to open a line using 
-	// JavaSond
+	// JavaSound
 	protected boolean usePortAudio(boolean portAudio) {
 		if (portAudio != this.synth.getAudioDeviceManager() instanceof JPortAudioDevice) {
 			try {
@@ -260,12 +260,18 @@ class Engine {
 					// hopeless
 					throw new RuntimeException(e);
 				}
-				int newDeviceIdForOldDevice = this.getDeviceIdByName(targetDeviceName, true);
-				if (newDeviceIdForOldDevice != deviceId) {
-					Engine.printMessage("Automatically switched to PortAudio driver.");
-					Engine.printMessage("Note that the device id of '" + targetDeviceName + "' has changed from " + deviceId + " to " + newDeviceIdForOldDevice + ".");
-					Engine.printMessage("If output is working as expected, you can safely ignore this message.");
-					Engine.printMessage("If something is awry, check the output of Sound.list() *after* the call to selectOutputDevice()");
+				Engine.printMessage("The selected output device did not work with the default driver, automatically switched to PortAudio.");
+				int newDeviceIdForOldDevice = this.synth.getAudioDeviceManager().getDefaultOutputDeviceID();
+				try {
+					newDeviceIdForOldDevice = this.getDeviceIdByName(targetDeviceName, true);
+					if (newDeviceIdForOldDevice != deviceId) {
+						Engine.printMessage("Note that the device id of '" + targetDeviceName + "' has changed from " + deviceId + " to " + newDeviceIdForOldDevice + ".");
+						Engine.printMessage("If output is working as expected, you can safely ignore this message.");
+						Engine.printMessage("If something is awry, check the output of Sound.list() *after* the call to selectOutputDevice()");
+					}
+				} catch (RuntimeException ee) {
+					// probably a generic device name like 'Primary Sound Device'
+					Engine.printMessage("Switched to new default output device '" + this.getDeviceName(newDeviceIdForOldDevice) + "'.");
 				}
 				deviceId = newDeviceIdForOldDevice;
 			}
@@ -273,7 +279,7 @@ class Engine {
 				this.outputDevice = deviceId;
 				this.startSynth();
 			} else {
-				Engine.printError("audio device #" + deviceId + " has no stereo output channel");
+				Engine.printError("audio device '" + this.getDeviceName(deviceId) + "' has no stereo output channel");
 			}
 		}
 		return this.outputDevice;

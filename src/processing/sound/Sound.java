@@ -1,5 +1,7 @@
 package processing.sound;
 
+import java.util.stream.IntStream;
+
 import com.jsyn.Synthesizer;
 import com.jsyn.data.FloatSample;
 import com.jsyn.devices.AudioDeviceManager;
@@ -49,12 +51,16 @@ public class Sound {
 		this.volume(volume);
 	}
 
-	public static String[] list() {
-		return Sound.list(false);
-	}
-
 	public static AudioDeviceManager getAudioDeviceManager() {
 		return Engine.getAudioDeviceManager();
+	}
+
+	public static String[] deviceNames() {
+		String[] names = new String[Sound.getAudioDeviceManager().getDeviceCount()];
+		for (int i = 0; i < names.length; i++) {
+			names[i] = Engine.getEngine().getDeviceName(i);
+		}
+		return names;
 	}
 
 	/**
@@ -71,58 +77,84 @@ public class Sound {
 	 * default, sound devices without any inputs or outputs are omitted from the 
 	 * output listing for clarity. Pass `true` here if you want a complete list of 
 	 * all devices (for debugging).
+	 * @param filter only list audio devices whose device name contains this 
+	 * string
 	 * @return an array giving the names of all audio devices available on this
 	 *         computer
 	 * @webref Configuration:Sound
 	 * @webBrief Print and return information on available audio devices and their 
 	 * number of input/output channels.
 	 */
+	public static String[] list(String filter) {
+		String[] deviceNames = Sound.deviceNames();
+		Engine.printMessage(Sound.getAudioDeviceManager().getName() + " audio device search for '" + filter + "'\n");
+		Sound.printDeviceTable(IntStream.range(0, deviceNames.length).filter(i -> deviceNames[i].contains(filter)).toArray());
+		return deviceNames;
+	}
+
+	public static String[] list() {
+		return Sound.list(false);
+	}
+
 	public static String[] list(boolean printAll) {
-		Engine e = Engine.getEngine();
-		AudioDeviceManager audioManager = e.getAudioDeviceManager();
-		Engine.printMessage("audio device listing by " + audioManager + ":\n");
-		int numDevices = audioManager.getDeviceCount();
-		int longestLength = "Output device name".length();
-		String[] deviceNames = new String[numDevices];
-		for (int i = 0; i < numDevices; i++) {
-			deviceNames[i] = e.getDeviceName(i);
-			longestLength = Math.max(longestLength, deviceNames[i].length());
-		}
+		String[] deviceNames = Sound.deviceNames();
+		AudioDeviceManager audioManager = Engine.getAudioDeviceManager();
+		Engine.printMessage(audioManager.getName() + " audio device listing\n");
 		if (printAll) {
-			String lineFormat = " %-3s %3s | %-" + longestLength + "s | %6s | %4s%n";
-
-			System.out.format(lineFormat, "", "id", "Device name", "inputs", "outputs");
-			System.out.println("     ----+" + "-".repeat(longestLength+2) + "+--------".repeat(2));
-			for (int i = 0; i < numDevices; i++) {
-				System.out.format(lineFormat,
-						Engine.getEngine().inputDevice == i ? (Engine.getEngine().outputDevice == i ? "I,O" : "I") :
-						(Engine.getEngine().outputDevice == i ? "O" : ""), i, deviceNames[i],
-						audioManager.getMaxInputChannels(i),
-						audioManager.getMaxOutputChannels(i));
-			}
-
+			Sound.printDeviceTable(IntStream.range(0, deviceNames.length).toArray());
 		} else {
-			String lineFormat = " %1s %3s | %-" + longestLength + "s | %4s%n";
+			Sound.printDeviceTable(IntStream.range(0, deviceNames.length).filter(i -> audioManager.getMaxInputChannels(i) > 0).toArray(),
+					IntStream.range(0, deviceNames.length).filter(i -> audioManager.getMaxOutputChannels(i) > 0).toArray());
+		}
+		return Sound.deviceNames();
+	}
 
-			System.out.format(lineFormat, " ", "id", "Input device name", "inputs");
-			System.out.println("   ----+" + "-".repeat(longestLength+2) + "+--------");
-			for (int i = 0; i < numDevices; i++) {
-				if (audioManager.getMaxInputChannels(i) > 0) {
-					System.out.format(lineFormat, Engine.getEngine().inputDevice == i ? "I" : " ", i, deviceNames[i], audioManager.getMaxInputChannels(i));
-				}
-			}
-			System.out.println();
-			System.out.format(lineFormat, " ", "id", "Output device name", "outputs");
-			System.out.println("   ----+" + "-".repeat(longestLength+2) + "+--------");
-			for (int i = 0; i < numDevices; i++) {
-				if (audioManager.getMaxOutputChannels(i) > 0) {
-					System.out.format(lineFormat, Engine.getEngine().outputDevice == i ? "O" : " ",  i, deviceNames[i], audioManager.getMaxOutputChannels(i));
-				}
-			}
+	/**
+	 * Helper method for formatting
+	 */
+	private static int longestDeviceNameLength(int[] deviceIds) {
+		int longestLength = "Output device name".length();
+		for (int i : deviceIds) {
+			longestLength = Math.max(longestLength, Engine.getEngine().getDeviceName(i).length());
+		}
+		return longestLength;
+	}
+
+	private static void printDeviceTable(int[] deviceIds) {
+		AudioDeviceManager audioManager = Sound.getAudioDeviceManager();
+		int longestLength = Sound.longestDeviceNameLength(deviceIds);
+		String lineFormat = " %-3s %3s | %-" + longestLength + "s | %6s | %4s%n";
+
+		System.out.format(lineFormat, "", "id", "Device name", "inputs", "outputs");
+		System.out.println("     ----+" + "-".repeat(longestLength+2) + "+--------".repeat(2));
+		for (int i : deviceIds) {
+			System.out.format(lineFormat,
+					Engine.getEngine().inputDevice == i ? (Engine.getEngine().outputDevice == i ? "I,O" : "I") :
+					(Engine.getEngine().outputDevice == i ? "O" : ""), i, Engine.getEngine().getDeviceName(i),
+					audioManager.getMaxInputChannels(i),
+					audioManager.getMaxOutputChannels(i));
 		}
 		System.out.println();
+	}
 
-		return deviceNames;
+	private static void printDeviceTable(int[] inputDeviceIds, int[] outputDeviceIds) {
+		AudioDeviceManager audioManager = Sound.getAudioDeviceManager();
+		int longestLength = Math.max(Sound.longestDeviceNameLength(inputDeviceIds),
+				Sound.longestDeviceNameLength(outputDeviceIds));
+		String lineFormat = " %1s %3s | %-" + longestLength + "s | %4s%n";
+
+		System.out.format(lineFormat, " ", "id", "Input device name", "inputs");
+		System.out.println("   ----+" + "-".repeat(longestLength+2) + "+--------");
+		for (int i : inputDeviceIds) {
+			System.out.format(lineFormat, Engine.getEngine().inputDevice == i ? "I" : " ", i, Engine.getEngine().getDeviceName(i), audioManager.getMaxInputChannels(i));
+		}
+		System.out.println();
+		System.out.format(lineFormat, " ", "id", "Output device name", "outputs");
+		System.out.println("   ----+" + "-".repeat(longestLength+2) + "+--------");
+		for (int i : outputDeviceIds) {
+			System.out.format(lineFormat, Engine.getEngine().outputDevice == i ? "O" : " ",  i, Engine.getEngine().getDeviceName(i), audioManager.getMaxOutputChannels(i));
+		}
+		System.out.println();
 	}
 
 	public static int sampleRate() {
