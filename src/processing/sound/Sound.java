@@ -87,6 +87,7 @@ public class Sound {
 	 */
 	public static String[] list(String filter) {
 		String[] deviceNames = Sound.deviceNames();
+		System.out.println();
 		Engine.printMessage(Sound.getAudioDeviceManager().getName() + " audio device search for '" + filter + "'\n");
 		Sound.printDeviceTable(IntStream.range(0, deviceNames.length).filter(i -> deviceNames[i].contains(filter)).toArray());
 		return deviceNames;
@@ -99,6 +100,7 @@ public class Sound {
 	public static String[] list(boolean printAll) {
 		String[] deviceNames = Sound.deviceNames();
 		AudioDeviceManager audioManager = Engine.getAudioDeviceManager();
+		System.out.println();
 		Engine.printMessage(audioManager.getName() + " audio device listing\n");
 		if (printAll) {
 			Sound.printDeviceTable(IntStream.range(0, deviceNames.length).toArray());

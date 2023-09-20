@@ -138,14 +138,20 @@ class Engine {
 		if (this.synth != null) {
 			this.stopSynth(true);
 		}
-		this.inputDevice = deviceManager.getDefaultInputDeviceID();
+		try {
+			// this might be -1 if there is no device with inputs. handled below.
+			this.inputDevice = deviceManager.getDefaultInputDeviceID();
+		} catch (RuntimeException e) {
+			// JPortAudioDevice even throws an exception if none of the devices have 
+			// inputs...
+		}
 		this.outputDevice = deviceManager.getDefaultOutputDeviceID();
 		this.synth = JSyn.createSynthesizer(deviceManager);
 	}
 
-	// called in three different cases:
-	// 1. explicitly by the user
-	// 2. automatically by selectOutputDevice when it fails to open a line using 
+	// called in two different cases:
+	// 1. explicitly by the user (through MultiChannel.usePortAudio())
+	// 2. automatically by selectOutputDevice() when it fails to open a line using 
 	// JavaSound
 	protected boolean usePortAudio(boolean portAudio) {
 		if (portAudio != this.synth.getAudioDeviceManager() instanceof JPortAudioDevice) {
@@ -191,8 +197,11 @@ class Engine {
 		}
 		this.setVolume(1.0f);
 
+		// prevent IndexOutOfBoundsException on input-less devices
+		int inputChannels = this.inputDevice >= 0 ?
+			this.synth.getAudioDeviceManager().getMaxInputChannels(this.inputDevice) : 0;
 		this.synth.start(this.sampleRate,
-				this.inputDevice, this.synth.getAudioDeviceManager().getMaxInputChannels(this.inputDevice),
+				this.inputDevice, inputChannels,
 				this.outputDevice, this.synth.getAudioDeviceManager().getMaxOutputChannels(this.outputDevice));
 	}
 
