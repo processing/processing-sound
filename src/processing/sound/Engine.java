@@ -136,7 +136,7 @@ class Engine {
 	
 	private void createSynth(AudioDeviceManager deviceManager) {
 		if (this.synth != null) {
-			this.stopSynth(true);
+			this.purgeSynth();
 		}
 		try {
 			// this might be -1 if there is no device with inputs. handled below.
@@ -164,24 +164,36 @@ class Engine {
 		return this.synth.getAudioDeviceManager() instanceof JPortAudioDevice;
 	}
 
-	private void stopSynth(boolean discard) {
+	private void purgeSynth() {
+		this.stopSynth();
+		// TODO disconnect EVERYTHING so it can be garbage collected
+		this.synth = null;
+	}
+
+	/**
+	 * Stop the synthesizer and remove all ChannelOuts
+	 */
+	private void stopSynth() {
 		if (this.synth.isRunning()) {
 			this.synth.stop();
-			if (discard) {
-				// TODO disconnect EVERYTHING so it can be garbage collected
-			}
 			// TODO clean up old outputs/volumes/entire synth network (if any)?
 			for (ChannelOut c : this.output) {
+				c.stop();
+				c.input.disconnectAll();
 				this.synth.remove(c);
 			}
+			this.output = null;
 			for (Multiply m : this.volume) {
+				m.stop();
+				m.inputA.disconnectAll();
 				this.synth.remove(m);
 			}
+			this.volume = null;
 		}
 	}
 
 	private void startSynth() {
-		this.stopSynth(false);
+		this.stopSynth();
 
 		this.output = new ChannelOut[this.synth.getAudioDeviceManager().getMaxOutputChannels(this.outputDevice)];
 		this.volume = new Multiply[this.synth.getAudioDeviceManager().getMaxOutputChannels(this.outputDevice)];
