@@ -20,6 +20,7 @@ public abstract class SoundObject {
 
 	// all subclasses need to set this amplitude port -- either to the amplitude
 	// port of the circuit, or directly to an amplitude port of their sound unit
+	// TODO replace this with a MixerStereo
 	protected UnitInputPort amplitude;
 
 	protected float amp = 1.0f;
