@@ -1,6 +1,6 @@
 import processing.sound.*;
 
-import com.jsyn.Synthesizer;
+import com.jsyn.engine.SynthesisEngine;
 
 void setup() {
 
@@ -27,7 +27,7 @@ void setup() {
 
   // to get programmatic access to the same information (and more), you can get 
   // and inspect the JSyn Synthesizer class yourself:
-  Synthesizer s = Sound.getSynthesizer();
+  SynthesisEngine s = Sound.getSynthesisEngine();
   println("Current CPU usage: " + s.getUsage());
 
 }

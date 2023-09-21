@@ -262,9 +262,11 @@ public class Sound {
 	}
 
 	/**
-	 * Direct access to the underlying JSyn Synthesizer object. Use at your own risk.
+	 * Direct access to the underlying JSyn SynthesisEngine object. Use at your 
+	 * own risk.
+	 * @see com.jsyn.engine.SynthesisEngine
 	 */
-	public static Synthesizer getSynthesizer() {
-		return Engine.getEngine().synth;
+	public static SynthesisEngine getSynthesisEngine() {
+		return (SynthesisEngine) Engine.getEngine().synth;
 	}
 }
