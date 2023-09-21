@@ -98,7 +98,6 @@ public abstract class SoundObject {
 	public void play() {
 		// TODO print info message if it's already playing?
 		if (!this.isPlaying) {
-			Engine.getEngine().add(this.circuit);
 			Engine.getEngine().play(this.circuit);
 			this.setAmplitude();
 			this.isPlaying = true;

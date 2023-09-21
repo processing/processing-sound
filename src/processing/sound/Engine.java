@@ -396,14 +396,18 @@ class Engine {
 	}
 
 	protected void play(UnitSource source) {
-		// TODO check if unit is already connected
-		// source.getOutput().isConnected()
-		for (int i = 0; i < source.getOutput().getNumParts(); i++) {
-			this.connectToOutput((this.outputChannel + i) % this.synth.getAudioDeviceManager().getMaxOutputChannels(this.outputDevice), source, i);
-			// source.getOutput().connect(i, this.volume[(this.outputChannel + i) % this.synth.getAudioDeviceManager().getMaxOutputChannels(this.outputDevice)].inputA, 0);
-			if (this.multiChannelMode) {
-				// only add the first (left) channel
-				break;
+		// check if unit is already connected
+		UnitGenerator generator = source.getUnitGenerator();
+		if (!this.addedUnits.contains(generator)) {
+			this.synth.add(generator);
+			this.addedUnits.add(generator);
+			for (int i = 0; i < source.getOutput().getNumParts(); i++) {
+				this.connectToOutput((this.outputChannel + i) % this.synth.getAudioDeviceManager().getMaxOutputChannels(this.outputDevice), source, i);
+				// source.getOutput().connect(i, this.volume[(this.outputChannel + i) % this.synth.getAudioDeviceManager().getMaxOutputChannels(this.outputDevice)].inputA, 0);
+				if (this.multiChannelMode) {
+					// only add the first (left) channel
+					break;
+				}
 			}
 		}
 	}
@@ -415,6 +419,7 @@ class Engine {
 			for (int i : IntStream.range(0, source.getOutput().getNumParts()).toArray()) {
 				source.getOutput().disconnectAll(i);
 			}
+			// removal happens inside
 			this.remove(source.getUnitGenerator());
 		}
 	}

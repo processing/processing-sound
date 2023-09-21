@@ -1,8 +1,10 @@
 package processing.sound;
 
 import com.jsyn.data.SegmentedEnvelope;
+import com.jsyn.ports.QueueDataCommand;
+import com.jsyn.ports.QueueDataEvent;
+import com.jsyn.ports.UnitDataQueueCallback;
 import com.jsyn.unitgen.VariableRateMonoReader;
-import com.softsynth.shared.time.TimeStamp;
 
 import processing.core.PApplet;
 
@@ -35,23 +37,43 @@ public class Env {
 				sustainTime, sustainLevel * input.amp, // sustain
 				releaseTime, 0.0 });
 
-		// TODO re-use player from fixed or dynamic pool
+		// fire-and-forget envelope player
 		VariableRateMonoReader player = new VariableRateMonoReader();
-
-		// this would make sense to me but breaks the envelope for some reason
-//		input.amplitude.disconnectAll();
-		player.output.connect(input.amplitude);
 		Engine.getEngine().add(player);
+		// we need to start the player explicitly, otherwise if it gets disconnected 
+		// by another envelope kicking in before it has completed, it would stop 
+		// prematurely and the callback (which removes it from the synth for garbage 
+		// collection) would never get called!
+		player.start();
 
-		player.dataQueue.queue(env);
+		input.amplitude.disconnectAll();
+		player.output.connect(input.amplitude);
 		if (!input.isPlaying()) {
 			input.play();
 		}
 
-		// disconnect player from amplitude port after finished and set amplitude to 0
-		TimeStamp envFinished = Engine.getEngine().synth.createTimeStamp().makeRelative(attackTime + sustainTime + releaseTime);
-		player.output.disconnect(0, input.amplitude, 0, envFinished);
-		// TODO better: trigger unit stop() so that isPlaying() is set to false as well?
-		input.amplitude.set(0, envFinished);
+		QueueDataCommand cmd = player.dataQueue.createQueueDataCommand(env, 0, env.getNumFrames());
+		// need to set auto stop for the remove() inside the callback to work
+		cmd.setAutoStop(true);
+		cmd.setCallback(new UnitDataQueueCallback() {
+			public void finished(QueueDataEvent event) {
+				// check if this output has maybe already been disconnected (by a new 
+				// envelope that has taken over)
+				if (player.output.isConnected()) {
+					player.output.disconnectAll();
+					// TODO what to do with the input soundobject after the envelope is 
+					// finished? just silence it, but then it isn't automatically garbage 
+					// collected? should we trigger the object's stop() as well?
+					input.amplitude.set(0);
+				}
+				Engine.getEngine().remove(player);
+			}
+			public void looped(QueueDataEvent event) {
+			}
+			public void started(QueueDataEvent event) {
+			}
+		});
+
+		player.getSynthesizer().queueCommand(cmd);
 	}
 }
