@@ -90,7 +90,7 @@ class Engine {
 	protected final Set<UnitGenerator> addedUnits = new HashSet<UnitGenerator>();
 
 	// multi-channel lineouts
-	private ChannelOut[] output;
+	protected ChannelOut[] output;
 	// multipliers for each output channel for controlling the global output volume
 	private Multiply[] volume;
 

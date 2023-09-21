@@ -1,5 +1,7 @@
 package processing.sound;
 
+import com.jsyn.unitgen.ChannelOut;
+
 /**
  * Controls the routing of sounds on multi-channel devices
  * 
@@ -43,6 +45,15 @@ public abstract class MultiChannel {
 
 	public static int availableChannels() {
 		return MultiChannel.availableChannels(Engine.getEngine().outputDevice);
+	}
+
+	/**
+	 * Returns the JSyn <code>ChannelOut</code> objects that are being played to 
+	 * by the synthesizer
+	 * @see ChannelOut
+	 */
+	public static ChannelOut[] outputs() {
+		return Engine.getEngine().output;
 	}
 
 	/**
