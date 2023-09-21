@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.IntStream;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
@@ -409,7 +410,11 @@ class Engine {
 
 	protected void stop(UnitSource source) {
 		if (this.addedUnits.contains(source.getUnitGenerator())) {
-			source.getOutput().disconnectAll();
+			// this is usually just the two-part output of a JSynCircuit, but let's 
+			// keep it generic just in case
+			for (int i : IntStream.range(0, source.getOutput().getNumParts()).toArray()) {
+				source.getOutput().disconnectAll(i);
+			}
 			this.remove(source.getUnitGenerator());
 		}
 	}
