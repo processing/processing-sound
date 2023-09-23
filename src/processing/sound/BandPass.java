@@ -10,7 +10,12 @@ import processing.core.PApplet;
  * @webBrief This is a band pass filter.
  * @param parent PApplet: typically use "this"
  **/
-public class BandPass extends Effect<FilterBandPass> {
+public class BandPass extends Filter<FilterBandPass> {
+
+	// when set to a positive value (desired bandpass bandwidth in Hertz), any 
+	// change to freq() will be followed by a re-calculation of Q that will 
+	// produce the given bandwidth
+	private float bandwidth = -1;
 
 	public BandPass(PApplet parent) {
 		super(parent);
@@ -22,39 +27,56 @@ public class BandPass extends Effect<FilterBandPass> {
 	}
 
 	/**
-	 * Set the bandwidth for the filter.
+	 * Sets the bandwidth of this BandPass filter.
 	 * @webref Effects:BandPass
-	 * @webBrief Set the bandwidth for the filter.
-	 * @param freq Bandwidth in Hz
+	 * @webBrief Sets the bandwidth for the filter.
+	 * @param bw the filter bandwidth in Hertz
+	 * @see BandPass#res()
 	 **/
 	public void bw(float bw) {
-		// TODO check filter quality
-		this.left.Q.set(this.left.frequency.get() / bw);
-		this.right.Q.set(this.right.frequency.get() / bw);
+		this.bandwidth = bw;
+		this.updateQ();
+	}
+
+	private void updateQ() {
+		if (this.bandwidth > 0) {
+			// TODO check if the value is still in the [0.1, 10] range?
+			this.res((float) this.left.frequency.get() / this.bandwidth);
+		}
 	}
 
 	/**
-	 * Set the cutoff frequency for the filter.
+	 * Sets a fixed Q factor for this filter. If you want to specify a fixed 
+	 * bandwidth for this bandpass filter (in Hertz) that is maintained even as 
+	 * the center frequency of the filter changes, use <code>bw(float)</code> 
+	 * instead.
 	 * @webref Effects:BandPass
-	 * @webBrief Set the cutoff frequency for the filter.
-	 * @param freq Cutoff frequency between 0 and 20000
+	 * @webBrief Sets the resonance (or 'Q factor') of this filter.
+	 * @param q the desired Q factor, a value between 0.1 and 10
+	 * @see BandPass#bw()
+	 */
+	public void res(float q) {
+		super.res(q);
+		this.bandwidth = -1;
+	}
+
+	/**
+	 * Sets the center frequency of the filter.
+	 * @webref Effects:BandPass
+	 * @webBrief Sets the center frequency of the filter.
+	 * @param freq the center frequency in Hertz
 	 **/
 	public void freq(float freq) {
-		this.left.frequency.set(freq);
-		this.right.frequency.set(freq);
-	}
-	
-	public void process(SoundObject input, float freq) {
-		this.freq(freq);
-		this.process(input);
+		super.freq(freq);
+		this.updateQ();
 	}
 
 	/**
 	 * Start applying this bandpass filter to an input signal.
 	 * @webref Effects:BandPass
-	 * @param input the sound source to apply the filter to
-	 * @param freq Cutoff frequency between 0 and 20000
-	 * @param bw Set the bandwidth
+	 * @param input the sound source to filter
+	 * @param freq the center frequency in Hertz
+	 * @param bw the filter bandwidth in Hertz
 	 **/
 	public void process(SoundObject input, float freq, float bw) {
 		this.freq(freq);
@@ -63,11 +85,11 @@ public class BandPass extends Effect<FilterBandPass> {
 	}
 
 	/**
-	 * Sets frequency and bandwidth of the filter with one method. 
+	 * Sets frequency and bandwidth of the filter with one method.
 	 * @webref Effects:BandPass
 	 * @webBrief Sets frequency and bandwidth of the filter with one method.
-	 * @param freq Set the frequency
-	 * @param bw Set the bandwidth
+	 * @param freq the center frequency in Hertz
+	 * @param bw the filter bandwidth in Hertz
 	 **/
 	public void set(float freq, float bw) {
 		this.freq(freq);
