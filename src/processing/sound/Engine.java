@@ -34,26 +34,38 @@ import processing.core.PApplet;
  */
 class Engine {
 
-	static {
-		PrintStream originalStream = System.out;
-		System.setOut(new PrintStream(new OutputStream(){
-			public void write(int b) { }
-		}));
-		try {
-			System.loadLibrary("portaudio_x64");
-		} catch (UnsatisfiedLinkError e) {
-			// System.loadLibrary("jportaudio_0_1_0");
-		}
-		System.setOut(originalStream);
-	}
+	// static {
+	// 	try {
+	// 		// TODO PRINT INSTRUCTIONS for going to System Preferences > Security & 
+	// 		// Privacy > General to 'Allow' libjportaudio.jnilib
+	// 		// System.loadLibrary("libjportaudio");
+	// 		System.loadLibrary("portaudio_x64");
+	// 	} catch (UnsatisfiedLinkError e) {
+	// 		// System.loadLibrary("jportaudio_0_1_0");
+	// 	}
+	// }
 
-	private static AudioDeviceManager getDefaultAudioDeviceManager() {
+	private static AudioDeviceManager createDefaultAudioDeviceManager() {
 		try {
 			Class.forName("javax.sound.sampled.AudioSystem");
 			// create a JavaSound device first
 			return AudioDeviceFactory.createAudioDeviceManager(true);
 		} catch (ClassNotFoundException e) {
 			return new JSynAndroidAudioDeviceManager();
+		}
+	}
+
+	private static AudioDeviceManager createAudioDeviceManager(boolean portAudio) {
+		PrintStream originalStream = System.out;
+		System.setOut(new PrintStream(new OutputStream(){
+			public void write(int b) { }
+		}));
+		try {
+			return portAudio ? new JPortAudioDevice() : Engine.createDefaultAudioDeviceManager();
+		} catch (UnsatisfiedLinkError e) {
+			throw new RuntimeException("PortAudio is not supported on this operating system/architecture");
+		} finally {
+			System.setOut(originalStream);
 		}
 	}
 
@@ -66,11 +78,23 @@ class Engine {
 	 * setting this variable to null, forcing a (second) singleton to be created, 
 	 * and then swapping them out manually at will.
 	 */
-	static Engine singleton;
+	private static Engine singleton;
+
+	// static Engine getEngine(boolean portAudio) {
+	// 	return Engine.
+
+	static Engine getEngine() {
+		return Engine.getEngine(null);
+	}
 
 	static Engine getEngine(PApplet parent) {
+		return Engine.getEngine(parent, false);
+	}
+
+	static Engine getEngine(PApplet parent, boolean portAudio) {
 		if (Engine.singleton == null) {
-			Engine.singleton = new Engine();
+			// this might throw a RuntimeException, which is fine
+		 	Engine.singleton = new Engine(Engine.createAudioDeviceManager(portAudio));
 		}
 		if (parent != null) {
 			Engine.singleton.registerWithParent(parent);
@@ -78,15 +102,12 @@ class Engine {
 		return Engine.singleton;
 	}
 
-	static Engine getEngine() {
-		return Engine.getEngine(null);
-	}
-
 	static AudioDeviceManager getAudioDeviceManager() {
-		return Engine.getEngine(null).synth.getAudioDeviceManager();
+		return Engine.getEngine().synth.getAudioDeviceManager();
 	}
 
 	protected Synthesizer synth;
+	boolean hasBeenUsed = false;
 	protected final Set<UnitGenerator> addedUnits = new HashSet<UnitGenerator>();
 
 	// multi-channel lineouts
@@ -107,68 +128,62 @@ class Engine {
 	protected boolean multiChannelMode = false;
 
 	/**
-	 * Create a new synthesizer and connect it to the default sound devices.
+	 * Create a new synthesizer and connect it to the default output device.
 	 */
-	private Engine() {
-		Engine.singleton = this;
+	private Engine(AudioDeviceManager audioDeviceManager) {
+		this(audioDeviceManager, -1);
+	}
 
+	private Engine(AudioDeviceManager audioDeviceManager, int outputDevice) {
 		// suppress JSyn's INFO log messages to stop them from showing
 		// up as redtext in the Processing console
 		Logger logger = Logger.getLogger(com.jsyn.engine.SynthesisEngine.class.getName());
 		logger.setLevel(Level.WARNING);
 
-		this.createSynth(Engine.getDefaultAudioDeviceManager());
-
-		// TODO if the default device does not have a stereo output, loop through 
-		// the available devices and just select the first one?
-		// if (this.outputDevice == -1) {
-			// Engine.printError("could not find any audio devices with a stereo output");
-			// return;
-		// }
-		// this.selectInputDevice(this.synth.getAudioDeviceManager().getDefaultInputDeviceID());
-		// if (this.inputDevice == -1) {
-			// Engine.printWarning("could not find any sound devices with input channels, you won't be able to use the AudioIn class");
-		// }
-
+		this.createSynth(audioDeviceManager);
 		// this method starts the synthesizer -- if the output fails, it might 
 		// create a new PortAudio synth on the fly and try to start that
-		this.selectOutputDevice(this.outputDevice);
+		this.selectOutputDevice(outputDevice);
 	}
 	
 	private void createSynth(AudioDeviceManager deviceManager) {
 		if (this.synth != null) {
-			this.purgeSynth();
-		}
-		try {
-			// this might be -1 if there is no device with inputs. handled below.
-			this.inputDevice = deviceManager.getDefaultInputDeviceID();
-		} catch (RuntimeException e) {
-			// JPortAudioDevice even throws an exception if none of the devices have 
-			// inputs...
-		}
-		this.outputDevice = deviceManager.getDefaultOutputDeviceID();
-		this.synth = JSyn.createSynthesizer(deviceManager);
-	}
-
-	// called in two different cases:
-	// 1. explicitly by the user (through MultiChannel.usePortAudio())
-	// 2. automatically by selectOutputDevice() when it fails to open a line using 
-	// JavaSound
-	protected boolean usePortAudio(boolean portAudio) {
-		if (portAudio != this.synth.getAudioDeviceManager() instanceof JPortAudioDevice) {
-			try {
-				this.createSynth(portAudio ? new JPortAudioDevice() : Engine.getDefaultAudioDeviceManager());
-			} catch (UnsatisfiedLinkError e) {
-				Engine.printError("PortAudio is not supported on this operating system/architecture");
+			this.stopSynth();
+			// TODO disconnect EVERYTHING so it can be garbage collected
+			if (this.hasBeenUsed) {
+				Engine.printWarning("Switching audio device drivers. Any previously created Sound library objects can not be used any more!");
+				Engine.printWarning("To remove this error messge, make sure to call Sound.outputDevice(...) at the very top of your setup()");
+				this.hasBeenUsed = false;
 			}
 		}
+		this.synth = JSyn.createSynthesizer(deviceManager);
+		// try {
+			// this might be -1 if there is no device with inputs
+			// this.inputDevice = deviceManager.getDefaultInputDeviceID();
+		// } catch (RuntimeException e) {
+			// JPortAudioDevice even throws an exception if none of the devices have 
+			// inputs...
+		// }
+	}
+
+	public boolean isUsingPortAudio() {
 		return this.synth.getAudioDeviceManager() instanceof JPortAudioDevice;
 	}
 
-	private void purgeSynth() {
-		this.stopSynth();
-		// TODO disconnect EVERYTHING so it can be garbage collected
-		this.synth = null;
+	/**
+	 * Switch to/from using PortAudio.
+	 * Called in two different cases:
+	 * 1. explicitly by the user (through MultiChannel.usePortAudio())
+	 * 2. automatically by selectOutputDevice() when it fails to open a line using 
+	 * JavaSound
+	 */
+	protected boolean usePortAudio(boolean portAudio) {
+		if (portAudio != this.isUsingPortAudio()) {
+			this.createSynth(Engine.createAudioDeviceManager(portAudio));
+			// if this was called by the user (from the MultiChannel class), its their 
+			// responsibilit to select output device and start the synth!
+		}
+		return this.isUsingPortAudio();
 	}
 
 	/**
@@ -213,6 +228,7 @@ class Engine {
 		// prevent IndexOutOfBoundsException on input-less devices
 		int inputChannels = this.inputDevice >= 0 ?
 			this.synth.getAudioDeviceManager().getMaxInputChannels(this.inputDevice) : 0;
+		// TODO suppress Mac Portaudio stdout
 		this.synth.start(this.sampleRate,
 				this.inputDevice, inputChannels,
 				this.outputDevice, this.synth.getAudioDeviceManager().getMaxOutputChannels(this.outputDevice));
@@ -255,7 +271,8 @@ class Engine {
 	}
 
 	private void probeDeviceOutputLine(int deviceId, int sampleRate) throws LineUnavailableException {
-		// based on https://github.com/philburk/jsyn/blob/06f9a9a4d6aa4ddabde81f77878826a62e5d79ab/src/main/java/com/jsyn/devices/javasound/JavaSoundAudioDevice.java#L141-L174
+		// based on 
+		// https://github.com/philburk/jsyn/blob/06f9a9a4d6aa4ddabde81f77878826a62e5d79ab/src/main/java/com/jsyn/devices/javasound/JavaSoundAudioDevice.java#L141-L174
 		// TODO actually call manager.createOutputStream(deviceId, this.sampleRate) 
 		// (hiding stdout) to avoid strange channel numbering weirdness
 		DataLine.Info info = new DataLine.Info(SourceDataLine.class, new AudioFormat(sampleRate, 16, 2, true, false));
@@ -267,42 +284,76 @@ class Engine {
 		line.close();
 	}
 
+	/**
+	 * After calling this method, the synth is running.
+	 * @param deviceId device index, or -1 to select/find an appropriate stereo 
+	 * output device
+	 */
 	protected int selectOutputDevice(int deviceId) {
-		if (this.isValidDeviceId(deviceId)) {
+		if (deviceId == -1) {
+			// if the default device does not have a stereo output, loop through
+			for (int i : IntStream.concat(
+						IntStream.of(this.synth.getAudioDeviceManager().getDefaultOutputDeviceID()),
+						IntStream.range(0, this.synth.getAudioDeviceManager().getDeviceCount())).toArray()) {
+				try {
+					return this.selectOutputDevice(i);
+				} catch (RuntimeException e) {
+					// e.printStackTrace();
+				}
+			}
+			throw new RuntimeException("Could not find any supported audio devices with a stereo output");
+			// the available devices and just select the first one?
+			// if (this.outputDevice == -1) {
+			// return;
+			// }
+			// this.selectInputDevice(this.synth.getAudioDeviceManager().getDefaultInputDeviceID());
+			// if (this.inputDevice == -1) {
+			// Engine.printWarning("could not find any sound devices with input channels, you won't be able to use the AudioIn class");
+			// }
+		} else if (!this.isValidDeviceId(deviceId) || this.outputDevice == deviceId) {
+			return this.outputDevice;
+		}
+
+		// JPortAudioDevice seems to throw IllegalArgumentException no matter what 
+		// you probe it with, so don't even try
+		if (!this.isUsingPortAudio()) {
 			// check for a working line first (since using PortAudio might change the 
 			// number of available channels)
 			try {
 				this.probeDeviceOutputLine(deviceId, this.sampleRate);
 			} catch (LineUnavailableException e) {
-				// if this fails then we need to get the name of the old output device 
-				// and re-select it on the new device
+				// try portaudio access to the same device -- need get the name of the 
+				// old output device and re-select it on the new device manager
 				String targetDeviceName = this.getDeviceName(deviceId);
-				// this might replace this.synth
-				if (!this.usePortAudio(true)) {
-					// hopeless
+				try {
+					this.usePortAudio(true);
+				} catch (RuntimeException ee) {
 					throw new RuntimeException(e);
 				}
-				Engine.printMessage("The selected output device did not work with the default driver, automatically switched to PortAudio.");
+				// this might replace this.synth
+				Engine.printMessage("Output device '" + targetDeviceName + "' did not work with the default driver, automatically switched to PortAudio.");
 				int newDeviceIdForOldDevice = this.synth.getAudioDeviceManager().getDefaultOutputDeviceID();
 				try {
+					// TODO also loop through candidates
 					newDeviceIdForOldDevice = this.getDeviceIdByName(targetDeviceName, true);
 					if (newDeviceIdForOldDevice != deviceId) {
 						Engine.printMessage("Note that the device id of '" + targetDeviceName + "' has changed from " + deviceId + " to " + newDeviceIdForOldDevice + ".");
 						Engine.printMessage("If output is working as expected, you can safely ignore this message.");
-						Engine.printMessage("If something is awry, check the output of Sound.list() *after* the call to selectOutputDevice()");
+						Engine.printMessage("If something is awry, check the output of Sound.list() *after* the call to Sound.selectOutputDevice()");
 					}
 				} catch (RuntimeException ee) {
 					// probably a generic device name like 'Primary Sound Device'
 					Engine.printMessage("Switched to new default output device '" + this.getDeviceName(newDeviceIdForOldDevice) + "'.");
 				}
-				deviceId = newDeviceIdForOldDevice;
+				// recursive fun
+				return this.selectOutputDevice(newDeviceIdForOldDevice);
 			}
-			if (this.checkDeviceHasOutputs(deviceId)) {
-				this.outputDevice = deviceId;
-				this.startSynth();
-			} else {
-				Engine.printError("audio device '" + this.getDeviceName(deviceId) + "' has no stereo output channel");
-			}
+		}
+		if (this.checkDeviceHasOutputs(deviceId)) {
+			this.outputDevice = deviceId;
+			this.startSynth();
+		} else {
+			Engine.printError("audio device '" + this.getDeviceName(deviceId) + "' has no stereo output channel");
 		}
 		return this.outputDevice;
 	}

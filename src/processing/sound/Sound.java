@@ -82,8 +82,7 @@ public class Sound {
 	 * @return an array giving the names of all audio devices available on this
 	 *         computer
 	 * @webref Configuration:Sound
-	 * @webBrief Print and return information on available audio devices and their 
-	 * number of input/output channels.
+	 * @webBrief Shows information about available audio devices
 	 */
 	public static String[] list(String filter) {
 		String[] deviceNames = Sound.deviceNames();

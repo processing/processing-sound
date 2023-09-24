@@ -75,7 +75,16 @@ public abstract class MultiChannel {
 	 * @see Sound#list()
 	 */
 	public static boolean usePortAudio() {
-		return Engine.getEngine().usePortAudio(true);
+		Engine engine = Engine.getEngine(null, true);
+		try {
+			if (engine.usePortAudio(true)) {
+				engine.selectOutputDevice(-1);
+			}
+			return engine.isUsingPortAudio();
+		} catch (RuntimeException e) {
+			Engine.printError(e.getMessage());
+		}
+		return engine.isUsingPortAudio();
 	}
 
 }
