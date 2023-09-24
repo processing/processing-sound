@@ -262,14 +262,14 @@ public class AudioSample extends SoundObject {
 	}
 
 	/**
-	 * Jump to a specific position in the audiosample while continuing to play (or starting to play if it wasn't playing already).
-	 * 
-	 * @param time
-	 *            position to jump to, in seconds.
+	 * Jump to a specific position in the audiosample while continuing to play (or 
+	 * starting to play if it wasn't playing already).
+	 *
+	 * @param time position to jump to, in seconds
 	 * @see AudioSample#cue(float)
 	 * @see AudioSample#play()
 	 * @webref Sampling:AudioSample
-	 * @webBrief Jump to a specific position in the audiosample while continuing to play (or starting to play if it wasn't playing already).
+	 * @webBrief Jumps to a specific position in the audio sample.
 	 **/
 	public void jump(float time) {
 		// FIXME this currently only works for simply *playing* files, if the
@@ -327,27 +327,25 @@ public class AudioSample extends SoundObject {
 	private void loopInternal(int startFrame, int numFrames, int numLoops) {
 		// always use current sample player
 		this.stop();
+		super.play(); // adds the player
 		this.setStartFrameCountOffset();
 		this.startFrame = startFrame;
 		QueueDataCommand cmd = this.player.dataQueue.createQueueDataCommand(this.sample, startFrame, numFrames);
 		// TODO setAutoStop(true) ?
-		// TODO setImmadiate(true) ?
+		// TODO setImmediate(true) ?
 		cmd.setCallback(new PlaybackFinishedCallback());
 		// TODO how to loop indefinitely??
-		if (numLoops > 1) {
-			// how many times it's *repeated* after the first time
-			cmd.setNumLoops(numLoops - 1);
-		} else {
-			// TODO this.player.dataQueue.queueLoop(this.sample, startFrame, 
-			// numFrames);
-		}
+		// how many times it's *repeated* after the first time
+		// any negative number makes an infinite loop
+		cmd.setNumLoops(numLoops - 1);
+		// TODO this.player.dataQueue.queueLoop(this.sample, startFrame, numFrames);
 		this.player.getSynthesizer().queueCommand(cmd);
 		this.isPlayingAtLeastUntil = System.currentTimeMillis() + 50;
 		this.isPlaying = true;
 	}
 
 	private void loopInternal(int startFrame, int numFrames) {
-		this.loopInternal(startFrame, numFrames, 0);
+		this.loopInternal(startFrame, numFrames, -1);
 	}
 
 	/*
@@ -440,7 +438,6 @@ public class AudioSample extends SoundObject {
 			stop();
 		}
 		public void looped(QueueDataEvent event) {
-			System.out.println("loop");
 		}
 		public void started(QueueDataEvent event) {
 		}
