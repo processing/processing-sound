@@ -21,6 +21,7 @@ import com.jsyn.Synthesizer;
 import com.jsyn.devices.AudioDeviceFactory;
 import com.jsyn.devices.AudioDeviceManager;
 import com.jsyn.devices.AudioDeviceOutputStream;
+import com.jsyn.devices.javasound.JavaSoundAudioDevice;
 import com.jsyn.devices.jportaudio.JPortAudioDevice;
 import com.jsyn.unitgen.ChannelOut;
 import com.jsyn.unitgen.Multiply;
@@ -314,9 +315,14 @@ class Engine {
 			return this.outputDevice;
 		}
 
-		// JPortAudioDevice seems to throw IllegalArgumentException no matter what 
-		// you probe it with, so don't even try
-		if (!this.isUsingPortAudio()) {
+		// if the synth is still JavaSound-based, probe the new output device early 
+		// to provoke a LineUnavailableException, in which case we should try to 
+		// switch to PortAudio.
+		// there is no point probing the channel on a JPortAudioDevice (which seems 
+		// to throw IllegalArgumentException no matter what you probe it with), or 
+		// the JSynAndroidAudioDeviceManager (which does not support the JavaSound 
+		// clases used for probing)
+		if (this.synth.getAudioDeviceManager() instanceof JavaSoundAudioDevice) {
 			// check for a working line first (since using PortAudio might change the 
 			// number of available channels)
 			try {
