@@ -137,6 +137,19 @@
 		<copy file="library.properties" toFile="../sound.txt" />
 	</target>
 
+	<target name="dist-android" depends="prepare-dist" description="Build a Sound library zip for Android mode">
+		<zip destfile="../sound-android.zip">
+			<zipfileset dir="." prefix="sound">
+				<patternset refid="dist.files" />
+				<!-- don't add any native library directories, see https://github.com/processing/processing-android/issues/738 -->
+				<exclude name="${lib}/*-*/*" />
+				<!-- also drop unnecessary jars to avoid duplicate class errors -->
+				<exclude name="${lib}/*spi*" />
+				<exclude name="${lib}/jportaudio.jar" />
+			</zipfileset>
+		</zip>
+	</target>
+
 	<target name="dist-slim" depends="prepare-dist" description="Build a reduced size Sound library zip (omitting javadoc documentation and examples with audio files)">
 		<zip destfile="../sound-slim.zip">
 			<zipfileset dir="." prefix="sound">
