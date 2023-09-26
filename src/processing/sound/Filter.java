@@ -5,8 +5,11 @@ import com.jsyn.unitgen.FilterBiquadCommon;
 
 import processing.core.PApplet;
 
-// common superclass for JSyn filters that have a 'Q' unitport
-abstract class Filter<E extends FilterBiquadCommon> extends Effect<E> {
+/**
+ * Common superclass for JSyn filters that have a 'Q' unitport
+ * @webref Effects:Filter
+ */
+public abstract class Filter<E extends FilterBiquadCommon> extends Effect<E> {
 
 	public Filter(PApplet parent) {
 		super(parent);
@@ -14,7 +17,7 @@ abstract class Filter<E extends FilterBiquadCommon> extends Effect<E> {
 
 	/**
 	 * Sets the resonance (or 'Q factor') of this filter. Increasing Q increases 
-	 * the Resonance of the filter at its cutoff frequency. Defaults to 1.
+	 * the resonance of the filter at its cutoff frequency. Defaults to 1.
 	 * @webref Effects:Filter
 	 * @webBrief Sets the resonance (or 'Q factor') of this filter.
 	 * @param q the desired Q factor, a value between 0.1 and 10

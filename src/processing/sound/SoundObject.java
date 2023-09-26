@@ -55,7 +55,7 @@ public abstract class SoundObject {
 	 * @param amp
 	 *            A float value between 0.0 (complete silence) and 1.0 (full volume)
 	 *            controlling the amplitude/volume of this sound.
-	 * @webref SoundObject:SoundObject
+	 * @webref SoundObject
 	 **/
 	public void amp(float amp) {
 		if (Engine.checkAmp(amp)) {
@@ -82,7 +82,7 @@ public abstract class SoundObject {
 	 * @param pos
 	 *            The panoramic position of this sound unit as a float from -1.0
 	 *            (left) to 1.0 (right).
-	 * @webref SoundObject:SoundObject
+	 * @webref SoundObject
 	 **/
 	public void pan(float pos) {
 		if (this.circuit.processor == null) {

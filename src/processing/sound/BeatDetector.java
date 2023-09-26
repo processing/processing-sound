@@ -43,14 +43,13 @@ public class BeatDetector extends Analyzer {
   }
 
   /**
-   * Returns whether or not the current moment of audio contains a beat or not.
-   * A "beat" is defined as a spike in the energy of the audio signal — it may
+   * Returns <code>true</code> if the current moment of the audio signal 
+   * contains a beat, <code>false</code> otherwise.<br />
+   * A "beat" is defined as a spike in the energy of the audio signal - it may
    * or may not coincide exactly with a musical beat.
    *
    * @webref Analysis:BeatDetector
    * @webBrief Returns whether or not the current moment of audio contains a beat or not.
-   *
-   * @return True if the audio signal currently contains a beat, false otherwise.
    */
   public boolean isBeat() {
     return this.detector.current.getValue() == 1;

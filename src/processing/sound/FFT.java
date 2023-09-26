@@ -26,9 +26,9 @@ public class FFT extends Analyzer {
 	 * @param parent
 	 *            typically use "this"
 	 * @param bands
-	 *            number of frequency bands for the FFT as an integer (default 512).
-	 *            This parameter needs to be a power of 2 (e.g. 16, 32, 64, 128,
-	 *            ...).
+	 *            number of frequency bands for the FFT as an integer. This 
+	 *            parameter needs to be a power of 2 (e.g. 16, 32, 64, 128,
+	 *            ...). The default is 512.
 	 */
 	public FFT(PApplet parent, int bands) {
 		super(parent);
@@ -59,7 +59,7 @@ public class FFT extends Analyzer {
 	}
 
 	/**
-	 * Calculates the current frequency spectrum from the input source and returns
+	 * Calculates the current frequency spectrum of the input source and returns
 	 * it as an array with as many elements as frequency bands.
 	 *
 	 * @param value
@@ -68,7 +68,8 @@ public class FFT extends Analyzer {
 	 * @return The current frequency spectrum of the input source. The array has as
 	 *         many elements as this FFT analyzer's number of frequency bands.
 	 * @webref Analysis:FFT
-	 * @webBrief Calculates the current frequency spectrum and returns it as an array with as many elements as frequency bands.
+	 * @webBrief Calculates the current frequency spectrum of the audio input 
+	 * signal.
 	 **/
 	public float[] analyze(float[] value) {
 		if (this.input == null) {
@@ -79,8 +80,8 @@ public class FFT extends Analyzer {
 	}
 
 	/**
-	 * Calculates the frequency spectrum of the given sample and returns an array of magnitudes, one
-	 * for each frequency band.
+	 * Calculates the frequency spectrum of the given audio sample and returns an 
+	 * array of magnitudes, one for each frequency band.
 	 *
 	 * This version is intended to be used in non-real time processing, particularly when you are
 	 * creating an animation in non-real time and want to get the FFT for a particular chunk of an audio sample.
@@ -95,7 +96,7 @@ public class FFT extends Analyzer {
 	 * @return The current frequency spectrum of the input source. The array has as
 	 *         many elements as this FFT analyzer's number of frequency bands.
 	 * @webref Analysis:FFT
-	 * @webBrief Calculates the frequency spectrum of the given sample, returning an array of magnitudes.
+	 * @webBrief Calculates the frequency spectrum of the given audio sample.
 	 **/
 	public float[] analyzeSample(float[] sample, int numBands) {
 		float[] target = new float[numBands];

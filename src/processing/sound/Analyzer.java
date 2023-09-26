@@ -8,7 +8,7 @@ import processing.core.PApplet;
  * Common superclass of all audio analysis classes
  * @webref Analysis
  */
-abstract class Analyzer {
+public abstract class Analyzer {
 
 	protected SoundObject input;
 
