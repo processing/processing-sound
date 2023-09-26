@@ -5,13 +5,17 @@ import com.jsyn.unitgen.FilterAllPass;
 import processing.core.PApplet;
 
 /**
- * This is a all pass filter.
- * For signals processed, all frequencies hold the same amplitude 
- * but have their phase relationship modified using a delayline of one sample.
- * 	>> y(k) = -z * x(k) + x(k - 1) + z * y(k - 1)
- * Where: y is the output, x is the input, z is the gain coefficient, and k is the signal.
+ * This is an all pass filter. For signals processed, all frequencies hold the 
+ * same amplitude but have their phase relationship modified using a delayline 
+ * of one sample,<br />
+ * <br />
+ * <code>y(k) = -z * x(k) + x(k - 1) + z * y(k - 1)</code><br />
+ * <br />
+ * where <code>y</code> is the output, <code>x</code> is the input, 
+ * <code>z</code> is the gain coefficient, and <code>k</code> is the signal.
  * @webref Effects:AllPass
- * @webBrief This is a all pass filter. It outputs all frequencies at the same amplitude but changes their phase relationship.
+ * @webBrief Outputs all input frequencies at the same amplitude but changes 
+ * their phase relationship.
  * @param parent PApplet: typically use "this"
  **/
 public class AllPass extends Effect<FilterAllPass> {
