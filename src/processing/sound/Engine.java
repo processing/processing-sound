@@ -35,17 +35,6 @@ import processing.core.PApplet;
  */
 class Engine {
 
-	// static {
-	// 	try {
-	// 		// TODO PRINT INSTRUCTIONS for going to System Preferences > Security & 
-	// 		// Privacy > General to 'Allow' libjportaudio.jnilib
-	// 		// System.loadLibrary("libjportaudio");
-	// 		System.loadLibrary("portaudio_x64");
-	// 	} catch (UnsatisfiedLinkError e) {
-	// 		// System.loadLibrary("jportaudio_0_1_0");
-	// 	}
-	// }
-
 	private static AudioDeviceManager createDefaultAudioDeviceManager() {
 		try {
 			Class.forName("javax.sound.sampled.AudioSystem");
@@ -57,13 +46,28 @@ class Engine {
 	}
 
 	private static AudioDeviceManager createAudioDeviceManager(boolean portAudio) {
+		if (!portAudio) {
+			return Engine.createDefaultAudioDeviceManager();
+		}
+		// hide JPortAudio init messages from console
 		PrintStream originalStream = System.out;
 		System.setOut(new PrintStream(new OutputStream(){
 			public void write(int b) { }
 		}));
+		// JPortAudio takes care of loading all native libraries -- except the 
+		// dependent portaudio dll on Windows for some reason. try loading it no 
+		// matter what platform we're on and ignore any errors, if it's really not 
+		// supported on this system then the JPortAudio device further down will 
+		// blow up anyway
 		try {
-			return portAudio ? new JPortAudioDevice() : Engine.createDefaultAudioDeviceManager();
+			System.loadLibrary("portaudio_x64");
 		} catch (UnsatisfiedLinkError e) {
+		}
+
+		try {
+			return new JPortAudioDevice();
+		} catch (UnsatisfiedLinkError e) {
+			e.printStackTrace();
 			throw new RuntimeException("PortAudio is not supported on this operating system/architecture");
 		} finally {
 			System.setOut(originalStream);
@@ -321,11 +325,13 @@ class Engine {
 		// there is no point probing the channel on a JPortAudioDevice (which seems 
 		// to throw IllegalArgumentException no matter what you probe it with), or 
 		// the JSynAndroidAudioDeviceManager (which does not support the JavaSound 
-		// clases used for probing)
+		// classes used for probing)
 		if (this.synth.getAudioDeviceManager() instanceof JavaSoundAudioDevice) {
 			// check for a working line first (since using PortAudio might change the 
 			// number of available channels)
 			try {
+				// TODO does this also work as expected if the device is currently 
+				// listed as having 0 output channels?
 				this.probeDeviceOutputLine(deviceId, this.sampleRate);
 			} catch (LineUnavailableException e) {
 				// try portaudio access to the same device -- need get the name of the 
