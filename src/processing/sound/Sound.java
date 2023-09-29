@@ -240,32 +240,41 @@ public class Sound {
 	}
 
 	/**
-	 * Prints information about the sound library's current memory and CPU usage to the console.
-	 * @webref Configuration:Sound
-	 */
-	public static void status() {
-		Engine.printMessage(String.format("%.2f", Engine.getEngine().synth.getCurrentTime()) + " seconds elapsed, generated " + Engine.getEngine().synth.getFrameCount() + " frames (framerate " + Engine.getEngine().synth.getFrameRate() + ")");
-		Engine.printMessage("  CPU usage: " + Math.round(100 * Engine.getEngine().synth.getUsage()) + "%");
-		Engine.printMessage("  elements in synthesizer network: " + Engine.getEngine().addedUnits.size());
-		long nSamples = 0;
-		for (FloatSample s : SoundFile.SAMPLECACHE.values()) {
-			nSamples += s.getNumFrames() * s.getChannelsPerFrame();
-		}
-		Engine.printMessage("  decoded audio samples held in cache: " + SoundFile.SAMPLECACHE.size() + " (" + nSamples + " frames total)");
-		// might return something useful later
-		// Sound.printConnections();
-	}
-
-	public static void printConnections() {
-		((SynthesisEngine) Engine.getEngine().synth).printConnections();
-	}
-
-	/**
 	 * Direct access to the underlying JSyn SynthesisEngine object. Use at your 
 	 * own risk.
 	 * @see com.jsyn.engine.SynthesisEngine
 	 */
 	public static SynthesisEngine getSynthesisEngine() {
 		return (SynthesisEngine) Engine.getEngine().synth;
+	}
+
+	/**
+	 * Prints information about the sound library's current memory and CPU usage 
+	 * to the console.
+	 * @webBrief Prints information about the sound library's current memory and 
+	 * CPU usage
+	 * @webref Configuration:Sound
+	 */
+	public static void status() {
+		SynthesisEngine e = Sound.getSynthesisEngine();
+		Engine.println();
+		Engine.printMessage("synthesis has been running for " + String.format("%.2f", e.getCurrentTime()) + " seconds, generated " + e.getFrameCount() + " frames (framerate " + e.getFrameRate() + ")");
+		Engine.println("  audio devices used by " + e.getAudioDeviceManager().getName() + ":");
+		if (Engine.getEngine().inputDevice != -1) {
+			Engine.println("    input from '" + e.getAudioDeviceManager().getDeviceName(Engine.getEngine().inputDevice) + "': " + e.getAudioDeviceManager().getMaxInputChannels(Engine.getEngine().inputDevice) + " channels, latency " + e.getInputLatency() + "ms");
+		}
+		Engine.println("    output on '" + e.getAudioDeviceManager().getDeviceName(Engine.getEngine().outputDevice) + "': " + e.getAudioDeviceManager().getMaxOutputChannels(Engine.getEngine().outputDevice) + " channels, latency " + e.getOutputLatency() + "ms");
+		Engine.println("\n  elements in synthesizer network: " + Engine.getEngine().addedUnits.size());
+		long nSamples = 0;
+		for (FloatSample s : SoundFile.SAMPLECACHE.values()) {
+			nSamples += s.getNumFrames() * s.getChannelsPerFrame();
+		}
+		Engine.println("  decoded audio samples held in cache: " + SoundFile.SAMPLECACHE.size() + " (" + nSamples + " frames total)");
+		Engine.println("  CPU usage: " + Math.round(100 * e.getUsage()) + "%");
+		Engine.println();
+	}
+
+	public static void printConnections() {
+		Sound.getSynthesisEngine().printConnections();
 	}
 }

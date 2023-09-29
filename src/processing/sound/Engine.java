@@ -67,7 +67,7 @@ class Engine {
 		try {
 			return new JPortAudioDevice();
 		} catch (UnsatisfiedLinkError e) {
-			e.printStackTrace();
+			// e.printStackTrace();
 			throw new RuntimeException("PortAudio is not supported on this operating system/architecture");
 		} finally {
 			System.setOut(originalStream);
@@ -550,16 +550,24 @@ class Engine {
 		return true;
 	}
 
+	protected static void println(String message) {
+		PApplet.println(message);
+	}
+
+	protected static void println() {
+		Engine.println("");
+	}
+
 	protected static void printMessage(String message) {
-		PApplet.println("Sound library: " + message);
+		Engine.println("Sound library: " + message);
 	}
 
 	protected static void printWarning(String message) {
-		PApplet.println("Sound library warning: " + message);
+		Engine.println("Sound library warning: " + message);
 	}
 
 	protected static void printError(String message) {
-		PApplet.println("Sound library error: " + message);
+		Engine.println("Sound library error: " + message);
 	}
 
 }
