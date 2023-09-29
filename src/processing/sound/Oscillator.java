@@ -20,14 +20,22 @@ public abstract class Oscillator<JSynOscillator extends UnitOscillator> extends 
 	}
 
 	/**
-	 * Set the frequency of the oscillator in Hz.
+	 * Sets the frequency of the oscillator.
 	 * @webref Oscillators:Oscillator
-	 * @param freq A floating point value of the oscillator in Hz.
-	 **/
+	 * @param freq the desired oscillator frequency in Hertz
+	 */
 	public void freq(float freq) {
 		// TODO check positive?
 		this.oscillator.frequency.set(freq);
 	}
+	
+ /*
+	* Modulates the frequency of this oscillator using another (low frequency) 
+	* oscillator.
+	public void modulateFreq(SoundObject modulator) {
+		this.oscillator.frequency.connect(modulator.circuit.source);
+	}
+	*/
 
 	public void play() {
 		super.play();
@@ -39,6 +47,10 @@ public abstract class Oscillator<JSynOscillator extends UnitOscillator> extends 
 		this.play();
 	}
 
+	/**
+	 * @deprecated
+	 * @nowebref
+	 */
 	public void play(float freq, float amp, float add) {
 		this.add(add);
 		this.play(freq, amp);
@@ -71,6 +83,7 @@ public abstract class Oscillator<JSynOscillator extends UnitOscillator> extends 
 
 	/**
 	 * @deprecated
+	 * @nowebref
 	 */
 	public void set(float freq, float amp, float add, float pos) {
 		this.freq(freq);

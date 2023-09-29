@@ -12,8 +12,8 @@ public abstract class MultiChannel {
 	/**
 	 * Controls which output channel sounds will be played back to.
 	 *
-	 * After selecting a new output channel, all sounds that start `play()`ing will
-	 * be sent to that channel.
+	 * After selecting a new output channel, all sounds that start `play()`ing 
+	 * will be sent to that channel.
 	 * 
 	 * @param channel the channel number to send sounds to
 	 * @return the channel number that sounds will be sent to
@@ -28,6 +28,29 @@ public abstract class MultiChannel {
 
 	public static int activeChannel() {
 		return Engine.getEngine().outputChannel;
+	}
+
+	/**
+	 * Connect a SoundObject to the given output channel.
+	 *
+	 * Use this only for SoundObjects that are already playing back on some 
+	 * channel, which you want to have playing back on another channel at the same 
+	 * time.
+	 */
+	public static void connectToOutput(SoundObject o, int channel) {
+		Engine.getEngine().connectToOutput(channel, o.circuit);
+	}
+
+	/**
+	 * Disconnect a SoundObject from the given output channel.
+	 *
+	 * Only use on SoundObjects that were previously connected using 
+	 * connectToOutput()
+	 *
+	 * @see connectToOutput()
+	 */
+	public static void disconnectFromOutput(SoundObject o, int channel) {
+		Engine.getEngine().disconnectFromOutput(channel, o.circuit);
 	}
 
 	/**

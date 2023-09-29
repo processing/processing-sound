@@ -508,6 +508,10 @@ class Engine {
 		source.getOutput().connect(part, this.volume[channel].inputA, 0);
 	}
 
+	protected void disconnectFromOutput(int channel, UnitSource source) {
+		this.disconnectFromOutput(channel, source, 0);
+	}
+
 	protected void disconnectFromOutput(int channel, UnitSource source, int part) {
 		source.getOutput().disconnect(part, this.volume[channel].inputA, 0);
 	}
