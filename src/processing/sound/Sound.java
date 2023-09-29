@@ -261,10 +261,10 @@ public class Sound {
 		Engine.printMessage("synthesis has been running for " + String.format("%.2f", e.getCurrentTime()) + " seconds, generated " + e.getFrameCount() + " frames (framerate " + e.getFrameRate() + ")");
 		Engine.println("  audio devices used by " + e.getAudioDeviceManager().getName() + ":");
 		if (Engine.getEngine().inputDevice != -1) {
-			Engine.println("    input from '" + e.getAudioDeviceManager().getDeviceName(Engine.getEngine().inputDevice) + "': " + e.getAudioDeviceManager().getMaxInputChannels(Engine.getEngine().inputDevice) + " channels, latency " + e.getInputLatency() + "ms");
+			Engine.println("    input from '" + e.getAudioDeviceManager().getDeviceName(Engine.getEngine().inputDevice) + "': " + e.getAudioDeviceManager().getMaxInputChannels(Engine.getEngine().inputDevice) + " channels, latency " + Math.round(1000*e.getInputLatency()) + "ms");
 		}
-		Engine.println("    output on '" + e.getAudioDeviceManager().getDeviceName(Engine.getEngine().outputDevice) + "': " + e.getAudioDeviceManager().getMaxOutputChannels(Engine.getEngine().outputDevice) + " channels, latency " + e.getOutputLatency() + "ms");
-		Engine.println("\n  elements in synthesizer network: " + Engine.getEngine().addedUnits.size());
+		Engine.println("    output on '" + e.getAudioDeviceManager().getDeviceName(Engine.getEngine().outputDevice) + "': " + e.getAudioDeviceManager().getMaxOutputChannels(Engine.getEngine().outputDevice) + " channels, latency " + Math.round(1000*e.getOutputLatency()) + "ms");
+		Engine.println("\n  nodes in synthesizer network: " + Engine.getEngine().addedUnits.size());
 		long nSamples = 0;
 		for (FloatSample s : SoundFile.SAMPLECACHE.values()) {
 			nSamples += s.getNumFrames() * s.getChannelsPerFrame();

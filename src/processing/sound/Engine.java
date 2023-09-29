@@ -47,7 +47,13 @@ class Engine {
 
 	private static AudioDeviceManager createAudioDeviceManager(boolean portAudio) {
 		if (!portAudio) {
-			return Engine.createDefaultAudioDeviceManager();
+			AudioDeviceManager a = Engine.createDefaultAudioDeviceManager();
+			if (a.getDefaultOutputDeviceID() != -1) {
+				return a;
+			}
+			// if the default device manager lists no output devices, go straight for 
+			// portaudio
+			Engine.printMessage("Didn't find any output devices with the default driver, trying PortAudio...");
 		}
 		// hide JPortAudio init messages from console
 		PrintStream originalStream = System.out;
@@ -149,6 +155,7 @@ class Engine {
 		// this method starts the synthesizer -- if the output fails, it might 
 		// create a new PortAudio synth on the fly and try to start that
 		this.selectOutputDevice(outputDevice);
+		this.selectInputDevice(-1);
 	}
 	
 	private void createSynth(AudioDeviceManager deviceManager) {
@@ -187,6 +194,7 @@ class Engine {
 			this.createSynth(Engine.createAudioDeviceManager(portAudio));
 			// if this was called by the user (from the MultiChannel class), its their 
 			// responsibilit to select output device and start the synth!
+			this.inputDevice = -1;
 		}
 		return this.isUsingPortAudio();
 	}
@@ -214,6 +222,9 @@ class Engine {
 	}
 
 	private void startSynth() {
+		// it looks like some synth errors (such as Blocking API not implemented on 
+		// Windows PortAudio) are unrecoverable, so it would actually be good to 
+		// *always* purge the entire synth and not just stop/start it...
 		this.stopSynth();
 
 		this.output = new ChannelOut[this.synth.getAudioDeviceManager().getMaxOutputChannels(this.outputDevice)];
@@ -233,7 +244,6 @@ class Engine {
 		// prevent IndexOutOfBoundsException on input-less devices
 		int inputChannels = this.inputDevice >= 0 ?
 			this.synth.getAudioDeviceManager().getMaxInputChannels(this.inputDevice) : 0;
-		// TODO suppress Mac Portaudio stdout
 		this.synth.start(this.sampleRate,
 				this.inputDevice, inputChannels,
 				this.outputDevice, this.synth.getAudioDeviceManager().getMaxOutputChannels(this.outputDevice));
@@ -259,9 +269,29 @@ class Engine {
 	}
 
 	protected int selectInputDevice(int deviceId) {
-		if (this.isValidDeviceId(deviceId)) {
+		if (deviceId == -1) {
+			int defaultInputDevice = this.synth.getAudioDeviceManager().getDefaultInputDeviceID();
+			if (defaultInputDevice == -1) {
+				Engine.printWarning("Did not find any sound devices with input channels, you won't be able to use the AudioIn class");
+			} else {
+				// if the default device is a WDM-KS binding better not touch it, 
+				// selecting it might ruin the synth object for good
+				if (!this.getDeviceName(defaultInputDevice).contains("WDM-KS")) {
+					// otherwise, give it a shot
+					try {
+						this.selectInputDevice(this.synth.getAudioDeviceManager().getDefaultInputDeviceID());
+					} catch (RuntimeException e) {
+						Engine.printWarning("failed to initialise default input device '" + this.getDeviceName(deviceId) + "' (" + e.getMessage() + ")");
+						this.inputDevice = -1;
+						this.startSynth();
+					}
+				}
+			}
+		} else if (this.isValidDeviceId(deviceId)) {
 			if (this.checkDeviceHasInputs(deviceId)) {
+				int oldInputDevice = this.inputDevice;
 				this.inputDevice = deviceId;
+				// might throw a RuntimeException (see above)
 				this.startSynth();
 			} else {
 				Engine.printError("audio device #" + deviceId + " has no input channels");
@@ -290,32 +320,37 @@ class Engine {
 	}
 
 	/**
+	 * Go through the list of candidate device ids until the first one that works
+	 * @throws RuntimeException if none of the output devices work
+	 */
+	protected int selectOutputDevice(int[] candidates) {
+		for (int i : candidates) {
+			try {
+				return this.selectOutputDevice(i);
+			} catch (RuntimeException e) {
+			}
+		}
+		throw new RuntimeException("failed to play to any of the output devices");
+	}
+
+	/**
 	 * After calling this method, the synth is running.
 	 * @param deviceId device index, or -1 to select/find an appropriate stereo 
 	 * output device
 	 */
 	protected int selectOutputDevice(int deviceId) {
 		if (deviceId == -1) {
-			// if the default device does not have a stereo output, loop through
-			for (int i : IntStream.concat(
-						IntStream.of(this.synth.getAudioDeviceManager().getDefaultOutputDeviceID()),
-						IntStream.range(0, this.synth.getAudioDeviceManager().getDeviceCount())).toArray()) {
-				try {
-					return this.selectOutputDevice(i);
-				} catch (RuntimeException e) {
-					// e.printStackTrace();
-				}
+			// if the default device does not work, loop through
+			try {
+				return this.selectOutputDevice(IntStream.concat(
+							IntStream.of(this.synth.getAudioDeviceManager().getDefaultOutputDeviceID()),
+							IntStream.range(0, this.synth.getAudioDeviceManager().getDeviceCount())).toArray());
+			} catch (RuntimeException e) {
+				// fatal
+				throw new RuntimeException("Could not find any supported audio devices with a stereo output");
 			}
-			throw new RuntimeException("Could not find any supported audio devices with a stereo output");
-			// the available devices and just select the first one?
-			// if (this.outputDevice == -1) {
-			// return;
-			// }
-			// this.selectInputDevice(this.synth.getAudioDeviceManager().getDefaultInputDeviceID());
-			// if (this.inputDevice == -1) {
-			// Engine.printWarning("could not find any sound devices with input channels, you won't be able to use the AudioIn class");
-			// }
 		} else if (!this.isValidDeviceId(deviceId) || this.outputDevice == deviceId) {
+			// prints an error or does nothing
 			return this.outputDevice;
 		}
 
@@ -332,7 +367,11 @@ class Engine {
 			try {
 				// TODO does this also work as expected if the device is currently 
 				// listed as having 0 output channels?
+				// if (this.synth.getAudioDeviceManager().getMaxOutputChannels(deviceId) == 0) {
+				// 	 Engine.printMessage(...);
+				// } else {
 				this.probeDeviceOutputLine(deviceId, this.sampleRate);
+				// all is well, move along to the bottom...
 			} catch (LineUnavailableException e) {
 				// try portaudio access to the same device -- need get the name of the 
 				// old output device and re-select it on the new device manager
@@ -343,7 +382,7 @@ class Engine {
 					throw new RuntimeException(e);
 				}
 				// this might replace this.synth
-				Engine.printMessage("Output device '" + targetDeviceName + "' did not work with the default driver, automatically switched to PortAudio.");
+				Engine.printMessage("Output device '" + targetDeviceName + "' did not work with the default driver, switching to PortAudio...");
 				int newDeviceIdForOldDevice = this.synth.getAudioDeviceManager().getDefaultOutputDeviceID();
 				try {
 					// TODO also loop through candidates
@@ -355,23 +394,25 @@ class Engine {
 					}
 				} catch (RuntimeException ee) {
 					// probably a generic device name like 'Primary Sound Device'
-					Engine.printMessage("Switched to new default output device '" + this.getDeviceName(newDeviceIdForOldDevice) + "'.");
+					Engine.printMessage("Switched to new default output device '" + this.getDeviceName(newDeviceIdForOldDevice) + "'");
 				}
 				// recursive fun
 				return this.selectOutputDevice(newDeviceIdForOldDevice);
 			}
 		}
+
+		// finally made it to the 'normal' output device selection code
 		if (this.checkDeviceHasOutputs(deviceId)) {
 			this.outputDevice = deviceId;
 			this.startSynth();
 		} else {
-			Engine.printError("audio device '" + this.getDeviceName(deviceId) + "' has no stereo output channel");
+			Engine.printWarning("audio device '" + this.getDeviceName(deviceId) + "' has no stereo output channel");
 		}
 		return this.outputDevice;
 	}
 
 	protected String getDeviceName(int deviceId) {
-		return this.synth.getAudioDeviceManager().getDeviceName(deviceId).trim();
+		return this.isValidDeviceId(deviceId) ? this.synth.getAudioDeviceManager().getDeviceName(deviceId).trim() : "";
 	}
 
 	protected int getDeviceIdByName(String deviceName) {

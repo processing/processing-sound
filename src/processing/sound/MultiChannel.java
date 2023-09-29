@@ -78,6 +78,7 @@ public abstract class MultiChannel {
 		Engine engine = Engine.getEngine(null, true);
 		try {
 			if (engine.usePortAudio(true)) {
+				// all good, go for default device
 				engine.selectOutputDevice(-1);
 			}
 			return engine.isUsingPortAudio();
