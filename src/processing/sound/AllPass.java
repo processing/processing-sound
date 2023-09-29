@@ -30,10 +30,11 @@ public class AllPass extends Effect<FilterAllPass> {
 	}
 
 	/**
-	 * Set the gain for the filter.
+	 * Sets the gain for the filter in the range 0.0 - 1.0, where larger values 
+	 * increase phase displacement.
 	 * @webref Effects:AllPass
-	 * @webBrief Set the gain for the filter. Takes float from 0.0 - 1.0 where larger values increase phase displacement.
-	 * @param g Phase displacement as float 0.0 - 1.0
+	 * @webBrief Sets the gain for the filter.
+	 * @param g phase displacement in the range 0.0 - 1.0
 	 **/
 	public void gain(float g) {
 		// Keep the user from throwing bad output signals.

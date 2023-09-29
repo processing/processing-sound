@@ -57,7 +57,7 @@ public abstract class MultiChannel {
 	}
 
 	/**
-	 * Force using PortAudio instead of JavaSound (Windows only).
+	 * Force using PortAudio instead of JavaSound.
 	 *
 	 * Support for 24 bit audio interfaces on Windows requires using the native
 	 * PortAudio bindings instead of the default JavaSound one. The Sound library 
@@ -71,7 +71,7 @@ public abstract class MultiChannel {
 	 * Returns <code>true</code> if PortAudio was successfully loaded.
 	 *
 	 * @webref I/O:MultiChannel
-	 * @webBrief Force using PortAudio instead of JavaSound (Windows only).
+	 * @webBrief Force using PortAudio instead of JavaSound.
 	 * @see Sound#list()
 	 */
 	public static boolean usePortAudio() {

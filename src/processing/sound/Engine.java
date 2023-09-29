@@ -83,7 +83,7 @@ class Engine {
 			// disallowed by system policy at 
 			// java.base/jdk.internal.loader.NativeLibraries.load(Native Method)
 			if (e.getMessage().contains("disallowed")) {
-				throw new RuntimeException("in order to use the PortAudio drivers, you need to give Processing permission to open the PortAudio library file.\n\n============================== ENABLING PORTAUDIO ON MAC OS X ==============================\n\nPlease follow these steps to enable PortAudio (dont worry, you only need to do this once):\n\n  - if you pressed 'Move to Bin' in the previous popup, you will need first need to restore\n    the library file: please find libjportaudio.jnilib in your Bin, right click and select 'Put Back'\n\n  - go to System Preferences > Security & Privacy> General. At the bottom you will see\na message saying that 'libjportaudio.jnilib was blocked'. Press 'Allow Anyway'. When you\nrun this sketch again you should get another popup, just select 'Open' and you're done!\n\n============================================================================================");
+				throw new RuntimeException("in order to use the PortAudio drivers, you need to give Processing permission to open the PortAudio library file.\n\n============================== ENABLING PORTAUDIO ON MAC OS X ==============================\n\nPlease follow these steps to enable PortAudio (dont worry, you only need to do this once):\n\n  - if you pressed 'Move to Bin' in the previous popup, you will need first need to restore the\n    library file: please find libjportaudio.jnilib in your Bin, right click and select 'Put Back'\n\n  - go to System Preferences > Security & Privacy> General. At the bottom you will see\na message saying that 'libjportaudio.jnilib was blocked'. Press 'Allow Anyway'. When you\nrun this sketch again you should get another popup, just select 'Open' and you're done!\n\n============================================================================================");
 			}
 			throw new RuntimeException("PortAudio is not supported on this operating system/architecture");
 		} finally {
@@ -354,6 +354,8 @@ class Engine {
 			// if the default device does not work, loop through
 			try {
 				return this.selectOutputDevice(IntStream.concat(
+							// FIXME sometimes the JPortAudioDevice throws a RuntimeException 
+							// "-1, possibly no available default device"
 							IntStream.of(this.synth.getAudioDeviceManager().getDefaultOutputDeviceID()),
 							IntStream.range(0, this.synth.getAudioDeviceManager().getDeviceCount())).toArray());
 			} catch (RuntimeException e) {
@@ -545,6 +547,10 @@ class Engine {
 	public class Callback {
 		public void dispose() {
 			synth.stop();
+			// TODO suppress shutdown messages on Mac, like:
+			// JPortAudio: 64-bit
+			// requestedFramesPerBuffer = 128, coreAudioBufferSizeFrames = 384
+			// ringBufferSize after = 1024
 		}
 
 		public void pause() {
