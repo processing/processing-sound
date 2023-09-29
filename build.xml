@@ -65,8 +65,7 @@
 			</patternset>
 			<mapper type="flatten"/>
 		</unzip>
-		<!-- the mac libraries need to go into library/ rather than the sub-directory...  -->
-		<unzip src="${lib}/jportaudio_mac_20120904.zip" dest="${lib}/">
+		<unzip src="${lib}/jportaudio_mac_20120904.zip" dest="${lib}/macos-x86_64/">
 			<patternset>
 				<include name="**/*.jnilib" />
 			</patternset>

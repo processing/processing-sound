@@ -73,7 +73,18 @@ class Engine {
 		try {
 			return new JPortAudioDevice();
 		} catch (UnsatisfiedLinkError e) {
-			// e.printStackTrace();
+			// on loading PortAudio the first time on Mac, an exception with the 
+			// following message is thrown:
+			// no suitable image found.  Did find:
+			// ~/Documents/Processing/libraries/sound/library/macos-x86_64/libjportaudio.jnilib: 
+			// code signature in 
+			// (~/Documents/Processing/libraries/sound/library/macos-x86_64/libjportaudio.jnilib) 
+			// not valid for use in process using Library Validation: library load 
+			// disallowed by system policy at 
+			// java.base/jdk.internal.loader.NativeLibraries.load(Native Method)
+			if (e.getMessage().contains("disallowed")) {
+				throw new RuntimeException("in order to use the PortAudio drivers, you need to give Processing permission to open the PortAudio library file.\n\n============================== ENABLING PORTAUDIO ON MAC OS X ==============================\n\nPlease follow these steps to enable PortAudio (dont worry, you only need to do this once):\n\n  - if you pressed 'Move to Bin' in the previous popup, you will need first need to restore\n    the library file: please find libjportaudio.jnilib in your Bin, right click and select 'Put Back'\n\n  - go to System Preferences > Security & Privacy> General. At the bottom you will see\na message saying that 'libjportaudio.jnilib was blocked'. Press 'Allow Anyway'. When you\nrun this sketch again you should get another popup, just select 'Open' and you're done!\n\n============================================================================================");
+			}
 			throw new RuntimeException("PortAudio is not supported on this operating system/architecture");
 		} finally {
 			System.setOut(originalStream);
