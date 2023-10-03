@@ -9,12 +9,15 @@ import processing.core.PApplet;
 /**
  * This is a Waveform analyzer. It returns the waveform of an 
  * audio stream the moment it is queried with the <b>analyze()</b>
- * method.
+ * method.<br/>
+ * Note that by default all sound generators (including microphone capture from
+ * <code>AudioIn</code>) have an amplitude of 1, which means that the values of 
+ * their waveform will be numbers in the range <code>[-0.5, 0.5]</code>.
  * 
  * @author icalvin102
  * 
  * @webref Analysis:Waveform
- * @webBrief This is a Waveform analyzer.
+ * @webBrief Inspects the underlying soundwave of an audio signal.
  **/
 public class Waveform extends Analyzer {
 
