@@ -1,6 +1,7 @@
 package processing.sound;
 
 import com.jsyn.ports.UnitOutputPort;
+import com.softsynth.math.FourierMath;
 
 import processing.core.PApplet;
 
@@ -80,7 +81,7 @@ public class FFT extends Analyzer {
 	}
 
 	/**
-	 * Calculates the frequency spectrum of the given audio sample and returns an 
+	 * Calculates the frequency spectrum of a given audio sample and returns an 
 	 * array of magnitudes, one for each frequency band.
 	 *
 	 * This version is intended to be used in non-real time processing, particularly when you are
@@ -93,15 +94,34 @@ public class FFT extends Analyzer {
 	 *            an array with sound samples
 	 * @param numBands
 	 *            the number of fft bands requested. Must be a power of 2 (one of 2, 4, 8, 16 etc.)
-	 * @return The current frequency spectrum of the input source. The array has as
+	 * @param target float array that the computed spectrum will be written into.
+	 * The FFT will compute as many frequency bands as the length of this array, 
+	 * which must be a power of 2 (2, 4, 8, 16 etc.)
+	 * @return The frequency spectrum of the given audio sample. The array has as
 	 *         many elements as this FFT analyzer's number of frequency bands.
 	 * @webref Analysis:FFT
-	 * @webBrief Calculates the frequency spectrum of the given audio sample.
+	 * @webBrief Calculates the frequency spectrum of a given audio sample.
 	 **/
-	public float[] analyzeSample(float[] sample, int numBands) {
-		float[] target = new float[numBands];
-		fft.calculateMagnitudesFromSample(sample, target);
+	public static float[] analyzeSample(float[] sample, float[] target) {
+		FFT.calculateMagnitudesFromSample(sample, target);
 		return target;
+	}
+
+	public static float[] analyzeSample(float[] sample, int numBands) {
+		return FFT.analyzeSample(sample, new float[numBands]);
+	}
+
+	// the meat of the matter
+	protected static void calculateMagnitudesFromSample(float[] sample, float[] imaginary, float[] target) {
+		if (Integer.bitCount(target.length) != 1) {
+			Engine.printError("number of FFT bands needs to be a power of 2");
+		}
+		FourierMath.transform(1, sample.length, sample, imaginary);
+		FourierMath.calculateMagnitudes(sample, imaginary, target);
+	}
+
+	protected static void calculateMagnitudesFromSample(float[] sample, float[] target) {
+		FFT.calculateMagnitudesFromSample(sample, new float[sample.length], target);
 	}
 
 }
