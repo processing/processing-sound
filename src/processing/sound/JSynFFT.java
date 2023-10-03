@@ -14,35 +14,28 @@ import com.softsynth.math.FourierMath;
 class JSynFFT extends FixedRateMonoWriter {
 
 	private FloatSample buffer;
-	private double[] real;
-	private double[] imaginary;
-	private double[] magnitude;
+	private float[] real;
+	private float[] imaginary;
 
 	protected JSynFFT(int bufferSize) {
 		super();
 		this.buffer = new FloatSample(bufferSize);
-		this.real = new double[bufferSize];
-		this.imaginary = new double[bufferSize];
-		this.magnitude = new double[bufferSize / 2];
+		this.real = new float[bufferSize];
+		this.imaginary = new float[bufferSize];
 
 		// write any connected input into the output buffer ad infinitum
 		this.dataQueue.queueLoop(this.buffer);
 	}
 
+	// TODO check that target is half size of the buffer?
 	protected void calculateMagnitudes(float[] target) {
 		// get position currently being written to
 		int pos = (int) this.dataQueue.getFrameCount() % this.buffer.getNumFrames();
-		for (int i = 0; i < this.buffer.getNumFrames(); i++) {
-			// TODO could apply window?
-			this.real[i] = this.buffer.readDouble((pos + i) % this.buffer.getNumFrames());
-		}
-		Arrays.fill(this.imaginary, 0);
-		FourierMath.fft(this.real.length, this.real, this.imaginary);
-		FourierMath.calculateMagnitudes(this.real, this.imaginary, this.magnitude);
-
-		for (int i = 0; i < target.length; i++) {
-			target[i] = (float) (2 * this.magnitude[i]);
-		}
+		// TODO could apply smoothing window?
+		this.buffer.read(pos, this.real, 0, this.buffer.getNumFrames() - pos);
+		this.buffer.read(0, this.real, this.buffer.getNumFrames() - pos, pos);
+		FourierMath.transform(1, this.real.length, this.real, this.imaginary);
+		FourierMath.calculateMagnitudes(this.real, this.imaginary, target);
 	}
 
 	protected void calculateMagnitudesFromSample(float[] sample, float[] target) {
