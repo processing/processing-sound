@@ -26,6 +26,10 @@ public class AudioSample extends SoundObject {
 	protected FloatSample sample;
 	protected VariableRateDataReader player;
 
+	// what to do when a sample that's already playing is triggered again.
+	// default is 'sustain'
+	protected int playMode = 0;
+
 	// cued frame index of this sample
 	protected int startFrame = 0;
 	// DataReader's queue status, required for accurate computation of playback
@@ -104,7 +108,7 @@ public class AudioSample extends SoundObject {
 		super(parent);
 	}
 
-	// private constructor for cloning (see getUnusedPlayer() method below)
+	// private constructor for cloning
 	protected AudioSample(AudioSample original) {
 		super(null);
 		this.sample = original.sample;
@@ -300,23 +304,6 @@ public class AudioSample extends SoundObject {
 		}
 	}
 
-	// helper function: when called on a soundfile already running, the original
-	// library triggered a second (concurrent) playback. with JSyn, every data
-	// reader can only do one playback at a time, so if the present player
-	// is busy we need to create a new one with the exact same settings and
-	// trigger it instead (see JSyn's VoiceAllocator class)
-	protected AudioSample getUnusedPlayer() {
-		// TODO could implement a more intelligent player allocation pool method here to
-		// limit the total number of playback voices
-		if (this.isPlaying()) {
-			// use private constructor which copies the sample as well as all playback
-			// settings over
-			return new AudioSample(this);
-		} else {
-			return this;
-		}
-	}
-
 	private void setStartFrameCountOffset() {
 		this.startFrameCountOffset = this.player.dataQueue.getFrameCount();
 	}
@@ -459,10 +446,23 @@ public class AudioSample extends SoundObject {
 	}
 
 	public void play() {
+		AudioSample source = this;
+		if (this.isPlaying()) {
+			switch (this.playMode) {
+				case UNTILDONE:
+					return;
+				case RESTART:
+					this.jumpFrame(0);
+					return;
+				case SUSTAIN:
+					// use private constructor which copies the sample as well as all 
+					// playback settings over
+					source = new AudioSample(this);
+			}
+		}
 		// play() is different from jump() in that, if the current sample is
 		// already playing back, it creates a new player object to play from
 		// in chorus
-		AudioSample source = this.getUnusedPlayer();
 		source.playInternal();
 		// for improved handling by the user, could return a reference to
 		// whichever audiosample object is the actual source (i.e. JSyn
@@ -529,7 +529,21 @@ public class AudioSample extends SoundObject {
 	}
 
 	public void playFor(float duration) {
-		AudioSample source = this.getUnusedPlayer();
+		AudioSample source = this;
+		if (this.isPlaying()) {
+			switch (this.playMode) {
+				case UNTILDONE:
+					return;
+				case RESTART:
+					this.jumpFrame(0);
+					return;
+				case SUSTAIN:
+					// use private constructor which copies the sample as well as all 
+					// playback settings over
+					source = new AudioSample(this);
+			}
+		}
+
 		source.playInternal(this.startFrame, Math.min((int) Math.round(duration * this.sampleRate()), this.frames() - this.startFrame));
 		// FIXME at the end of playback the startFrame is still the initially cued one,
 		// even though position() reports that the file is at the end of the playback bit.
@@ -749,6 +763,41 @@ public class AudioSample extends SoundObject {
 		}
 	}
 
+	public static final int SUSTAIN = 0;
+	public static final int RESTART = 1;
+	public static final int UNTILDONE = 2;
+
+	/**
+	 * The play mode determines what happens to an AudioSample (or SoundFile) when 
+	 * it is triggered while in the middle of playback. In <code>SUSTAIN</code> 
+	 * mode (the default), playback will continue simultaneous to the new 
+	 * playback. In <code>RESTART</code> mode, <code>play()</code> will stop 
+	 * playback and start over.  With <code>UNTILDONE</code>, a sound will play 
+	 * only if it's not already playing.
+	 * @webref Sampling:AudioSample
+	 * @webBrief Sets the playback behaviour when this sample is triggered while 
+	 * in the middle of playback
+	 */
+	void playMode(int mode) {
+		if (mode >= SUSTAIN && mode <= UNTILDONE) {
+			this.playMode = mode;
+		} else {
+			Engine.printError("invalid play mode. needs to be one of SUSTAIN, RESTART or UNTILDONE");
+		}
+	}
+
+	void playMode(String mode) {
+		if (mode.equalsIgnoreCase("sustain")) {
+			this.playMode(SUSTAIN);
+		} else if (mode.equalsIgnoreCase("restart")) {
+			this.playMode(RESTART);
+		} else if (mode.equalsIgnoreCase("untildone")) {
+			this.playMode(UNTILDONE);
+		} else {
+			Engine.printError("invalid play mode. needs to be one of \"sustain\", \"restart\" or \"untildone\"");
+		}
+	}
+
 	/**
 	 * Get the current sample data and write it into the given array.
 	 *
@@ -818,7 +867,7 @@ public class AudioSample extends SoundObject {
 	 *            `read(frameIndex)` will return the samples from both the left and
 	 *            right channel in interleaved order. (See the Soundfile > StereoSample
 	 *            example for a demonstration.)
-	 * @return float: the value of the audio sample at the given index
+	 * @return float: the value of the audio suntilDoneample at the given index
 	 */
 	public float read(int frameIndex) {
 		// TODO catch exception and print understandable error message
