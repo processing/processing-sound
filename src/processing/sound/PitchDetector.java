@@ -16,22 +16,23 @@ import processing.core.PApplet;
 public class PitchDetector extends Analyzer {
   private final com.jsyn.unitgen.PitchDetector detector;
 
-  private float minimumConfidence = 0.8f;
+  private float minimumConfidence;
 
   /**
    * @param parent typically "this"
    * @param minimumConfidence the minimum confidence level required for 
-   * frequency measurements, between 0 (accept all measurements, no matter how 
-   * unreliable) to 1 (only accept perfect measurements). Defaults to 0.8.
+   * frequency measurements, between <code>0.0</code> (accept all measurements, 
+   * no matter how unreliable) to <code>1.0</code> (only accept perfect 
+   * measurements). Defaults to 0.8.
    */
   public PitchDetector(PApplet parent, float minimumConfidence) {
-    this(parent);
+    super(parent);
+    this.detector = new com.jsyn.unitgen.PitchDetector();
     this.minimumConfidence = minimumConfidence;
   }
 
   public PitchDetector(PApplet parent) {
-    super(parent);
-    this.detector = new com.jsyn.unitgen.PitchDetector();
+    this(parent, 0.8f);
   }
 
   @Override
@@ -53,7 +54,8 @@ public class PitchDetector extends Analyzer {
   /**
    * Returns an estimate of the current pitch (or 'fundamental frequency') of 
    * the input sound signal, in Hertz. If the confidence in the current 
-   * measurement does not exceed the minimum confidence, this method returns 0.
+   * measurement does not exceed the minimum confidence, this method returns 
+   * <code>0.0</code>.
    * @webref Analysis:PitchDetector
    * @webBrief Detect the fundamental frequency of the input sound signal.
    * @param minimumConfidence the minimum confidence level required for 
@@ -70,6 +72,6 @@ public class PitchDetector extends Analyzer {
   public float analyze(float[] target) {
     target[0] = (float) this.detector.frequency.getValue();
     target[1] = (float) this.detector.confidence.getValue();
-    return target[0];
+    return (target[1] >= this.minimumConfidence ? target[0] : 0.0f);
   }
 }

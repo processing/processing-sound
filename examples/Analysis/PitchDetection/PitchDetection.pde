@@ -1,9 +1,8 @@
 /**
  * This sketch shows how to use the PitchDetector class to detect the pitch 
  * (also known as the 'fundamental frequency') of a sound signal. For complex 
- * signals this is not a trivial task, so the analyzer only returns a frequency 
- * (measured in Hertz, or 'Hz') when its measurement exceeds a 'confidence level'
- * that can be specified by the user.
+ * signals this is not a trivial task, so the analyzer not only returns the pitch 
+ * (measured in Hertz, or 'Hz') but also a 'confidence level' in that measurement.
  */
 
 import processing.sound.*;
@@ -26,17 +25,18 @@ void draw() {
   fill(color(0));
   rect(i, 0, 1, height);
 
-  // require a minimum confidence level based on current mouse position
-  float confidence = map(mouseY, 0, height, 1.0, 0.0);
-  float frequency = pitchDetector.analyze(confidence);
+  // the array version of analyze() returns the detected pitch as well
+  // as the confidence level in the correctness of that pitch
+  float[] pitchAndConfidence = new float[2];
+  pitchDetector.analyze(pitchAndConfidence);
 
-  // did we get a reading that had the required confidence level?
-  if (frequency != 0.0) {
-    // map the range of the human voice (40 - 1000Hz) to the height of the 
-    // sketch, and color the dot according to confidence that was required
-    // for this measurement
-    fill(lerpColor(color(255, 0, 0), color(0, 255, 0), confidence));
-    circle(i, int(map(frequency, 1000, 40, 0, height)), 4);
+  // don't draw measurements when there is absolutely 0 confidence in them
+  if (pitchAndConfidence[1] > 0) {
+    // draw all others: map the range of a human whistle (~40 - 2000Hz) to the height
+    // of the sketch, and color the dot according to the confidence in this measurement
+    fill(lerpColor(color(255, 0, 0), color(0, 255, 0), pitchAndConfidence[1]));
+
+    circle(i, int(map(pitchAndConfidence[0], 2000, 40, 0, height)), 2);
   }
 
   i = (i+1) % width;
