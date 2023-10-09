@@ -1,5 +1,6 @@
 package processing.sound;
 
+import com.jsyn.ports.UnitOutputPort;
 import com.jsyn.unitgen.UnitOscillator;
 
 import processing.core.PApplet;
@@ -8,15 +9,23 @@ import processing.core.PApplet;
  * For advanced users: common superclass of all oscillator sound sources
  * @webref Oscillators
  */
-public abstract class Oscillator<JSynOscillator extends UnitOscillator> extends SoundObject {
+public abstract class Oscillator<JSynOscillator extends UnitOscillator> extends SoundObject implements Modulator {
 
 	protected JSynOscillator oscillator;
 
 	protected Oscillator(PApplet theParent, JSynOscillator oscillator) {
 		super(theParent);
 		this.oscillator = oscillator;
+		this.oscillator.frequency.setValueAdded(true);
+		this.oscillator.amplitude.setValueAdded(true);
 		this.circuit = new JSynCircuit(this.oscillator.getOutput());
 		this.amplitude = this.oscillator.amplitude;
+	}
+
+	public UnitOutputPort getModulator() {
+		// add to the synth
+		this.circuit.setSynthesisEngine(Sound.getSynthesisEngine());
+		return this.circuit.getOutput();
 	}
 
 	/**
@@ -30,12 +39,20 @@ public abstract class Oscillator<JSynOscillator extends UnitOscillator> extends 
 	}
 	
  /*
-	* Modulates the frequency of this oscillator using another (low frequency) 
-	* oscillator.
-	public void modulateFreq(SoundObject modulator) {
-		this.oscillator.frequency.connect(modulator.circuit.source);
-	}
+	* Modulates the frequency of this oscillator using another generator, 
+	* typically a (low frequency) oscillator.
+	* @param modulator an oscillator or noise object
+	* @webBrief Modulates the frequency of this oscillator.
 	*/
+	public void freq(Modulator modulator) {
+		this.oscillator.frequency.disconnectAll();
+		this.oscillator.frequency.connect(modulator.getModulator());
+	}
+
+	public void amp(Modulator modulator) {
+		this.oscillator.amplitude.disconnectAll();
+		this.oscillator.amplitude.connect(modulator.getModulator());
+	}
 
 	public void play() {
 		super.play();

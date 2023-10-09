@@ -58,12 +58,8 @@ public abstract class SoundObject {
 	 * @webref SoundObject
 	 **/
 	public void amp(float amp) {
-		if (Engine.checkAmp(amp)) {
-			this.amp = amp;
-			if (this.isPlaying()) {
-				this.setAmplitude();
-			}
-		}
+		this.amp = amp;
+		this.setAmplitude();
 	}
 
 	/**
