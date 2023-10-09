@@ -189,7 +189,7 @@ public class Sound {
 	 *            the device name obtained from Sound.list()
 	 * @see Sound#list()
 	 * @webref Configuration:Sound
-	 * @webBrief Choose the device (sound card) which should be used for grabbing audio input using AudioIn.
+	 * @webBrief Selects the audio device used for grabbing audio input.
 	 */
 	public static int inputDevice(int deviceId) {
 		return Engine.getEngine().selectInputDevice(deviceId);
@@ -209,7 +209,7 @@ public class Sound {
 	 *            the device name obtained from Sound.list()
 	 * @see Sound#list()
 	 * @webref Configuration:Sound
-	 * @webBrief Choose the device (sound card) which the Sound library's audio output should be sent to.
+	 * @webBrief Selects which audio device audio output is sent to.
 	 */
 	public static int outputDevice(int deviceId) {
 		return Engine.getEngine().selectOutputDevice(deviceId);

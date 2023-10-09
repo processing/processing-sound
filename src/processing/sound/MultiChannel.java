@@ -1,5 +1,7 @@
 package processing.sound;
 
+import java.util.stream.IntStream;
+
 import com.jsyn.unitgen.ChannelOut;
 
 /**
@@ -8,6 +10,37 @@ import com.jsyn.unitgen.ChannelOut;
  * @webref I/O:MultiChannel
  */
 public abstract class MultiChannel {
+
+	/**
+	 * Finds the audio device (sound card) with the highest number of output 
+	 * channels, and selects it as the output device.<br>
+	 * This method is just a convenient shorthand for what is probably the most 
+	 * frequent multi-channel device selection use case. You could implement the 
+	 * same (and even more precise) programmatic control over device selection in 
+	 * your own sketch using <code>Sound.list()</code>, 
+	 * <code>MultiChannel.availableChannels()</code> and 
+	 * <code>Sound.outputDevice()</code>.
+	 *
+	 * @webBrief Selects the output device with the highest number of channels.
+	 *
+	 * @webref I/O:MultiChannel
+	 * @see Sound#list()
+	 * @see Sound#outputDevice()
+	 * @see MultiChannel#availableChannels()
+	 */
+	public static int autoSelectDevice(int minChannels) {
+		int[] candidates = IntStream.range(0, Sound.getAudioDeviceManager().getDeviceCount())
+			.filter(i -> MultiChannel.availableChannels(i) >= minChannels).toArray();
+		// TODO throw Exception when 0 candidates
+		return Engine.getEngine().selectOutputDevice(candidates);
+	}
+
+	public static int autoSelectDevice() {
+		// there might be duplicate listings with different drivers, try them all
+		int nChannels = IntStream.range(0, Sound.getAudioDeviceManager().getDeviceCount())
+			.map(i -> MultiChannel.availableChannels(i)).max().getAsInt();
+		return MultiChannel.autoSelectDevice(nChannels);
+	}
 
 	/**
 	 * Controls which output channel sounds will be played back to.
@@ -31,18 +64,17 @@ public abstract class MultiChannel {
 	}
 
 	/**
-	 * Connect a SoundObject to the given output channel.
+	 * Connects a SoundObject to the given output channel.
 	 *
 	 * Use this only for SoundObjects that are already playing back on some 
-	 * channel, which you want to have playing back on another channel at the same 
-	 * time.
+	 * channel, to have them play back on another channel at the same time.
 	 */
 	public static void connectToOutput(SoundObject o, int channel) {
 		Engine.getEngine().connectToOutput(channel, o.circuit);
 	}
 
 	/**
-	 * Disconnect a SoundObject from the given output channel.
+	 * Disconnects a SoundObject from the given output channel.
 	 *
 	 * Only use on SoundObjects that were previously connected using 
 	 * connectToOutput()
@@ -61,6 +93,7 @@ public abstract class MultiChannel {
 	 *
 	 * @webref I/O:MultiChannel
 	 * @see Sound#outputDevice(int)
+	 * @see Sound#list()
 	 */
 	public static int availableChannels(int deviceId) {
 		return Engine.getAudioDeviceManager().getMaxOutputChannels(deviceId);
