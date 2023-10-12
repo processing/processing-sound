@@ -6,13 +6,13 @@ import com.jsyn.unitgen.PeakFollower;
 import processing.core.PApplet;
 
 /**
- * This is a volume analyzer. It calculates the root mean square of the
- * amplitude of each audio block and returns that value.
+ * This is a volume analyzer. It tracks the peaks of an input signal, which is a 
+ * simple measure of the overall amplitude of that signal.
  * 
  * @webref Analysis:Amplitude
  * @webBrief This is a volume analyzer.
  */
-public class Amplitude extends Analyzer {
+public class Amplitude extends Analyzer implements Modulator {
 
 	private PeakFollower follower;
 
@@ -23,7 +23,16 @@ public class Amplitude extends Analyzer {
 	public Amplitude(PApplet parent) {
 		super(parent);
 		this.follower = new PeakFollower();
-		this.follower.halfLife.set(0.1);
+		this.halfLife(0.1f);
+	}
+
+	/**
+	 * Sets the half-life of this amplitude analyzer. The output approaches zero 
+	 * based on the value on halfLife. The default value is <code>0.1</code>.
+	 * @webBrief Sets the half-life of this amplitude analyzer.
+	 */
+	public void halfLife(float value) {
+		this.follower.halfLife.set(value);
 	}
 
 	protected void removeInput() {
@@ -64,5 +73,9 @@ public class Amplitude extends Analyzer {
 	 **/
 	public void input(SoundObject input) {
 		super.input(input);
+	}
+
+	public UnitOutputPort getModulator() {
+		return this.follower.output;
 	}
 }
