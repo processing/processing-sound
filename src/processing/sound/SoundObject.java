@@ -150,4 +150,13 @@ public abstract class SoundObject {
 			this.circuit.removeEffect();
 		}
 	}
+
+	/**
+	 * Gets the <code>JSynCircuit</code> object which encapsulates all the JSyn 
+	 * units (basic sound generator, pan and amplitude) which control the sound 
+	 * synthesis of this SoundObject.
+	 */
+	public JSynCircuit getUnitGenerator() {
+		return this.circuit;
+	}
 }

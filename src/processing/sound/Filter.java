@@ -6,13 +6,17 @@ import com.jsyn.unitgen.FilterBiquadCommon;
 import processing.core.PApplet;
 
 /**
- * Common superclass for JSyn filters that have a 'Q' unitport
+ * Common superclass for JSyn filters that have a 'frequency' and a 'Q' unitport
  * @webref Effects:Filter
  */
 public abstract class Filter<E extends FilterBiquadCommon> extends Effect<E> {
 
 	public Filter(PApplet parent) {
 		super(parent);
+		this.left.frequency.setValueAdded(true);
+		this.right.frequency.setValueAdded(true);
+		this.left.Q.setValueAdded(true);
+		this.right.Q.setValueAdded(true);
 	}
 
 	/**
@@ -28,6 +32,18 @@ public abstract class Filter<E extends FilterBiquadCommon> extends Effect<E> {
 		this.right.Q.set(q);
 	}
 
+ /**
+	* Modulates the resonance of this filter using another generator, typically a 
+	* (low frequency) oscillator. The effective resonance of the filter will be 
+	* the sum of the static value passed to <code>.res(float)</code>, and the 
+	* dynamic value produced by the modulator (which fluctuates around 0).
+	* @param modulator an oscillator or noise object
+	*/
+	public void res(Modulator modulator) {
+		Engine.setModulation(this.left.Q, modulator);
+		Engine.setModulation(this.right.Q, modulator);
+	}
+
 	/**
 	 * Sets the cutoff frequency for the filter.
 	 * @webref Effects:Filter
@@ -37,6 +53,18 @@ public abstract class Filter<E extends FilterBiquadCommon> extends Effect<E> {
 	public void freq(float freq) {
 		this.left.frequency.set(freq);
 		this.right.frequency.set(freq);
+	}
+	
+ /**
+	* Modulates the frequency of this filter using another generator, typically a 
+	* (low frequency) oscillator. The effective cutoff frequency of the filter 
+	* will be the sum of the static value passed to <code>.freq(float)</code>, and 
+	* the dynamic value produced by the modulator (which fluctuates around 0).
+	* @param modulator an oscillator or noise object
+	*/
+	public void freq(Modulator modulator) {
+		Engine.setModulation(this.left.frequency, modulator);
+		Engine.setModulation(this.right.frequency, modulator);
 	}
 	
 	public void process(SoundObject input, float freq) {

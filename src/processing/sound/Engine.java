@@ -23,6 +23,7 @@ import com.jsyn.devices.AudioDeviceManager;
 import com.jsyn.devices.AudioDeviceOutputStream;
 import com.jsyn.devices.javasound.JavaSoundAudioDevice;
 import com.jsyn.devices.jportaudio.JPortAudioDevice;
+import com.jsyn.ports.UnitInputPort;
 import com.jsyn.unitgen.ChannelOut;
 import com.jsyn.unitgen.Multiply;
 import com.jsyn.unitgen.UnitGenerator;
@@ -581,6 +582,15 @@ class Engine {
 		// Android only
 		theParent.registerMethod("pause", this.registeredCallback);
 		theParent.registerMethod("resume", this.registeredCallback);
+	}
+
+	protected static void setModulation(UnitInputPort port, Modulator modulator) {
+		if (modulator == null) {
+			port.disconnectAll();
+		} else {
+			port.setValueAdded(true);
+			port.connect(modulator.getModulator());
+		}
 	}
 
 	// static helper methods that do stuff like checking argument values or 

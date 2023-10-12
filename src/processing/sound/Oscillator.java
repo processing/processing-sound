@@ -38,20 +38,20 @@ public abstract class Oscillator<JSynOscillator extends UnitOscillator> extends 
 		this.oscillator.frequency.set(freq);
 	}
 	
- /*
+ /**
 	* Modulates the frequency of this oscillator using another generator, 
-	* typically a (low frequency) oscillator.
+	* typically a (low frequency) oscillator. The effective frequency of the 
+	* oscillator will be the sum of the static <code>float</code> value passed to 
+	* <code>freq()</code>, and the dynamic value produced by the modulator (which 
+	* fluctuates around 0).
 	* @param modulator an oscillator or noise object
-	* @webBrief Modulates the frequency of this oscillator.
 	*/
 	public void freq(Modulator modulator) {
-		this.oscillator.frequency.disconnectAll();
-		this.oscillator.frequency.connect(modulator.getModulator());
+		Engine.setModulation(this.oscillator.frequency, modulator);
 	}
 
 	public void amp(Modulator modulator) {
-		this.oscillator.amplitude.disconnectAll();
-		this.oscillator.amplitude.connect(modulator.getModulator());
+		Engine.setModulation(this.oscillator.amplitude, modulator);
 	}
 
 	public void play() {
