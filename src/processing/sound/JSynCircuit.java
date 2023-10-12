@@ -8,9 +8,10 @@ import com.jsyn.unitgen.UnitGenerator;
 import com.jsyn.unitgen.UnitSource;
 
 /**
- * Helper class wrapping a source unit generator, add/pan processor and effect into one circuit.
+ * Helper class wrapping a source unit generator, add/pan processor and effect 
+ * into one circuit.
  */
-class JSynCircuit extends Circuit implements UnitSource {
+public class JSynCircuit extends Circuit implements UnitSource {
 
 	private UnitGenerator source;
 	protected JSynProcessor processor;
