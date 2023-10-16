@@ -51,17 +51,10 @@
 
 	<target name="bundled-deps" description="Download JSyn and (J)PortAudio">
 		<get src="https://github.com/philburk/jsyn/releases/download/v17.1.0/jsyn-17.1.0.jar" dest="${lib}" skipexisting="true" />
-		<get src="https://www.softsynth.com/jsyn/developers/archives/jportaudio_pc_20120904.zip" dest="${lib}" skipexisting="true" />
 		<get src="https://www.softsynth.com/jsyn/developers/archives/jportaudio_mac_20120904.zip" dest="${lib}" skipexisting="true" />
-		<unzip src="${lib}/jportaudio_pc_20120904.zip" dest="${lib}">
+		<unzip src="${lib}/jportaudio_mac_20120904.zip" dest="${lib}">
 			<patternset>
 				<include name="**/*.jar" />
-			</patternset>
-			<mapper type="flatten"/>
-		</unzip>
-		<unzip src="${lib}/jportaudio_pc_20120904.zip" dest="${lib}/windows-amd64/">
-			<patternset>
-				<include name="**/*_x64.dll" />
 			</patternset>
 			<mapper type="flatten"/>
 		</unzip>
