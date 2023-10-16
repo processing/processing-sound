@@ -36,6 +36,8 @@ import processing.core.PApplet;
  */
 class Engine {
 
+	static boolean verbose = false;
+
 	private static AudioDeviceManager createDefaultAudioDeviceManager() {
 		try {
 			Class.forName("javax.sound.sampled.AudioSystem");
@@ -58,9 +60,15 @@ class Engine {
 		}
 		// hide JPortAudio init messages from console
 		PrintStream originalStream = System.out;
-		System.setOut(new PrintStream(new OutputStream(){
-			public void write(int b) { }
-		}));
+		PrintStream originalErr = System.err;
+		if (!Engine.verbose) {
+			System.setOut(new PrintStream(new OutputStream(){
+				public void write(int b) { }
+			}));
+			System.setErr(new PrintStream(new OutputStream(){
+				public void write(int b) { }
+			}));
+		}
 		// JPortAudio takes care of loading all native libraries -- except the 
 		// dependent portaudio dll on Windows for some reason. try loading it no 
 		// matter what platform we're on and ignore any errors, if it's really not 
@@ -85,10 +93,13 @@ class Engine {
 			// java.base/jdk.internal.loader.NativeLibraries.load(Native Method)
 			if (e.getMessage().contains("disallowed")) {
 				throw new RuntimeException("in order to use the PortAudio drivers, you need to give Processing permission to open the PortAudio library file.\n\n============================== ENABLING PORTAUDIO ON MAC OS X ==============================\n\nPlease follow these steps to enable PortAudio (dont worry, you only need to do this once):\n\n  - if you pressed 'Move to Bin' in the previous popup, you will need first need to restore the\n    library file: please find libjportaudio.jnilib in your Bin, right click and select 'Put Back'\n\n  - go to System Preferences > Security & Privacy> General. At the bottom you will see\na message saying that 'libjportaudio.jnilib was blocked'. Press 'Allow Anyway'. When you\nrun this sketch again you should get another popup, just select 'Open' and you're done!\n\n============================================================================================");
+			} else if (Engine.verbose) {
+				e.printStackTrace();
 			}
 			throw new RuntimeException("PortAudio is not supported on this operating system/architecture");
 		} finally {
 			System.setOut(originalStream);
+			System.setErr(originalErr);
 		}
 	}
 
@@ -390,13 +401,12 @@ class Engine {
 				// try portaudio access to the same device -- need get the name of the 
 				// old output device and re-select it on the new device manager
 				String targetDeviceName = this.getDeviceName(deviceId);
+				Engine.printMessage("Output device '" + targetDeviceName + "' did not work with the default audio driver, trying again with PortAudio...");
 				try {
 					this.usePortAudio(true);
 				} catch (RuntimeException ee) {
 					throw new RuntimeException(e);
 				}
-				// this might replace this.synth
-				Engine.printMessage("Output device '" + targetDeviceName + "' did not work with the default driver, switching to PortAudio...");
 				int newDeviceIdForOldDevice = this.synth.getAudioDeviceManager().getDefaultOutputDeviceID();
 				try {
 					// TODO also loop through candidates

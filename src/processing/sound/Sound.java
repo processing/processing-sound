@@ -100,7 +100,7 @@ public class Sound {
 		String[] deviceNames = Sound.deviceNames();
 		AudioDeviceManager audioManager = Engine.getAudioDeviceManager();
 		System.out.println();
-		Engine.printMessage(audioManager.getName() + " audio device listing\n");
+		Engine.printMessage(audioManager.getName() + " device listing\n");
 		if (printAll) {
 			Sound.printDeviceTable(IntStream.range(0, deviceNames.length).toArray());
 		} else {
@@ -272,6 +272,10 @@ public class Sound {
 		Engine.println("  decoded audio samples held in cache: " + SoundFile.SAMPLECACHE.size() + " (" + nSamples + " frames total)");
 		Engine.println("  CPU usage: " + Math.round(100 * e.getUsage()) + "%");
 		Engine.println();
+	}
+
+	public static void verbose(boolean verbose) {
+		Engine.verbose = verbose;
 	}
 
 	public static void printConnections() {
