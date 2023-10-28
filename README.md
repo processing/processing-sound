@@ -17,8 +17,22 @@ For detailed changelogs, have a look at the [Github releases page](https://githu
 Audio files loaded with the [`SoundFile`](https://processing.org/reference/libraries/sound/SoundFile.html) class are fully loaded into raw memory. That means your sketch will require ~20MB of RAM per minute of stereo audio.
 
 - if you get `OutOfMemoryError: Java heap space` errors on resource-lean platforms (e.g. Raspberry Pi), make sure to increase the heap size in Processing's `File > Preferences > Running` menu. As a rough rule, your heap size should be at least twice as much as the largest audio sample used in your sketch.
-- depending on the format and length of the audio files, loading them for the first time with `new SoundFile("<yourfilename.ext>")` might block the sketch for several seconds, while calls to `sf.play()` execute instantly
+- depending on the format and length of the audio files, loading them for the first time with `sf = new SoundFile("yourfilename.ext")` might block the sketch for several seconds, while subsequent calls to `sf.play()` execute instantly. It is generally advisable to create all SoundFile objects in your `setup()`.
 - decoding of compressed formats (mp3, ogg, etc) can be quite slow on Raspberry Pi (20 seconds for a 3 minute mp3, 14 seconds for ogg on a Raspberry Pi 3B 32bit). Since all audio samples loaded by the library end up being stored as raw uncompressed data in RAM anyway, we generally recommend using WAV format for loading audio files
+
+### Multi-channel audio interface support
+
+The newest release of the Sound library adds support for [multi-channel audio output](https://github.com/processing/processing-sound/blob/main/examples/IO/MultiChannelOutput/MultiChannelOutput.pde). Most audio interfaces should work out of the box, for sake of completeness we have assembled a list of devices that have been tested to be working (for the devices marked with `*`, see below). If you have troubles getting any audio interface to be recognized correctly, please report them in [this Github issue](https://github.com/processing/processing-sound/issues/87).
+
+- Focusrite Scarlett 2i4
+- Motu Mk5 *
+- Presonus Studio 26c
+- Roland Rubix24
+- RME Fireface 802 *
+  - output is through the 30 channel device, not the 8 channel device
+  - on Windows, select a Buffer Size of 512 samples or less in the Fireface USB Settings
+
+Devices marked with a `*` work out of the box on MacOS, on Windows they are recognized but show up as several stereo devices, rather than one multi-channel device. To be able to use them as one multi-channel devices, you will need to install ASIO drivers and add an explicit call to `MultiChannel.usePortAudio()` at the beginning of your sketch.
 
 ### Contributing
 

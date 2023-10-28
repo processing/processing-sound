@@ -1,6 +1,8 @@
 import processing.sound.*;
 
 SinOsc sines[];
+int initialised;
+float frequency;
 
 void setup() {
   size(640, 360);
@@ -29,28 +31,39 @@ void setup() {
   println("Playing back different sine waves on the " + MultiChannel.availableChannels() + " different channels");
   
   sines = new SinOsc[MultiChannel.availableChannels()];
+  initialised = 0;
+  frequency = 100;
   
-  // loop through all channels and start one sine wave on each
-  float frequency = 100;
-  for (int i = 0; i < sines.length; i++) {
-    MultiChannel.activeChannel(i);
-    // create and start the sine oscillator.
-    sines[i] = new SinOsc(this);
-    sines[i].freq(frequency);
-    sines[i].play();
-    // add a nice theatrical break
-    delay(1000);
-
-    // increase frequency on the next channel by one semitone
-    frequency = frequency * 1.05946;
-  }
+  textSize(128);
+  fill(0);
+  textAlign(CENTER);
 }
 
 void draw() {
+  // loop through all channels and start one sine wave on each
+  if (initialised < sines.length) {
+    // add a nice theatrical break
+    delay(1000);
+
+    background(255);
+    text((initialised + 1) + " of " + sines.length, width/2, height/2);
+
+    MultiChannel.activeChannel(initialised);
+    // create and start the sine oscillator.
+    sines[initialised] = new SinOsc(this);
+    sines[initialised].freq(frequency);
+    sines[initialised].play();
+
+    // increase frequency on the next channel by one semitone
+    frequency = frequency * 1.05946;
+    initialised = initialised + 1;
+    return;
+  }
+
   // as long as the oscillators are not stopped they will 'stick'
   // to the channel that they were originally added to, and we can
   // change their parameters freely
-  float frequency = map(mouseX, 0, width, 80.0, 1000.0);
+  frequency = map(mouseX, 0, width, 80.0, 1000.0);
   
   for (SinOsc sin : sines) {
     sin.freq(frequency);
