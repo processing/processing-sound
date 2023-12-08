@@ -8,7 +8,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/workflows/setup.yml
+      - name: Set up build environment and dependencies
+        uses: ./.github/actions/setup
       - name: Compile
         run: ant compile
       - name: Run tests
