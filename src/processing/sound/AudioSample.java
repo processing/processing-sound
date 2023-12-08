@@ -467,7 +467,7 @@ public class AudioSample extends SoundObject {
 		// for improved handling by the user, could return a reference to
 		// whichever audiosample object is the actual source (i.e. JSyn
 		// container) of the newly triggered playback
-		// return source;
+		return source;
 	}
 
 	public void play(float rate) {
