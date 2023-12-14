@@ -164,9 +164,7 @@ public class AudioSample extends SoundObject {
 	 * @webBrief Changes the amplitude/volume of the player.
 	 **/
 	public void amp(float amp) {
-		if (Engine.checkAmp(amp)) {
-			this.player.amplitude.set(amp);
-		}
+		this.player.amplitude.set(amp);
 	}
 
 	/**
