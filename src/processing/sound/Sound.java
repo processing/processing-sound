@@ -121,13 +121,17 @@ public class Sound {
 		return longestLength;
 	}
 
+	private static String deviceNameTableDivider(int longestDeviceNameLength) {
+		return String.format("%" + (longestDeviceNameLength+2) + "s", "").replace(' ', '-');
+	}
+
 	private static void printDeviceTable(int[] deviceIds) {
 		AudioDeviceManager audioManager = Sound.getAudioDeviceManager();
 		int longestLength = Sound.longestDeviceNameLength(deviceIds);
 		String lineFormat = " %-3s %3s | %-" + longestLength + "s | %6s | %4s%n";
 
 		System.out.format(lineFormat, "", "id", "Device name", "inputs", "outputs");
-		System.out.println("     ----+" + "-".repeat(longestLength+2) + "+--------".repeat(2));
+		System.out.println("     ----+" + Sound.deviceNameTableDivider(longestLength) + "+--------".repeat(2));
 		for (int i : deviceIds) {
 			System.out.format(lineFormat,
 					Engine.getEngine().inputDevice == i ? (Engine.getEngine().outputDevice == i ? "I,O" : "I") :
@@ -145,13 +149,13 @@ public class Sound {
 		String lineFormat = " %1s %3s | %-" + longestLength + "s | %4s%n";
 
 		System.out.format(lineFormat, " ", "id", "Input device name", "inputs");
-		System.out.println("   ----+" + "-".repeat(longestLength+2) + "+--------");
+		System.out.println("   ----+" + Sound.deviceNameTableDivider(longestLength) + "+--------");
 		for (int i : inputDeviceIds) {
 			System.out.format(lineFormat, Engine.getEngine().inputDevice == i ? "I" : " ", i, Engine.getEngine().getDeviceName(i), audioManager.getMaxInputChannels(i));
 		}
 		System.out.println();
 		System.out.format(lineFormat, " ", "id", "Output device name", "outputs");
-		System.out.println("   ----+" + "-".repeat(longestLength+2) + "+--------");
+		System.out.println("   ----+" + Sound.deviceNameTableDivider(longestLength) + "+--------");
 		for (int i : outputDeviceIds) {
 			System.out.format(lineFormat, Engine.getEngine().outputDevice == i ? "O" : " ",  i, Engine.getEngine().getDeviceName(i), audioManager.getMaxOutputChannels(i));
 		}
