@@ -5,7 +5,9 @@ import java.util.stream.IntStream;
 import com.jsyn.unitgen.ChannelOut;
 
 /**
- * Controls the routing of sounds on multi-channel devices
+ * This class provides methods for querying the multi-channel output 
+ * capabilities of audio devices, and for providing fine-grained control for the 
+ * routing of sounds when outputting on a device with more than 2 channels.
  * 
  * @webref I/O:MultiChannel
  */
@@ -86,10 +88,11 @@ public abstract class MultiChannel {
 	}
 
 	/**
-	 * Gets the number of output channels available on an output device
+	 * Gets the number of output channels available on a given device
 	 * 
-	 * @param deviceId if none is given, gets information about the current device.
-	 * @return the number of output channels available on the current output device
+	 * @param deviceId the id of the device whose number of output channels should 
+	 * be returned. If none is given, gets information about the current device.
+	 * @return the number of output channels available on the given device
 	 *
 	 * @webref I/O:MultiChannel
 	 * @see Sound#outputDevice(int)
