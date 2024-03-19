@@ -528,18 +528,16 @@ class Engine {
 	}
 
 	protected void play(UnitSource source) {
-		// check if unit is already connected
+		// add unit to synth
 		UnitGenerator generator = source.getUnitGenerator();
-		if (!this.addedUnits.contains(generator)) {
-			this.synth.add(generator);
-			this.addedUnits.add(generator);
-			for (int i = 0; i < source.getOutput().getNumParts(); i++) {
-				this.connectToOutput((this.outputChannel + i) % this.synth.getAudioDeviceManager().getMaxOutputChannels(this.outputDevice), source, i);
+		this.add(generator);
+		// and connect to output(s)
+		for (int i = 0; i < source.getOutput().getNumParts(); i++) {
+			this.connectToOutput((this.outputChannel + i) % this.synth.getAudioDeviceManager().getMaxOutputChannels(this.outputDevice), source, i);
 				// source.getOutput().connect(i, this.volume[(this.outputChannel + i) % this.synth.getAudioDeviceManager().getMaxOutputChannels(this.outputDevice)].inputA, 0);
-				if (this.multiChannelMode) {
-					// only add the first (left) channel
-					break;
-				}
+			if (this.multiChannelMode) {
+				// only add the first (left) channel
+				break;
 			}
 		}
 	}
