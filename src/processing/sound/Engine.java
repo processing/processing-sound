@@ -527,6 +527,15 @@ class Engine {
 		source.getOutput().disconnect(part, this.volume[channel].inputA, 0);
 	}
 
+	protected void disconnectFromOutput(UnitSource source) {
+		for (Multiply o : this.volume) {
+			// keep it generic: disconnect all parts from all outputs
+			for (int i = 0; i < source.getOutput().getNumParts(); i++) {
+				source.getOutput().disconnect(i, o.inputA, 0);
+			}
+		}
+	}
+
 	protected void play(UnitSource source) {
 		// add unit to synth
 		UnitGenerator generator = source.getUnitGenerator();
@@ -544,13 +553,12 @@ class Engine {
 
 	protected void stop(UnitSource source) {
 		if (this.addedUnits.contains(source.getUnitGenerator())) {
-			// this is usually just the two-part output of a JSynCircuit, but let's 
-			// keep it generic just in case
-			for (int i : IntStream.range(0, source.getOutput().getNumParts()).toArray()) {
-				source.getOutput().disconnectAll(i);
+			// disconnect from any and all outputs
+			this.disconnectFromOutput(source);
+			// don't remove if it's still connected (typically to an analyzer)
+			if (!source.getOutput().isConnected()) {
+				this.remove(source.getUnitGenerator());
 			}
-			// removal happens inside
-			this.remove(source.getUnitGenerator());
 		}
 	}
 
