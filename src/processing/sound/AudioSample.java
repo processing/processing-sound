@@ -15,11 +15,12 @@ import processing.core.PApplet;
  * manipulate and play back sound samples.
  * 
  * If you want to pre-load your audio sample with an audio file from disk you
- * can do so using the {@link SoundFile} subclass.
+ * can do so using the <b>SoundFile</b> subclass.
  * 
  * @webref Sampling:AudioSample
  * @webBrief This class allows you low-level access to an audio buffer to create, access,
  * manipulate and play back sound samples.
+ * @see SoundFile
  */
 public class AudioSample extends SoundObject {
 
@@ -51,15 +52,9 @@ public class AudioSample extends SoundObject {
 	 *            typically use "this"
 	 * @param frames
 	 *            the desired number of frames for this audiosample
-	 * @param data
-	 *            an array of float values to be used as this audiosample's sound
-	 *            data. The audiosample will consequently have as many frames as the
-	 *            length of the given array. To match the default amplitude of 
-	 *            other sound generators, the sample values should be in the range 
-	 *            <code>[-0.5, 0.5]</code>
 	 * @param stereo
 	 *            whether to treat the audiosample as 2-channel (stereo) or not
-	 *            (default: <code>false</code>)
+	 *            (default: <b>false</b>)
 	 * @param frameRate
 	 *            the underlying frame rate of the sample (default: 44100)
 	 * @webref Sampling:AudioSample
@@ -80,6 +75,14 @@ public class AudioSample extends SoundObject {
 	// duration)?
 	// risk of accidental overloading through int/float, but could be interesting..
 
+	/**
+	 * @param data
+	 *            an array of float values to be used as this audiosample's sound
+	 *            data. The audiosample will consequently have as many frames as the
+	 *            length of the given array. To match the default amplitude of 
+	 *            other sound generators, the sample values should be in the range 
+	 *            <b>[-0.5, 0.5]</b>
+	 */
 	public AudioSample(PApplet parent, float[] data) {
 		this(parent, data, false);
 	}
