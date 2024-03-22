@@ -1,6 +1,7 @@
 import processing.sound.*;
 
 import com.jsyn.engine.SynthesisEngine;
+import com.jsyn.unitgen.ChannelOut;
 
 void setup() {
 
@@ -50,5 +51,5 @@ void draw() {
 
 // a useful callback method when you are debugging a sound sketch
 void mouseClicked() {
-  Sound.Status();
+  Sound.status();
 }
