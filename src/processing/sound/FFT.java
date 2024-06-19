@@ -136,7 +136,7 @@ public class FFT extends Analyzer {
 	// the meat of the matter
 	protected static void calculateMagnitudesFromSample(float[] sample, float[] imaginary, float[] target) {
 		if (FFT.checkNumBands(target.length)) {
-			FourierMath.transform(1, sample.length, sample, imaginary);
+			FourierMath.transform(1, target.length, sample, imaginary);
 			FourierMath.calculateMagnitudes(sample, imaginary, target);
 			// there is an argument for multiplying the normalized spectrum amplitude 
 			// values by two, see e.g.:
