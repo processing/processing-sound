@@ -6,6 +6,7 @@
 	<classpathentry kind="lib" path="library/processing-core.zip"/>
 	<classpathentry kind="lib" path="library/javamp3-1.0.4.jar"/>
 	<classpathentry kind="lib" path="library/jsyn-17.1.0.jar"/>
+	<classpathentry kind="lib" path="library/JAsioHost.jar"/>
 	<classpathentry kind="lib" path="library/junit-4.12.jar"/>
 	<classpathentry kind="lib" path="library/android.jar"/>
 	<classpathentry kind="lib" path="test/**/*.class"/>

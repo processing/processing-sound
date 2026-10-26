@@ -8,6 +8,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
       - name: Set up build environment and dependencies
         uses: ./.github/actions/setup
       - name: Compile

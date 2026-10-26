@@ -7,7 +7,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
       - name: Set up build environment and dependencies
         uses: ./.github/actions/setup
       - name: Build library with Ant
@@ -15,10 +15,10 @@ jobs:
       - name: Run tests
         run: ant test
       - name: Publish Test Report
-        uses: mikepenz/action-junit-report@v3
+        uses: mikepenz/action-junit-report@v6
         with:
           report_paths: 'TEST-*.xml'
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v7
         with:
           name: sound-jar-${{ github.sha }}
           path: library/sound.jar
@@ -27,7 +27,7 @@ jobs:
       - name: Generate Javadoc
         run: ant javadoc
       - name: Upload GitHub Pages Artifact
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact@v5
         with:
           path: reference/
 
@@ -50,4 +50,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v1
+        uses: actions/deploy-pages@v5

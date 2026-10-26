@@ -7,6 +7,7 @@
 		<pathelement location="${lib}/jsyn-17.1.0.jar" />
 		<pathelement location="${lib}/processing-core.zip" />
 		<pathelement location="${lib}/android.jar" />
+		<pathelement location="${lib}/JAsioHost.jar" />
 	</path>
 
 	<path id="classpath.testing">
@@ -66,10 +67,29 @@
 		</unzip>
 	</target>
 
+	<target name="checkjasio">
+		<available file="${lib}/JAsioHost.jar" property="hasjasiohost" />
+	</target>
+
+	<!-- JAsioHost provides the Java bindings for Windows' ASIO audio drivers,
+		it is used by the Sound library's MultiChannel.useJASIO() mode -->
+	<target name="jasio-deps" depends="checkjasio" unless="hasjasiohost" description="Build JAsioHost from the bundled sources">
+		<mkdir dir="bin-jasiohost" />
+		<javac source="1.8" target="1.8" srcdir="jasiohost-master/src" destdir="bin-jasiohost" encoding="UTF-8" includeAntRuntime="false" nowarn="true">
+			<include name="com/synthbot/jasiohost/*.java" />
+		</javac>
+		<jar destfile="${lib}/JAsioHost.jar" basedir="bin-jasiohost" />
+		<delete dir="bin-jasiohost" />
+		<copy todir="${lib}/windows-amd64" overwrite="never">
+			<fileset dir="jasiohost-master" includes="jasiohost32.dll jasiohost64.dll" />
+		</copy>
+	</target>
+
 	<target name="deps" description="Get library dependencies">
 		<antcall target="processing-deps" />
 		<antcall target="android-deps" />
 		<antcall target="bundled-deps" />
+		<antcall target="jasio-deps" />
 	</target>
 
 	<target name="compile" depends="deps" description="Compile sources">
@@ -113,6 +133,8 @@
 		<include name="${lib}/*.jnilib" />
 		<!-- all files inside per-architecture native library directories -->
 		<include name="${lib}/*-*/*" />
+		<!-- JAsioHost sources and license (LGPL requires they accompany the jar) -->
+		<include name="jasiohost-master/**" />
 
 		<exclude name="library/android.jar" />
 		<exclude name="${lib}/junit-*" />
@@ -140,6 +162,9 @@
 				<!-- also drop unnecessary jars to avoid duplicate class errors -->
 				<exclude name="${lib}/*spi*" />
 				<exclude name="${lib}/jportaudio.jar" />
+				<!-- ASIO is Windows-only -->
+				<exclude name="${lib}/JAsioHost.jar" />
+				<exclude name="jasiohost-master/**" />
 			</zipfileset>
 		</zip>
 	</target>

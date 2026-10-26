@@ -5,3 +5,5 @@
 .DS_Store
 TEST-*
 tags*
+.build-deps/
+hs_err_pid*.log

@@ -3,7 +3,7 @@ name: Set up build environment and dependencies
 runs:
   using: "composite"
   steps:
-    - uses: actions/setup-java@v3
+    - uses: actions/setup-java@v6
       with:
         java-version: '17'
         distribution: 'temurin'
@@ -12,7 +12,7 @@ runs:
 
     # cache any custom dependencies (e.g. processing-core.zip) in the library/
     # folder so that they don't have to be downloaded every time
-    - uses: actions/cache@v3
+    - uses: actions/cache@v6
       with:
         key: build-deps
         path: library/

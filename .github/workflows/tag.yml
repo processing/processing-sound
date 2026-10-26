@@ -9,7 +9,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
         with:
           # need this for figuring out the branch name
           # (see https://stackoverflow.com/questions/63745613/how-to-get-a-branch-name-on-github-action-when-push-on-a-tag)
@@ -28,7 +28,7 @@ jobs:
         run: ant dist dist-android
 
       - name: "v* tags only: create version release draft"
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         if: startsWith(github.ref, 'refs/tags/v')
         with:
           draft: true
@@ -39,7 +39,7 @@ jobs:
             ../sound.txt
 
       - name: "`latest` tag only: build latest library download release"
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         if: github.ref == 'refs/tags/latest'
         # just override the assets, otherwise leave the existing release unchanged
         with:
@@ -48,7 +48,7 @@ jobs:
             ../sound.txt
 
       - name: "all other tags: create preliminary test build release"
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         if: github.ref != 'refs/tags/latest' && !startsWith(github.ref, 'refs/tags/v')
         with:
           name: ${{ github.ref_name }} dev build

@@ -38,6 +38,13 @@ class Engine {
 
 	static boolean verbose = false;
 
+	/** use JavaSound where possible, PortAudio where necessary (the default) */
+	static final int DRIVER_DEFAULT = 0;
+	/** force the JPortAudio bindings */
+	static final int DRIVER_PORTAUDIO = 1;
+	/** force the JAsioHost ASIO bindings (Windows only) */
+	static final int DRIVER_JASIO = 2;
+
 	private static AudioDeviceManager createDefaultAudioDeviceManager() {
 		try {
 			Class.forName("javax.sound.sampled.AudioSystem");
@@ -48,7 +55,11 @@ class Engine {
 		}
 	}
 
-	private static AudioDeviceManager createAudioDeviceManager(boolean portAudio) {
+	private static AudioDeviceManager createAudioDeviceManager(int driver) {
+		if (driver == DRIVER_JASIO) {
+			return Engine.createJAsioAudioDeviceManager();
+		}
+		boolean portAudio = driver == DRIVER_PORTAUDIO;
 		if (!portAudio) {
 			AudioDeviceManager a = Engine.createDefaultAudioDeviceManager();
 			if (a.getDefaultOutputDeviceID() != -1) {
@@ -104,6 +115,27 @@ class Engine {
 	}
 
 	/**
+	 * Set up the JAsioHost bindings for native ASIO access. AsioDriver's static
+	 * initializer loads the jasiohost DLL, so any problems with the native library
+	 * (or a platform that is not Windows) show up right away as an error.
+	 */
+	private static AudioDeviceManager createJAsioAudioDeviceManager() {
+		if (!System.getProperty("os.name", "").toLowerCase().contains("windows")) {
+			throw new RuntimeException("ASIO output is only supported on Windows");
+		}
+		try {
+			return new JAsioAudioDeviceManager();
+		} catch (UnsatisfiedLinkError | ExceptionInInitializerError | NoClassDefFoundError e) {
+			if (Engine.verbose) {
+				e.printStackTrace();
+			}
+			throw new RuntimeException("the JAsioHost native library (jasiohost64.dll) could not be loaded, "
+					+ "make sure it is installed next to the Sound library's other native libraries "
+					+ "(sound/library/windows-amd64/)");
+		}
+	}
+
+	/**
 	 * Singleton instance that is created by the first method call to or creation 
 	 * of any Sound library class.
 	 * Any calls to configuration, start() or play() methods will be passed on to 
@@ -126,9 +158,17 @@ class Engine {
 	}
 
 	static Engine getEngine(PApplet parent, boolean portAudio) {
+		return Engine.getEngine(parent, portAudio ? Engine.DRIVER_PORTAUDIO : Engine.DRIVER_DEFAULT);
+	}
+
+	static Engine getEngine(PApplet parent, int driver) {
+		return Engine.getEngine(parent, driver, true);
+	}
+
+	static Engine getEngine(PApplet parent, int driver, boolean selectDevice) {
 		if (Engine.singleton == null) {
 			// this might throw a RuntimeException, which is fine
-		 	Engine.singleton = new Engine(Engine.createAudioDeviceManager(portAudio));
+		 	Engine.singleton = new Engine(Engine.createAudioDeviceManager(driver), -1, selectDevice);
 		}
 		if (parent != null) {
 			Engine.singleton.registerWithParent(parent);
@@ -165,20 +205,26 @@ class Engine {
 	 * Create a new synthesizer and connect it to the default output device.
 	 */
 	private Engine(AudioDeviceManager audioDeviceManager) {
-		this(audioDeviceManager, -1);
+		this(audioDeviceManager, -1, true);
 	}
 
 	private Engine(AudioDeviceManager audioDeviceManager, int outputDevice) {
+		this(audioDeviceManager, outputDevice, true);
+	}
+
+	private Engine(AudioDeviceManager audioDeviceManager, int outputDevice, boolean selectDevice) {
 		// suppress JSyn's INFO log messages to stop them from showing
 		// up as redtext in the Processing console
 		Logger logger = Logger.getLogger(com.jsyn.engine.SynthesisEngine.class.getName());
 		logger.setLevel(Level.WARNING);
 
 		this.createSynth(audioDeviceManager);
-		// this method starts the synthesizer -- if the output fails, it might 
-		// create a new PortAudio synth on the fly and try to start that
-		this.selectOutputDevice(outputDevice);
-		this.selectInputDevice(-1);
+		if (selectDevice) {
+			// this method starts the synthesizer -- if the output fails, it might 
+			// create a new PortAudio synth on the fly and try to start that
+			this.selectOutputDevice(outputDevice);
+			this.selectInputDevice(-1);
+		}
 	}
 	
 	private void createSynth(AudioDeviceManager deviceManager) {
@@ -205,6 +251,10 @@ class Engine {
 		return this.synth.getAudioDeviceManager() instanceof JPortAudioDevice;
 	}
 
+	public boolean isUsingJAsio() {
+		return this.synth.getAudioDeviceManager() instanceof JAsioAudioDeviceManager;
+	}
+
 	/**
 	 * Switch to/from using PortAudio.
 	 * Called in two different cases:
@@ -214,12 +264,27 @@ class Engine {
 	 */
 	protected boolean usePortAudio(boolean portAudio) {
 		if (portAudio != this.isUsingPortAudio()) {
-			this.createSynth(Engine.createAudioDeviceManager(portAudio));
+			this.createSynth(Engine.createAudioDeviceManager(
+					portAudio ? Engine.DRIVER_PORTAUDIO : Engine.DRIVER_DEFAULT));
 			// if this was called by the user (from the MultiChannel class), its their 
 			// responsibilit to select output device and start the synth!
 			this.inputDevice = -1;
 		}
 		return this.isUsingPortAudio();
+	}
+
+	/**
+	 * Switch to using the JAsioHost ASIO bindings.
+	 * Called explicitly by the user through MultiChannel.useJASIO(); it's their
+	 * responsibility to select an output device and start the synth afterwards.
+	 */
+	protected boolean useJAsio() {
+		if (!this.isUsingJAsio()) {
+			this.createSynth(Engine.createAudioDeviceManager(Engine.DRIVER_JASIO));
+			this.inputDevice = -1;
+			this.outputDevice = -1;
+		}
+		return this.isUsingJAsio();
 	}
 
 	/**
@@ -378,6 +443,12 @@ class Engine {
 			// prints an error or does nothing
 			return this.outputDevice;
 		}
+
+		// Stop the current synthesizer before probing the new device. In
+		// particular, ASIO only allows one loaded driver at a time, so probing
+		// another driver while the current one is loaded would incorrectly
+		// report zero channels.
+		this.stopSynth();
 
 		// if the synth is still JavaSound-based, probe the new output device early 
 		// to provoke a LineUnavailableException, in which case we should try to 
